@@ -1,6 +1,6 @@
-# RV-DIIOS (RISC-V Dual-Issue In-Order Superscalar)
+# RV-DIOOOS (RISC-V Dual-Issue Out-Of-Order Superscalar)
 
-This cpu is 6-stage dual-issue in-order superscalar processor.
+This cpu is 8-stage dual-issue out-of-order superscalar processor.
 
 ## SPECIFICATIONS
 
@@ -28,7 +28,7 @@ The installation scripts of necessary tools are located in directory **tools**. 
 
 1. Clone the repository:
 ```console
-git clone --recurse-submodules https://github.com/taneroksuz/rv-diios.git
+git clone --recurse-submodules https://github.com/taneroksuz/rv-diooos.git
 ```
 
 2. Install necessary tools for compilation and simulation:
@@ -63,4 +63,4 @@ make verilator MAXTIME=1000
 ### Coremark Benchmark
 | Cycles | Iteration/s/MHz | Iteration |
 | ------ | --------------- | --------- |
-| 192443 |            5.20 |        10 |
+|        |                 |           |
