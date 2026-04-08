@@ -57,8 +57,9 @@ module cpu (
   compress_out_type compress0_out, compress1_out;
   decoder_in_type decoder0_in, decoder1_in;
   decoder_out_type decoder0_out, decoder1_out;
-  fetch_out_type fetch_out_y, fetch_out_q;
-  decode_out_type decode_out_y, decode_out_q;
+
+  ifetch_out_type    ifetch_out;
+  idecode_out_type   idecode_out;
 
   prf_in_type        prf_in;
   prf_out_type       prf_out;
@@ -168,10 +169,10 @@ module cpu (
   assign rs_mem_in.rob_array    = rob_out.array;
   assign rs_mem_in.rob_head     = rob_out.head_ptr;
 
-  assign ren_in.instr0          = decode_out_y.instr0;
-  assign ren_in.instr0_valid    = decode_out_y.instr0.op.valid;
-  assign ren_in.instr1          = decode_out_y.instr1;
-  assign ren_in.instr1_valid    = decode_out_y.instr1.op.valid;
+  assign ren_in.instr0          = idecode_out.instr0;
+  assign ren_in.instr0_valid    = idecode_out.instr0.op.valid;
+  assign ren_in.instr1          = idecode_out.instr1;
+  assign ren_in.instr1_valid    = idecode_out.instr1.op.valid;
   assign ren_in.rob_tag0        = rob_out.alloc_tag0;
   assign ren_in.rob_tag1        = rob_out.alloc_tag1;
   assign ren_in.rob_full        = rob_out.full;
@@ -374,8 +375,7 @@ module cpu (
       .imem1_out(imem1_out),
       .imem0_in(imem0_in),
       .imem1_in(imem1_in),
-      .y(fetch_out_y),
-      .q(fetch_out_q)
+      .ifetch_out(ifetch_out)
   );
   idecode idecode_comp (
       .reset(reset),
@@ -391,9 +391,8 @@ module cpu (
       .compress1_in(compress1_in),
       .csr_out(csr_out),
       .btac_out(btac_out),
-      .fetch_out(fetch_out_y),
-      .y(decode_out_y),
-      .q(decode_out_q)
+      .ifetch_out(ifetch_out),
+      .idecode_out(idecode_out)
   );
   prf prf_comp (
       .reset  (reset),

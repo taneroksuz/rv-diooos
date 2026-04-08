@@ -6,6 +6,7 @@ module ifetch (
     input logic reset,
     input logic clock,
     input logic flush,
+    input logic halt,
     input buffer_out_type buffer_out,
     output buffer_in_type buffer_in,
     input csr_out_type csr_out,
@@ -15,19 +16,12 @@ module ifetch (
     input mem_out_type imem1_out,
     output mem_in_type imem0_in,
     output mem_in_type imem1_in,
-    input logic halt,
-    output fetch_out_type y,
-    output fetch_out_type q
+    output ifetch_out_type ifetch_out
 );
   timeunit 1ns; timeprecision 1ps;
 
-  localparam [1:0] idle = 0;
-  localparam [1:0] busy = 1;
-  localparam [1:0] ctrl = 2;
-  localparam [1:0] inv = 3;
-
-  fetch_reg_type r, rin;
-  fetch_reg_type v;
+  ifetch_reg_type r, rin;
+  ifetch_reg_type v;
 
   always_comb begin
 
@@ -66,25 +60,6 @@ module ifetch (
     v.ready0 = buffer_out.ready0;
     v.ready1 = buffer_out.ready1;
 
-    case (v.state)
-      idle: begin
-        v.stall = 1;
-      end
-      busy: begin
-        if (v.ready == 0) begin
-          v.stall = 1;
-        end
-      end
-      ctrl: begin
-        v.stall = 1;
-      end
-      inv: begin
-        v.stall = 1;
-      end
-      default: begin
-      end
-    endcase
-
     if (flush == 1) begin
       v.fence = 0;
       v.spec  = 1;
@@ -117,52 +92,6 @@ module ifetch (
 
     v.ipc1 = v.ipc0 + 4;
 
-    case (v.state)
-      idle: begin
-        if (flush == 0) begin
-          v.state = busy;
-          v.valid = 1;
-        end
-      end
-      busy: begin
-        if (v.ready == 1) begin
-          v.state = busy;
-          v.valid = 1;
-        end else if (v.spec == 1) begin
-          v.state = ctrl;
-          v.valid = 0;
-        end else if (v.fence == 1) begin
-          v.state = inv;
-          v.valid = 0;
-        end else begin
-          v.state = busy;
-          v.valid = 0;
-        end
-      end
-      ctrl: begin
-        if (v.ready == 1) begin
-          v.state = busy;
-          v.valid = 1;
-        end else begin
-          v.state = ctrl;
-          v.valid = 0;
-        end
-        v.ready = 0;
-      end
-      inv: begin
-        if (v.ready == 1) begin
-          v.state = busy;
-          v.valid = 1;
-        end else begin
-          v.state = inv;
-          v.valid = 0;
-        end
-        v.ready = 0;
-      end
-      default: begin
-      end
-    endcase
-
     buffer_in.pc0 = r.ipc0;
     buffer_in.pc1 = r.ipc1;
     buffer_in.rdata = v.rdata;
@@ -191,25 +120,18 @@ module ifetch (
 
     rin = v;
 
-    y.pc0 = v.pc0;
-    y.pc1 = v.pc1;
-    y.instr0 = v.instr0;
-    y.instr1 = v.instr1;
-    y.ready0 = v.ready0;
-    y.ready1 = v.ready1;
-
-    q.pc0 = r.pc0;
-    q.pc1 = r.pc1;
-    q.instr0 = r.instr0;
-    q.instr1 = r.instr1;
-    q.ready0 = r.ready0;
-    q.ready1 = r.ready1;
+    ifetch_out.pc0 = r.pc0;
+    ifetch_out.pc1 = r.pc1;
+    ifetch_out.instr0 = r.instr0;
+    ifetch_out.instr1 = r.instr1;
+    ifetch_out.ready0 = r.ready0;
+    ifetch_out.ready1 = r.ready1;
 
   end
 
   always_ff @(posedge clock) begin
     if (reset == 0 || flush == 1) begin
-      r <= init_fetch_reg;
+      r <= init_ifetch_reg;
     end else begin
       r <= rin;
     end

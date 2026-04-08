@@ -16,23 +16,22 @@ module idecode (
     output compress_in_type compress1_in,
     input csr_out_type csr_out,
     input btac_out_type btac_out,
-    input fetch_out_type fetch_out,
-    output decode_out_type y,
-    output decode_out_type q
+    input ifetch_out_type ifetch_out,
+    output idecode_out_type idecode_out
 );
   timeunit 1ns; timeprecision 1ps;
 
-  decode_reg_type r, rin;
-  decode_reg_type v;
+  idecode_reg_type r, rin;
+  idecode_reg_type v;
 
   always_comb begin
 
     v = r;
 
-    v.instr0.pc = fetch_out.ready0 ? fetch_out.pc0 : 32'hFFFFFFFF;
-    v.instr1.pc = fetch_out.ready1 ? fetch_out.pc1 : 32'hFFFFFFFF;
-    v.instr0.instr = fetch_out.ready0 ? fetch_out.instr0 : 0;
-    v.instr1.instr = fetch_out.ready1 ? fetch_out.instr1 : 0;
+    v.instr0.pc = ifetch_out.ready0 ? ifetch_out.pc0 : 32'hFFFFFFFF;
+    v.instr1.pc = ifetch_out.ready1 ? ifetch_out.pc1 : 32'hFFFFFFFF;
+    v.instr0.instr = ifetch_out.ready0 ? ifetch_out.instr0 : 0;
+    v.instr1.instr = ifetch_out.ready1 ? ifetch_out.instr1 : 0;
 
     v.instr0.npc = v.instr0.pc + ((&v.instr0.instr[1:0]) ? 4 : 2);
     v.instr1.npc = v.instr1.pc + ((&v.instr1.instr[1:0]) ? 4 : 2);
@@ -177,14 +176,14 @@ module idecode (
       v.instr1.lsu_op = compress1_out.lsu_op;
     end
 
-    if (fetch_out.ready0 == 1) begin
+    if (ifetch_out.ready0 == 1) begin
       if (v.instr0.op.valid == 0) begin
         v.instr0.op.exception = 1;
         v.instr0.op.valid = 1;
       end
     end
 
-    if (fetch_out.ready1 == 1) begin
+    if (ifetch_out.ready1 == 1) begin
       if (v.instr1.op.valid == 0) begin
         v.instr1.op.exception = 1;
         v.instr1.op.valid = 1;
@@ -203,19 +202,15 @@ module idecode (
 
     rin = v;
 
-    y.instr0 = v.instr0;
-    y.instr1 = v.instr1;
-    y.stall = v.stall;
-
-    q.instr0 = r.instr0;
-    q.instr1 = r.instr1;
-    q.stall = r.stall;
+    idecode_out.instr0 = r.instr0;
+    idecode_out.instr1 = r.instr1;
+    idecode_out.stall = r.stall;
 
   end
 
   always_ff @(posedge clock) begin
     if (reset == 0 || flush == 1) begin
-      r <= init_decode_reg;
+      r <= init_idecode_reg;
     end else begin
       r <= rin;
     end

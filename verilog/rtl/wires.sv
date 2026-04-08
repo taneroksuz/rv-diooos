@@ -500,94 +500,6 @@ package wires;
   };
 
   typedef struct packed {
-    logic [31 : 0] pc;
-    logic [31 : 0] npc;
-    logic [31 : 0] instr;
-    logic [31 : 0] imm;
-    logic [4 : 0] waddr;
-    logic [4 : 0] raddr1;
-    logic [4 : 0] raddr2;
-    logic [4 : 0] raddr3;
-    logic [11 : 0] caddr;
-    logic [1 : 0] fmt;
-    logic [2 : 0] rm;
-    logic [31 : 0] rdata1;
-    logic [31 : 0] rdata2;
-    logic [31 : 0] crdata;
-    logic [31 : 0] cwdata;
-    logic [31 : 0] bdata;
-    logic [31 : 0] mdata;
-    logic [31 : 0] wdata;
-    logic [31 : 0] ldata;
-    logic [31 : 0] sdata;
-    logic [31 : 0] ddata;
-    logic [31 : 0] bcdata;
-    logic [0 : 0] fready;
-    logic [0 : 0] dready;
-    logic [0 : 0] bcready;
-    logic [31 : 0] address;
-    logic [3 : 0] byteenable;
-    logic [7 : 0] ecause;
-    logic [31 : 0] etval;
-    logic [4 : 0] flags;
-    operation_type op;
-    operation_type op_b;
-    alu_op_type alu_op;
-    bcu_op_type bcu_op;
-    lsu_op_type lsu_op;
-    csr_op_type csr_op;
-    div_op_type div_op;
-    mul_op_type mul_op;
-    bit_op_type bit_op;
-    prediction_type pred;
-    prediction_type pred_b;
-  } calculation_type;
-
-  parameter calculation_type init_calculation = '{
-      pc : 32'hFFFFFFFF,
-      npc : 32'hFFFFFFFF,
-      instr : 0,
-      imm : 0,
-      waddr : 0,
-      raddr1 : 0,
-      raddr2 : 0,
-      raddr3 : 0,
-      caddr : 0,
-      fmt : 0,
-      rm : 0,
-      rdata1 : 0,
-      rdata2 : 0,
-      crdata : 0,
-      cwdata : 0,
-      bdata : 0,
-      mdata : 0,
-      wdata : 0,
-      sdata : 0,
-      ldata : 0,
-      ddata : 0,
-      bcdata : 0,
-      fready : 0,
-      dready : 0,
-      bcready : 0,
-      address : 0,
-      byteenable : 0,
-      ecause : 0,
-      etval : 0,
-      flags : 0,
-      op : init_operation,
-      op_b : init_operation,
-      alu_op : init_alu_op,
-      bcu_op : init_bcu_op,
-      lsu_op : init_lsu_op,
-      csr_op : init_csr_op,
-      div_op : init_div_op,
-      mul_op : init_mul_op,
-      bit_op : init_bit_op,
-      pred : init_prediction,
-      pred_b : init_prediction
-  };
-
-  typedef struct packed {
     logic [31 : 0] pc0;
     logic [31 : 0] pc1;
     logic [63 : 0] rdata;
@@ -696,7 +608,7 @@ package wires;
     logic [31 : 0] instr1;
     logic [0 : 0]  ready0;
     logic [0 : 0]  ready1;
-  } fetch_out_type;
+  } ifetch_out_type;
 
   typedef struct packed {
     logic [31 : 0] ipc0;
@@ -718,9 +630,9 @@ package wires;
     logic [0 : 0]  spec;
     logic [1 : 0]  state;
     logic [0 : 0]  stall;
-  } fetch_reg_type;
+  } ifetch_reg_type;
 
-  parameter fetch_reg_type init_fetch_reg = '{
+  parameter ifetch_reg_type init_ifetch_reg = '{
       ipc0 : 0,
       ipc1 : 0,
       irdata0 : 0,
@@ -746,15 +658,15 @@ package wires;
     instruction_type instr0;
     instruction_type instr1;
     logic [0 : 0] stall;
-  } decode_out_type;
+  } idecode_out_type;
 
   typedef struct packed {
     instruction_type instr0;
     instruction_type instr1;
     logic [0 : 0] stall;
-  } decode_reg_type;
+  } idecode_reg_type;
 
-  parameter decode_reg_type init_decode_reg = '{
+  parameter idecode_reg_type init_idecode_reg = '{
       instr0 : init_instruction,
       instr1 : init_instruction,
       stall : 0
