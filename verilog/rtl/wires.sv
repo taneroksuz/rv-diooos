@@ -602,77 +602,6 @@ package wires;
   } register_out_type;
 
   typedef struct packed {
-    logic [31 : 0] pc0;
-    logic [31 : 0] pc1;
-    logic [31 : 0] instr0;
-    logic [31 : 0] instr1;
-    logic [0 : 0]  ready0;
-    logic [0 : 0]  ready1;
-  } ifetch_out_type;
-
-  typedef struct packed {
-    logic [31 : 0] ipc0;
-    logic [31 : 0] ipc1;
-    logic [31 : 0] irdata0;
-    logic [31 : 0] irdata1;
-    logic [0 : 0]  iready0;
-    logic [0 : 0]  iready1;
-    logic [63 : 0] rdata;
-    logic [0 : 0]  ready;
-    logic [31 : 0] pc0;
-    logic [31 : 0] pc1;
-    logic [31 : 0] instr0;
-    logic [31 : 0] instr1;
-    logic [0 : 0]  ready0;
-    logic [0 : 0]  ready1;
-    logic [0 : 0]  valid;
-    logic [0 : 0]  fence;
-    logic [0 : 0]  spec;
-    logic [1 : 0]  state;
-    logic [0 : 0]  stall;
-  } ifetch_reg_type;
-
-  parameter ifetch_reg_type init_ifetch_reg = '{
-      ipc0 : 0,
-      ipc1 : 0,
-      irdata0 : 0,
-      irdata1 : 0,
-      iready0 : 0,
-      iready1 : 0,
-      rdata : 0,
-      ready : 0,
-      pc0 : 0,
-      pc1 : 0,
-      instr0 : 0,
-      instr1 : 0,
-      ready0 : 0,
-      ready1 : 0,
-      valid : 0,
-      fence : 0,
-      spec : 0,
-      state : 0,
-      stall : 0
-  };
-
-  typedef struct packed {
-    instruction_type instr0;
-    instruction_type instr1;
-    logic [0 : 0] stall;
-  } idecode_out_type;
-
-  typedef struct packed {
-    instruction_type instr0;
-    instruction_type instr1;
-    logic [0 : 0] stall;
-  } idecode_reg_type;
-
-  parameter idecode_reg_type init_idecode_reg = '{
-      instr0 : init_instruction,
-      instr1 : init_instruction,
-      stall : 0
-  };
-
-  typedef struct packed {
     logic [11:11] meip;
     logic [9:9]   seip;
     logic [8:8]   ueip;
@@ -857,6 +786,62 @@ package wires;
   localparam FLIST_DEPTH = PRF_DEPTH - ARCH_REGS;
   localparam FL_CNT_BITS = $clog2(FLIST_DEPTH) + 1;
   localparam FL_IDX_BITS = $clog2(FLIST_DEPTH);
+
+  typedef struct packed {
+    logic [31 : 0] ipc0;
+    logic [31 : 0] ipc1;
+    logic [31 : 0] irdata0;
+    logic [31 : 0] irdata1;
+    logic [0 : 0]  iready0;
+    logic [0 : 0]  iready1;
+    logic [63 : 0] rdata;
+    logic [0 : 0]  ready;
+    logic [31 : 0] pc0;
+    logic [31 : 0] pc1;
+    logic [31 : 0] instr0;
+    logic [31 : 0] instr1;
+    logic [0 : 0]  ready0;
+    logic [0 : 0]  ready1;
+    logic [0 : 0]  valid;
+    logic [0 : 0]  fence;
+    logic [0 : 0]  spec;
+    logic [1 : 0]  state;
+    logic [0 : 0]  stall;
+  } ifetch_reg_type;
+
+  parameter ifetch_reg_type init_ifetch_reg = '{
+      ipc0 : 0,
+      ipc1 : 0,
+      irdata0 : 0,
+      irdata1 : 0,
+      iready0 : 0,
+      iready1 : 0,
+      rdata : 0,
+      ready : 0,
+      pc0 : 0,
+      pc1 : 0,
+      instr0 : 0,
+      instr1 : 0,
+      ready0 : 0,
+      ready1 : 0,
+      valid : 0,
+      fence : 0,
+      spec : 0,
+      state : 0,
+      stall : 0
+  };
+
+  typedef struct packed {
+    instruction_type instr0;
+    instruction_type instr1;
+    logic [0 : 0] stall;
+  } idecode_reg_type;
+
+  parameter idecode_reg_type init_idecode_reg = '{
+      instr0 : init_instruction,
+      instr1 : init_instruction,
+      stall : 0
+  };
 
   typedef struct packed {
     logic [0:0]               valid;
@@ -1051,6 +1036,37 @@ package wires;
   } rs_mem_reg_type;
 
   localparam rs_mem_reg_type init_rs_mem_reg = 0;
+
+  typedef struct packed {
+    csr_out_type  csr_out;
+    btac_out_type btac_out;
+    mem_out_type  imem0_out;
+    mem_out_type  imem1_out;
+  } ifetch_in_type;
+
+  typedef struct packed {
+    buffer_in_type buffer_in;
+    btac_in_type btac_in;
+    mem_in_type imem0_in;
+    mem_in_type imem1_in;
+  } ifetch_out_type;
+
+  typedef struct packed {
+    buffer_out_type   buffer_out;
+    decoder_out_type  decoder0_out;
+    decoder_out_type  decoder1_out;
+    compress_out_type compress0_out;
+    compress_out_type compress1_out;
+  } idecode_in_type;
+
+  typedef struct packed {
+    decoder_in_type  decoder0_in;
+    decoder_in_type  decoder1_in;
+    compress_in_type compress0_in;
+    compress_in_type compress1_in;
+    instruction_type instr0;
+    instruction_type instr1;
+  } idecode_out_type;
 
   typedef struct packed {
     logic [PRF_ADDR_BITS-1:0] raddr0;

@@ -344,13 +344,13 @@ module buffer_ctrl (
       v.stall = 1;
     end
 
-    buffer_out.pc0 = v.ready0 ? v.pc0 : 32'hFFFFFFFF;
-    buffer_out.pc1 = v.ready1 ? v.pc1 : 32'hFFFFFFFF;
-    buffer_out.instr0 = v.ready0 ? v.instr0 : 0;
-    buffer_out.instr1 = v.ready1 ? v.instr1 : 0;
-    buffer_out.ready0 = v.ready0;
-    buffer_out.ready1 = v.ready1;
-    buffer_out.stall = ~v.wen;
+    buffer_out.pc0 = r.ready0 ? r.pc0 : 32'hFFFFFFFF;
+    buffer_out.pc1 = r.ready1 ? r.pc1 : 32'hFFFFFFFF;
+    buffer_out.instr0 = r.ready0 ? r.instr0 : 0;
+    buffer_out.instr1 = r.ready1 ? r.instr1 : 0;
+    buffer_out.ready0 = r.ready0;
+    buffer_out.ready1 = r.ready1;
+    buffer_out.stall = ~r.wen;
 
     rin = v;
 

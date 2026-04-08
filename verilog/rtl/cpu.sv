@@ -42,12 +42,12 @@ module cpu (
   csr_alu_out_type   csr_alu_out;
   lsu_in_type lsu0_in, lsu1_in;
   lsu_out_type lsu0_out, lsu1_out;
-
   csr_out_type csr_out;
+
   register_write_in_type register0_win, register1_win;
 
-  btac_in_type btac_in;
-  btac_out_type btac_out_raw, btac_out;
+  btac_in_type    btac_in;
+  btac_out_type   btac_out;
   buffer_in_type  buffer_in;
   buffer_out_type buffer_out;
   compress_in_type compress0_in, compress1_in;
@@ -55,9 +55,10 @@ module cpu (
   decoder_in_type decoder0_in, decoder1_in;
   decoder_out_type decoder0_out, decoder1_out;
 
+  ifetch_in_type   ifetch_in;
   ifetch_out_type  ifetch_out;
+  idecode_in_type  idecode_in;
   idecode_out_type idecode_out;
-
   prf_in_type      prf_in;
   prf_out_type     prf_out;
   fl_in_type       fl_in;
@@ -79,24 +80,29 @@ module cpu (
   commit_in_type   commit_in;
   commit_out_type  commit_out;
 
-  assign cpu_ctrl.flush_all = cpu_ctrl.flush | csr_out.trap | csr_out.mret;
-
-  always_comb begin
-    btac_out = btac_out_raw;
-    if (cpu_ctrl.flush) begin
-      btac_out.pred_miss  = 1'b1;
-      btac_out.pred_maddr = cpu_ctrl.flush_pc;
-    end else if (csr_out.trap) begin
-      btac_out.pred_miss  = 1'b1;
-      btac_out.pred_maddr = csr_out.mtvec;
-    end else if (csr_out.mret) begin
-      btac_out.pred_miss  = 1'b1;
-      btac_out.pred_maddr = csr_out.mepc;
-    end
-  end
-
+  assign cpu_ctrl.flush_all       = cpu_ctrl.flush | csr_out.trap | csr_out.mret;
   assign cpu_ctrl.backend_stall   = rename_out.stall | rob_out.full;
 
+  assign ifetch_in.csr_out        = csr_out;
+  assign ifetch_in.btac_out       = btac_out;
+  assign ifetch_in.imem0_out      = imem0_out;
+  assign ifetch_in.imem1_out      = imem1_out;
+
+  assign buffer_in                = ifetch_out.buffer_in;
+  assign btac_in                  = ifetch_out.btac_in;
+  assign imem0_in                 = ifetch_out.imem0_in;
+  assign imem1_in                 = ifetch_out.imem1_in;
+
+  assign idecode_in.buffer_out    = buffer_out;
+  assign idecode_in.decoder0_out  = decoder0_out;
+  assign idecode_in.decoder1_out  = decoder1_out;
+  assign idecode_in.compress0_out = compress0_out;
+  assign idecode_in.compress1_out = compress1_out;
+
+  assign decoder0_in              = idecode_out.decoder0_in;
+  assign decoder1_in              = idecode_out.decoder1_in;
+  assign compress0_in             = idecode_out.compress0_in;
+  assign compress1_in             = idecode_out.compress1_in;
 
   assign prf_in.raddr0            = rat_out.psrc0;
   assign prf_in.raddr1            = rat_out.psrc1;
@@ -225,6 +231,7 @@ module cpu (
   assign ldu_in.issue_valid       = rs_mem_out.issue0_valid && rs_mem_out.issue0.op.load;
   assign ldu_in.dmem_out          = dmem1_out;
   assign ldu_in.lsu_out           = lsu1_out;
+
   assign dmem1_in                 = ldu_out.dmem_in;
   assign lsu1_in                  = ldu_out.lsu_in;
   assign cdb_load                 = ldu_out.cdb;
@@ -237,6 +244,7 @@ module cpu (
   assign commit_in.csr            = csr_out;
   assign commit_in.dmem_out       = dmem0_out;
   assign commit_in.lsu_out        = lsu0_out;
+
   assign dmem0_in                 = commit_out.dmem_in;
   assign lsu0_in                  = commit_out.lsu_in;
   assign cpu_ctrl.flush           = commit_out.flush;
@@ -313,7 +321,7 @@ module cpu (
       .reset(reset),
       .clock(clock),
       .btac_in(btac_in),
-      .btac_out(btac_out_raw)
+      .btac_out(btac_out)
   );
   buffer buffer_comp (
       .reset(reset),
@@ -363,33 +371,14 @@ module cpu (
       .reset(reset),
       .clock(clock),
       .flush(cpu_ctrl.flush_all),
-      .halt(cpu_ctrl.backend_stall),
-      .buffer_out(buffer_out),
-      .buffer_in(buffer_in),
-      .csr_out(csr_out),
-      .btac_out(btac_out),
-      .btac_in(btac_in),
-      .imem0_out(imem0_out),
-      .imem1_out(imem1_out),
-      .imem0_in(imem0_in),
-      .imem1_in(imem1_in),
+      .ifetch_in(ifetch_in),
       .ifetch_out(ifetch_out)
   );
   idecode idecode_comp (
       .reset(reset),
       .clock(clock),
       .flush(cpu_ctrl.flush_all),
-      .decoder0_out(decoder0_out),
-      .decoder0_in(decoder0_in),
-      .decoder1_out(decoder1_out),
-      .decoder1_in(decoder1_in),
-      .compress0_out(compress0_out),
-      .compress0_in(compress0_in),
-      .compress1_out(compress1_out),
-      .compress1_in(compress1_in),
-      .csr_out(csr_out),
-      .btac_out(btac_out),
-      .ifetch_out(ifetch_out),
+      .idecode_in(idecode_in),
       .idecode_out(idecode_out)
   );
   prf prf_comp (
