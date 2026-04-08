@@ -1,0 +1,11 @@
+riscv/
+dump/
+bin/
+hex/
+riscv-tests/
+coremark/
+dhrystone/
+isa/
+env/
+whetstone/
+free-rtos/

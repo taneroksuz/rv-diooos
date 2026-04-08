@@ -1,0 +1,6 @@
+*
+!output/
+!output/*
+!*.sh
+!*.py
+!.gitignore

@@ -1,0 +1,6 @@
+*
+!output/
+!output/*
+!*.sh
+!*.tcl
+!.gitignore

@@ -1,0 +1,107 @@
+import configure::*;
+import wires::*;
+
+module free_list (
+    input  logic              reset,
+    input  logic              clock,
+    input  free_list_in_type  fl_in,
+    output free_list_out_type fl_out,
+    input  logic              flush
+);
+  timeunit 1ns; timeprecision 1ps;
+
+  fl_reg_type r, rin;
+  fl_reg_type v;
+
+  function automatic logic [PRF_ADDR_BITS-1:0] fl_read(input fl_arr_type arr,
+                                                       input logic [FL_IDX_BITS-1:0] idx);
+    return arr[idx*PRF_ADDR_BITS+:PRF_ADDR_BITS];
+  endfunction
+
+  function automatic fl_arr_type fl_write(input fl_arr_type arr, input logic [FL_IDX_BITS-1:0] idx,
+                                          input logic [PRF_ADDR_BITS-1:0] tag);
+    fl_arr_type t;
+    t = arr;
+    t[idx*PRF_ADDR_BITS+:PRF_ADDR_BITS] = tag;
+    return t;
+  endfunction
+
+  always_comb begin
+    logic [FL_CNT_BITS-1:0] nt, nsc, ncc, nsh, nch, sh1;
+    nt  = '0;
+    nsc = '0;
+    ncc = '0;
+    nsh = '0;
+    nch = '0;
+    sh1 = '0;
+
+    v   = r;
+
+    nt  = r.tail;
+    nsc = r.spec_count;
+    ncc = r.comm_count;
+    nsh = r.spec_head;
+    nch = r.comm_head;
+
+    if (fl_in.free_en0) begin
+      v.list = fl_write(v.list, nt[FL_IDX_BITS-1:0], fl_in.free_tag0);
+      nt = nt + 1;
+      ncc = ncc + 1;
+      nsc = nsc + 1;
+      nch = nch + 1;
+    end
+    if (fl_in.free_en1) begin
+      v.list = fl_write(v.list, nt[FL_IDX_BITS-1:0], fl_in.free_tag1);
+      nt = nt + 1;
+      ncc = ncc + 1;
+      nsc = nsc + 1;
+      nch = nch + 1;
+    end
+    if (fl_in.alloc0 && nsc >= 1) begin
+      nsh = nsh + 1;
+      nsc = nsc - 1;
+    end
+    if (fl_in.alloc1 && nsc >= 2) begin
+      nsh = nsh + 1;
+      nsc = nsc - 1;
+    end
+
+    v.tail            = nt;
+    v.spec_count      = nsc;
+    v.comm_count      = ncc;
+    v.spec_head       = nsh;
+    v.comm_head       = nch;
+
+    fl_out.alloc_tag0 = fl_read(r.list, r.spec_head[FL_IDX_BITS-1:0]);
+    sh1               = r.spec_head + 1;
+    fl_out.alloc_tag1 = fl_read(r.list, sh1[FL_IDX_BITS-1:0]);
+    fl_out.alloc_ok0  = r.spec_count >= 1;
+    fl_out.alloc_ok1  = r.spec_count >= 2;
+    fl_out.empty      = (r.spec_count == 0);
+    fl_out.has_two    = r.spec_count >= 2;
+
+    rin               = v;
+  end
+
+  always_ff @(posedge clock) begin
+    if (reset == 0) begin
+      fl_reg_type init_v;
+      integer k;
+      init_v.list       = '0;
+      init_v.spec_head  = '0;
+      init_v.comm_head  = '0;
+      init_v.tail       = FL_CNT_BITS'(FLIST_DEPTH);
+      init_v.spec_count = FL_CNT_BITS'(FLIST_DEPTH);
+      init_v.comm_count = FL_CNT_BITS'(FLIST_DEPTH);
+      for (k = 0; k < FLIST_DEPTH; k++)
+      init_v.list[k*PRF_ADDR_BITS+:PRF_ADDR_BITS] = PRF_ADDR_BITS'(ARCH_REGS + k);
+      r <= init_v;
+    end else if (flush) begin
+      r.spec_head  <= r.comm_head;
+      r.spec_count <= r.comm_count;
+    end else begin
+      r <= rin;
+    end
+  end
+
+endmodule
