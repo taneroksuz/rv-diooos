@@ -1,5 +1,6 @@
 import configure::*;
 import wires::*;
+import functions::*;
 
 module free_list (
     input  logic              reset,
@@ -13,21 +14,10 @@ module free_list (
   fl_reg_type r, rin;
   fl_reg_type v;
 
-  function automatic logic [PRF_ADDR_BITS-1:0] fl_read(input fl_arr_type arr,
-                                                       input logic [FL_IDX_BITS-1:0] idx);
-    return arr[idx*PRF_ADDR_BITS+:PRF_ADDR_BITS];
-  endfunction
-
-  function automatic fl_arr_type fl_write(input fl_arr_type arr, input logic [FL_IDX_BITS-1:0] idx,
-                                          input logic [PRF_ADDR_BITS-1:0] tag);
-    fl_arr_type t;
-    t = arr;
-    t[idx*PRF_ADDR_BITS+:PRF_ADDR_BITS] = tag;
-    return t;
-  endfunction
+  logic [FL_CNT_BITS-1:0] nt, nsc, ncc, nsh, nch, sh1;
 
   always_comb begin
-    logic [FL_CNT_BITS-1:0] nt, nsc, ncc, nsh, nch, sh1;
+
     nt  = '0;
     nsc = '0;
     ncc = '0;
@@ -72,8 +62,9 @@ module free_list (
     v.spec_head       = nsh;
     v.comm_head       = nch;
 
-    fl_out.alloc_tag0 = fl_read(r.list, r.spec_head[FL_IDX_BITS-1:0]);
     sh1               = r.spec_head + 1;
+
+    fl_out.alloc_tag0 = fl_read(r.list, r.spec_head[FL_IDX_BITS-1:0]);
     fl_out.alloc_tag1 = fl_read(r.list, sh1[FL_IDX_BITS-1:0]);
     fl_out.alloc_ok0  = r.spec_count >= 1;
     fl_out.alloc_ok1  = r.spec_count >= 2;
@@ -81,6 +72,7 @@ module free_list (
     fl_out.has_two    = r.spec_count >= 2;
 
     rin               = v;
+
   end
 
   always_ff @(posedge clock) begin

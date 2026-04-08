@@ -1,6 +1,7 @@
 import configure::*;
 import constants::*;
 import wires::*;
+import functions::*;
 
 module rob (
     input  logic        reset,
@@ -14,22 +15,11 @@ module rob (
   rob_reg_type r, rin;
   rob_reg_type v;
 
-  function automatic rob_entry_type rob_read(input rob_arr_type arr,
-                                             input logic [ROB_ADDR_BITS-1:0] idx);
-    return arr[idx*ROB_SLOT_W+:ROB_SLOT_W];
-  endfunction
-
-  function automatic rob_arr_type rob_write(
-      input rob_arr_type arr, input logic [ROB_ADDR_BITS-1:0] idx, input rob_entry_type entry);
-    rob_arr_type t;
-    t = arr;
-    t[idx*ROB_SLOT_W+:ROB_SLOT_W] = entry;
-    return t;
-  endfunction
+  rob_entry_type h0, h1, e, cleared;
+  logic h0_done, h1_done;
 
   always_comb begin
-    rob_entry_type h0, h1, e, cleared;
-    logic h0_done, h1_done;
+
     h0                  = init_rob_entry;
     h1                  = init_rob_entry;
     e                   = init_rob_entry;
@@ -149,6 +139,7 @@ module rob (
     rob_out.entry1       = h1;
 
     rin                  = v;
+
   end
 
   always_ff @(posedge clock) begin

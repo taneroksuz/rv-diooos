@@ -1298,7 +1298,7 @@ package wires;
     logic [0:0]   issue_valid;
     lsu_out_type  lsu_out;
     mem_out_type  dmem_out;
-  } load_in_type;
+  } ldu_in_type;
 
   typedef struct packed {
     cdb_type                  cdb;
@@ -1307,7 +1307,7 @@ package wires;
     logic [0:0]               rob_wen;
     mem_in_type               dmem_in;
     lsu_in_type               lsu_in;
-  } load_out_type;
+  } ldu_out_type;
 
   typedef struct packed {
     logic [0:0]    commit0;

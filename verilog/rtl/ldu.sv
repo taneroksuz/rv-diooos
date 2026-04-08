@@ -4,27 +4,27 @@ import wires::*;
 import functions::*;
 
 module ldu (
-    input  logic         reset,
-    input  logic         clock,
-    input  logic         flush,
-    input  load_in_type  load_in,
-    output load_out_type load_out
+    input  logic        reset,
+    input  logic        clock,
+    input  logic        flush,
+    input  ldu_in_type  ldu_in,
+    output ldu_out_type ldu_out
 );
   timeunit 1ns; timeprecision 1ps;
 
   agu_in_type  lagu_in;
   agu_out_type lagu_out;
 
-  assign lagu_in.rdata1 = load_in.issue.rdata1;
-  assign lagu_in.imm    = load_in.issue.imm;
-  assign lagu_in.pc     = load_in.issue.pc;
+  assign lagu_in.rdata1 = ldu_in.issue.rdata1;
+  assign lagu_in.imm    = ldu_in.issue.imm;
+  assign lagu_in.pc     = ldu_in.issue.pc;
   assign lagu_in.auipc  = 0;
   assign lagu_in.jal    = 0;
   assign lagu_in.jalr   = 0;
   assign lagu_in.branch = 0;
-  assign lagu_in.load   = load_in.issue.op.load;
+  assign lagu_in.load   = ldu_in.issue.op.load;
   assign lagu_in.store  = 0;
-  assign lagu_in.lsu_op = load_in.issue.lsu_op;
+  assign lagu_in.lsu_op = ldu_in.issue.lsu_op;
 
   agu lagu_comp (
       .agu_in (lagu_in),
@@ -32,38 +32,38 @@ module ldu (
   );
 
   logic load_enable;
-  assign load_enable                = load_in.issue_valid && load_in.issue.op.load && !flush;
+  assign load_enable               = ldu_in.issue_valid && ldu_in.issue.op.load && !flush;
 
-  assign load_out.dmem_in.mem_valid = load_enable;
-  assign load_out.dmem_in.mem_instr = 0;
-  assign load_out.dmem_in.mem_mode  = 0;
-  assign load_out.dmem_in.mem_addr  = lagu_out.address;
-  assign load_out.dmem_in.mem_wdata = 0;
-  assign load_out.dmem_in.mem_wstrb = 0;
+  assign ldu_out.dmem_in.mem_valid = load_enable;
+  assign ldu_out.dmem_in.mem_instr = 0;
+  assign ldu_out.dmem_in.mem_mode  = 0;
+  assign ldu_out.dmem_in.mem_addr  = lagu_out.address;
+  assign ldu_out.dmem_in.mem_wdata = 0;
+  assign ldu_out.dmem_in.mem_wstrb = 0;
 
-  assign load_out.lsu_in.ldata      = load_in.dmem_out.mem_rdata;
-  assign load_out.lsu_in.byteenable = lagu_out.byteenable;
-  assign load_out.lsu_in.lsu_op     = load_in.issue.lsu_op;
+  assign ldu_out.lsu_in.ldata      = ldu_in.dmem_out.mem_rdata;
+  assign ldu_out.lsu_in.byteenable = lagu_out.byteenable;
+  assign ldu_out.lsu_in.lsu_op     = ldu_in.issue.lsu_op;
 
   logic load_ready;
-  assign load_ready = load_in.dmem_out.mem_ready && load_enable;
+  assign load_ready = ldu_in.dmem_out.mem_ready && load_enable;
 
   always_comb begin
-    load_out.cdb = init_cdb;
-    load_out.rob_wtag   = load_in.issue.rob_tag;
-    load_out.rob_wentry = init_rob_entry;
-    load_out.rob_wen    = 0;
+    ldu_out.cdb = init_cdb;
+    ldu_out.rob_wtag   = ldu_in.issue.rob_tag;
+    ldu_out.rob_wentry = init_rob_entry;
+    ldu_out.rob_wen    = 0;
 
     if (load_ready && !flush) begin
-      load_out.cdb.valid            = 1;
-      load_out.cdb.tag              = load_in.issue.pdest;
-      load_out.cdb.data             = load_in.lsu_out.result;
-      load_out.rob_wen              = 1;
-      load_out.rob_wentry.done      = 1;
-      load_out.rob_wentry.result    = load_in.lsu_out.result;
-      load_out.rob_wentry.exception = lagu_out.exception;
-      load_out.rob_wentry.ecause    = lagu_out.ecause;
-      load_out.rob_wentry.etval     = lagu_out.etval;
+      ldu_out.cdb.valid            = 1;
+      ldu_out.cdb.tag              = ldu_in.issue.pdest;
+      ldu_out.cdb.data             = ldu_in.lsu_out.result;
+      ldu_out.rob_wen              = 1;
+      ldu_out.rob_wentry.done      = 1;
+      ldu_out.rob_wentry.result    = ldu_in.lsu_out.result;
+      ldu_out.rob_wentry.exception = lagu_out.exception;
+      ldu_out.rob_wentry.ecause    = lagu_out.ecause;
+      ldu_out.rob_wentry.etval     = lagu_out.etval;
     end
   end
 

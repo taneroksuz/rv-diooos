@@ -22,8 +22,8 @@ start=`date +%s`
 $VERILATOR --binary --timing --top-module testbench -Wno-UNOPTFLAT -Wno-WIDTHTRUNC -Wno-CASEINCOMPLETE -Wno-INITIALDLY -Wno-WIDTHEXPAND \
             $BASEDIR/verilog/conf/configure.sv \
             $BASEDIR/verilog/rtl/constants.sv \
-            $BASEDIR/verilog/rtl/functions.sv \
             $BASEDIR/verilog/rtl/wires.sv \
+            $BASEDIR/verilog/rtl/functions.sv \
             $BASEDIR/verilog/rtl/bit_alu.sv \
             $BASEDIR/verilog/rtl/bit_clmul.sv \
             $BASEDIR/verilog/rtl/btac.sv \
@@ -58,7 +58,7 @@ $VERILATOR --binary --timing --top-module testbench -Wno-UNOPTFLAT -Wno-WIDTHTRU
             $BASEDIR/verilog/rtl/rob.sv \
             $BASEDIR/verilog/rtl/rs_int.sv \
             $BASEDIR/verilog/rtl/rs_mem.sv \
-            $BASEDIR/verilog/rtl/rename_dispatch.sv \
+            $BASEDIR/verilog/rtl/rename.sv \
             $BASEDIR/verilog/rtl/eu.sv \
             $BASEDIR/verilog/rtl/ldu.sv \
             $BASEDIR/verilog/rtl/commit.sv \

@@ -73,12 +73,12 @@ module cpu (
   rs_int_out_type    rs_int_out;
   rs_mem_in_type     rs_mem_in;
   rs_mem_out_type    rs_mem_out;
-  rename_in_type     ren_in;
-  rename_out_type    ren_out;
+  rename_in_type     rename_in;
+  rename_out_type    rename_out;
   eu_in_type         eu_in;
   eu_out_type        eu_out_s;
-  load_in_type       ld_in;
-  load_out_type      ld_out;
+  ldu_in_type        ldu_in;
+  ldu_out_type       ldu_out;
   commit_in_type     commit_in;
   commit_out_type    commit_out;
 
@@ -97,154 +97,154 @@ module cpu (
   end
 
   logic backend_stall;
-  assign backend_stall          = ren_out.stall | rob_out.full;
+  assign backend_stall            = rename_out.stall | rob_out.full;
 
 
-  assign prf_in.raddr0          = rat_out.psrc0;
-  assign prf_in.raddr1          = rat_out.psrc1;
-  assign prf_in.raddr2          = rat_out.psrc2;
-  assign prf_in.raddr3          = rat_out.psrc3;
-  assign prf_in.waddr0          = commit_out.prf.waddr0;
-  assign prf_in.wdata0          = commit_out.prf.wdata0;
-  assign prf_in.wren0           = commit_out.prf.wren0;
-  assign prf_in.waddr1          = commit_out.prf.waddr1;
-  assign prf_in.wdata1          = commit_out.prf.wdata1;
-  assign prf_in.wren1           = commit_out.prf.wren1;
+  assign prf_in.raddr0            = rat_out.psrc0;
+  assign prf_in.raddr1            = rat_out.psrc1;
+  assign prf_in.raddr2            = rat_out.psrc2;
+  assign prf_in.raddr3            = rat_out.psrc3;
+  assign prf_in.waddr0            = commit_out.prf.waddr0;
+  assign prf_in.wdata0            = commit_out.prf.wdata0;
+  assign prf_in.wren0             = commit_out.prf.wren0;
+  assign prf_in.waddr1            = commit_out.prf.waddr1;
+  assign prf_in.wdata1            = commit_out.prf.wdata1;
+  assign prf_in.wren1             = commit_out.prf.wren1;
 
-  assign rat_in.rsrc0_a         = ren_out.rat.rsrc0_a;
-  assign rat_in.rsrc1_a         = ren_out.rat.rsrc1_a;
-  assign rat_in.rsrc2_a         = ren_out.rat.rsrc2_a;
-  assign rat_in.rsrc3_a         = ren_out.rat.rsrc3_a;
-  assign rat_in.waddr0_a        = ren_out.rat.waddr0_a;
-  assign rat_in.waddr0_p        = ren_out.rat.waddr0_p;
-  assign rat_in.wren0           = ren_out.rat.wren0;
-  assign rat_in.waddr1_a        = ren_out.rat.waddr1_a;
-  assign rat_in.waddr1_p        = ren_out.rat.waddr1_p;
-  assign rat_in.wren1           = ren_out.rat.wren1;
-  assign rat_in.commit_addr0    = commit_out.rat.commit_addr0;
-  assign rat_in.commit_tag0     = commit_out.rat.commit_tag0;
-  assign rat_in.commit_en0      = commit_out.rat.commit_en0;
-  assign rat_in.commit_addr1    = commit_out.rat.commit_addr1;
-  assign rat_in.commit_tag1     = commit_out.rat.commit_tag1;
-  assign rat_in.commit_en1      = commit_out.rat.commit_en1;
+  assign rat_in.rsrc0_a           = rename_out.rat.rsrc0_a;
+  assign rat_in.rsrc1_a           = rename_out.rat.rsrc1_a;
+  assign rat_in.rsrc2_a           = rename_out.rat.rsrc2_a;
+  assign rat_in.rsrc3_a           = rename_out.rat.rsrc3_a;
+  assign rat_in.waddr0_a          = rename_out.rat.waddr0_a;
+  assign rat_in.waddr0_p          = rename_out.rat.waddr0_p;
+  assign rat_in.wren0             = rename_out.rat.wren0;
+  assign rat_in.waddr1_a          = rename_out.rat.waddr1_a;
+  assign rat_in.waddr1_p          = rename_out.rat.waddr1_p;
+  assign rat_in.wren1             = rename_out.rat.wren1;
+  assign rat_in.commit_addr0      = commit_out.rat.commit_addr0;
+  assign rat_in.commit_tag0       = commit_out.rat.commit_tag0;
+  assign rat_in.commit_en0        = commit_out.rat.commit_en0;
+  assign rat_in.commit_addr1      = commit_out.rat.commit_addr1;
+  assign rat_in.commit_tag1       = commit_out.rat.commit_tag1;
+  assign rat_in.commit_en1        = commit_out.rat.commit_en1;
 
-  assign fl_in.alloc0           = ren_out.fl.alloc0;
-  assign fl_in.alloc1           = ren_out.fl.alloc1;
-  assign fl_in.free_tag0        = commit_out.fl.free_tag0;
-  assign fl_in.free_en0         = commit_out.fl.free_en0;
-  assign fl_in.free_tag1        = commit_out.fl.free_tag1;
-  assign fl_in.free_en1         = commit_out.fl.free_en1;
+  assign fl_in.alloc0             = rename_out.fl.alloc0;
+  assign fl_in.alloc1             = rename_out.fl.alloc1;
+  assign fl_in.free_tag0          = commit_out.fl.free_tag0;
+  assign fl_in.free_en0           = commit_out.fl.free_en0;
+  assign fl_in.free_tag1          = commit_out.fl.free_tag1;
+  assign fl_in.free_en1           = commit_out.fl.free_en1;
 
-  assign rob_in.alloc0          = ren_out.rob_alloc0;
-  assign rob_in.alloc_entry0    = ren_out.rob_entry0;
-  assign rob_in.alloc1          = ren_out.rob_alloc1;
-  assign rob_in.alloc_entry1    = ren_out.rob_entry1;
-  assign rob_in.write_tag0      = eu_out_s.rob_wtag0;
-  assign rob_in.write_entry0    = eu_out_s.rob_wentry0;
-  assign rob_in.write_en0       = eu_out_s.rob_wen0;
-  assign rob_in.write_tag1      = eu_out_s.rob_wtag1;
-  assign rob_in.write_entry1    = eu_out_s.rob_wentry1;
-  assign rob_in.write_en1       = eu_out_s.rob_wen1;
-  assign rob_in.write_tag2      = ld_out.rob_wtag;
-  assign rob_in.write_entry2    = ld_out.rob_wentry;
-  assign rob_in.write_en2       = ld_out.rob_wen;
-  assign rob_in.cdb0            = cdb0;
-  assign rob_in.cdb1            = cdb1;
+  assign rob_in.alloc0            = rename_out.rob_alloc0;
+  assign rob_in.alloc_entry0      = rename_out.rob_entry0;
+  assign rob_in.alloc1            = rename_out.rob_alloc1;
+  assign rob_in.alloc_entry1      = rename_out.rob_entry1;
+  assign rob_in.write_tag0        = eu_out_s.rob_wtag0;
+  assign rob_in.write_entry0      = eu_out_s.rob_wentry0;
+  assign rob_in.write_en0         = eu_out_s.rob_wen0;
+  assign rob_in.write_tag1        = eu_out_s.rob_wtag1;
+  assign rob_in.write_entry1      = eu_out_s.rob_wentry1;
+  assign rob_in.write_en1         = eu_out_s.rob_wen1;
+  assign rob_in.write_tag2        = ldu_out.rob_wtag;
+  assign rob_in.write_entry2      = ldu_out.rob_wentry;
+  assign rob_in.write_en2         = ldu_out.rob_wen;
+  assign rob_in.cdb0              = cdb0;
+  assign rob_in.cdb1              = cdb1;
 
-  assign rs_int_in.entry0       = ren_out.rs_int_entry0;
-  assign rs_int_in.alloc0       = ren_out.rs_int_alloc0;
-  assign rs_int_in.entry1       = ren_out.rs_int_entry1;
-  assign rs_int_in.alloc1       = ren_out.rs_int_alloc1;
-  assign rs_int_in.cdb0         = cdb0;
-  assign rs_int_in.cdb1         = cdb1;
-  assign rs_int_in.cdb_load     = cdb_load;
+  assign rs_int_in.entry0         = rename_out.rs_int_entry0;
+  assign rs_int_in.alloc0         = rename_out.rs_int_alloc0;
+  assign rs_int_in.entry1         = rename_out.rs_int_entry1;
+  assign rs_int_in.alloc1         = rename_out.rs_int_alloc1;
+  assign rs_int_in.cdb0           = cdb0;
+  assign rs_int_in.cdb1           = cdb1;
+  assign rs_int_in.cdb_load       = cdb_load;
 
-  assign rs_mem_in.entry0       = ren_out.rs_mem_entry0;
-  assign rs_mem_in.alloc0       = ren_out.rs_mem_alloc0;
-  assign rs_mem_in.entry1       = ren_out.rs_mem_entry1;
-  assign rs_mem_in.alloc1       = ren_out.rs_mem_alloc1;
-  assign rs_mem_in.cdb0         = cdb0;
-  assign rs_mem_in.cdb1         = cdb1;
-  assign rs_mem_in.cdb_load     = cdb_load;
-  assign rs_mem_in.rob_array    = rob_out.array;
-  assign rs_mem_in.rob_head     = rob_out.head_ptr;
+  assign rs_mem_in.entry0         = rename_out.rs_mem_entry0;
+  assign rs_mem_in.alloc0         = rename_out.rs_mem_alloc0;
+  assign rs_mem_in.entry1         = rename_out.rs_mem_entry1;
+  assign rs_mem_in.alloc1         = rename_out.rs_mem_alloc1;
+  assign rs_mem_in.cdb0           = cdb0;
+  assign rs_mem_in.cdb1           = cdb1;
+  assign rs_mem_in.cdb_load       = cdb_load;
+  assign rs_mem_in.rob_array      = rob_out.array;
+  assign rs_mem_in.rob_head       = rob_out.head_ptr;
 
-  assign ren_in.instr0          = idecode_out.instr0;
-  assign ren_in.instr0_valid    = idecode_out.instr0.op.valid;
-  assign ren_in.instr1          = idecode_out.instr1;
-  assign ren_in.instr1_valid    = idecode_out.instr1.op.valid;
-  assign ren_in.rob_tag0        = rob_out.alloc_tag0;
-  assign ren_in.rob_tag1        = rob_out.alloc_tag1;
-  assign ren_in.rob_full        = rob_out.full;
-  assign ren_in.rob_has_two     = rob_out.has_two_free;
-  assign ren_in.rat             = rat_out;
-  assign ren_in.prf             = prf_out;
-  assign ren_in.fl              = fl_out;
-  assign ren_in.rs_int_full     = rs_int_out.full;
-  assign ren_in.rs_int_has_two  = rs_int_out.has_two_free;
-  assign ren_in.rs_mem_full     = rs_mem_out.full;
-  assign ren_in.rs_mem_has_two  = rs_mem_out.has_two_free;
-  assign ren_in.cdb0            = cdb0;
-  assign ren_in.cdb1            = cdb1;
-  assign ren_in.cdb_load        = cdb_load;
+  assign rename_in.instr0         = idecode_out.instr0;
+  assign rename_in.instr0_valid   = idecode_out.instr0.op.valid;
+  assign rename_in.instr1         = idecode_out.instr1;
+  assign rename_in.instr1_valid   = idecode_out.instr1.op.valid;
+  assign rename_in.rob_tag0       = rob_out.alloc_tag0;
+  assign rename_in.rob_tag1       = rob_out.alloc_tag1;
+  assign rename_in.rob_full       = rob_out.full;
+  assign rename_in.rob_has_two    = rob_out.has_two_free;
+  assign rename_in.rat            = rat_out;
+  assign rename_in.prf            = prf_out;
+  assign rename_in.fl             = fl_out;
+  assign rename_in.rs_int_full    = rs_int_out.full;
+  assign rename_in.rs_int_has_two = rs_int_out.has_two_free;
+  assign rename_in.rs_mem_full    = rs_mem_out.full;
+  assign rename_in.rs_mem_has_two = rs_mem_out.has_two_free;
+  assign rename_in.cdb0           = cdb0;
+  assign rename_in.cdb1           = cdb1;
+  assign rename_in.cdb_load       = cdb_load;
 
-  assign eu_in.int_issue0       = rs_int_out.issue0;
-  assign eu_in.int_issue0_valid = rs_int_out.issue0_valid;
-  assign eu_in.int_issue1       = rs_int_out.issue1;
-  assign eu_in.int_issue1_valid = rs_int_out.issue1_valid;
-  assign eu_in.mem_issue0       = rs_mem_out.issue0;
-  assign eu_in.mem_issue0_valid = rs_mem_out.issue0_valid && rs_mem_out.issue0.op.store;
-  assign eu_in.csr              = csr_out;
-  assign eu_in.alu0_out         = alu0_out;
-  assign eu_in.alu1_out         = alu1_out;
-  assign eu_in.agu0_out         = agu0_out;
-  assign eu_in.agu1_out         = agu1_out;
-  assign eu_in.bcu0_out         = bcu0_out;
-  assign eu_in.bcu1_out         = bcu1_out;
-  assign eu_in.mul_out          = mul_out;
-  assign eu_in.div_out          = div_out;
-  assign eu_in.bit_alu0_out     = bit_alu0_out;
-  assign eu_in.bit_alu1_out     = bit_alu1_out;
-  assign eu_in.bit_clmul_out    = bit_clmul_out;
-  assign eu_in.csr_alu_out      = csr_alu_out;
+  assign eu_in.int_issue0         = rs_int_out.issue0;
+  assign eu_in.int_issue0_valid   = rs_int_out.issue0_valid;
+  assign eu_in.int_issue1         = rs_int_out.issue1;
+  assign eu_in.int_issue1_valid   = rs_int_out.issue1_valid;
+  assign eu_in.mem_issue0         = rs_mem_out.issue0;
+  assign eu_in.mem_issue0_valid   = rs_mem_out.issue0_valid && rs_mem_out.issue0.op.store;
+  assign eu_in.csr                = csr_out;
+  assign eu_in.alu0_out           = alu0_out;
+  assign eu_in.alu1_out           = alu1_out;
+  assign eu_in.agu0_out           = agu0_out;
+  assign eu_in.agu1_out           = agu1_out;
+  assign eu_in.bcu0_out           = bcu0_out;
+  assign eu_in.bcu1_out           = bcu1_out;
+  assign eu_in.mul_out            = mul_out;
+  assign eu_in.div_out            = div_out;
+  assign eu_in.bit_alu0_out       = bit_alu0_out;
+  assign eu_in.bit_alu1_out       = bit_alu1_out;
+  assign eu_in.bit_clmul_out      = bit_clmul_out;
+  assign eu_in.csr_alu_out        = csr_alu_out;
 
-  assign alu0_in                = eu_out_s.alu0_in;
-  assign alu1_in                = eu_out_s.alu1_in;
-  assign agu0_in                = eu_out_s.agu0_in;
-  assign agu1_in                = eu_out_s.agu1_in;
-  assign bcu0_in                = eu_out_s.bcu0_in;
-  assign bcu1_in                = eu_out_s.bcu1_in;
-  assign mul_in                 = eu_out_s.mul_in;
-  assign div_in                 = eu_out_s.div_in;
-  assign bit_alu0_in            = eu_out_s.bit_alu0_in;
-  assign bit_alu1_in            = eu_out_s.bit_alu1_in;
-  assign bit_clmul_in           = eu_out_s.bit_clmul_in;
-  assign csr_alu_in             = eu_out_s.csr_alu_in;
-  assign cdb0                   = eu_out_s.cdb0;
-  assign cdb1                   = eu_out_s.cdb1;
+  assign alu0_in                  = eu_out_s.alu0_in;
+  assign alu1_in                  = eu_out_s.alu1_in;
+  assign agu0_in                  = eu_out_s.agu0_in;
+  assign agu1_in                  = eu_out_s.agu1_in;
+  assign bcu0_in                  = eu_out_s.bcu0_in;
+  assign bcu1_in                  = eu_out_s.bcu1_in;
+  assign mul_in                   = eu_out_s.mul_in;
+  assign div_in                   = eu_out_s.div_in;
+  assign bit_alu0_in              = eu_out_s.bit_alu0_in;
+  assign bit_alu1_in              = eu_out_s.bit_alu1_in;
+  assign bit_clmul_in             = eu_out_s.bit_clmul_in;
+  assign csr_alu_in               = eu_out_s.csr_alu_in;
+  assign cdb0                     = eu_out_s.cdb0;
+  assign cdb1                     = eu_out_s.cdb1;
 
-  assign ld_in.issue            = rs_mem_out.issue0;
-  assign ld_in.issue_valid      = rs_mem_out.issue0_valid && rs_mem_out.issue0.op.load;
-  assign ld_in.dmem_out         = dmem1_out;
-  assign ld_in.lsu_out          = lsu1_out;
-  assign dmem1_in               = ld_out.dmem_in;
-  assign lsu1_in                = ld_out.lsu_in;
-  assign cdb_load               = ld_out.cdb;
+  assign ldu_in.issue             = rs_mem_out.issue0;
+  assign ldu_in.issue_valid       = rs_mem_out.issue0_valid && rs_mem_out.issue0.op.load;
+  assign ldu_in.dmem_out          = dmem1_out;
+  assign ldu_in.lsu_out           = lsu1_out;
+  assign dmem1_in                 = ldu_out.dmem_in;
+  assign lsu1_in                  = ldu_out.lsu_in;
+  assign cdb_load                 = ldu_out.cdb;
 
-  assign commit_in.commit0      = rob_out.commit0;
-  assign commit_in.commit1      = rob_out.commit1;
-  assign commit_in.commit_ctrl  = rob_out.commit_ctrl;
-  assign commit_in.entry0       = rob_out.entry0;
-  assign commit_in.entry1       = rob_out.entry1;
-  assign commit_in.csr          = csr_out;
-  assign commit_in.dmem_out     = dmem0_out;
-  assign commit_in.lsu_out      = lsu0_out;
-  assign dmem0_in               = commit_out.dmem_in;
-  assign lsu0_in                = commit_out.lsu_in;
-  assign flush                  = commit_out.flush;
-  assign flush_pc               = commit_out.flush_pc;
-  assign register0_win          = commit_out.register0_win;
-  assign register1_win          = commit_out.register1_win;
+  assign commit_in.commit0        = rob_out.commit0;
+  assign commit_in.commit1        = rob_out.commit1;
+  assign commit_in.commit_ctrl    = rob_out.commit_ctrl;
+  assign commit_in.entry0         = rob_out.entry0;
+  assign commit_in.entry1         = rob_out.entry1;
+  assign commit_in.csr            = csr_out;
+  assign commit_in.dmem_out       = dmem0_out;
+  assign commit_in.lsu_out        = lsu0_out;
+  assign dmem0_in                 = commit_out.dmem_in;
+  assign lsu0_in                  = commit_out.lsu_in;
+  assign flush                    = commit_out.flush;
+  assign flush_pc                 = commit_out.flush_pc;
+  assign register0_win            = commit_out.register0_win;
+  assign register1_win            = commit_out.register1_win;
 
   alu alu0_comp (
       .alu_in (alu0_in),
@@ -436,12 +436,12 @@ module cpu (
       .rs_in (rs_mem_in),
       .rs_out(rs_mem_out)
   );
-  rename_dispatch rd_comp (
+  rename rd_comp (
       .reset(reset),
       .clock(clock),
       .flush(flush_all),
-      .rin  (ren_in),
-      .rout (ren_out)
+      .rename_in(rename_in),
+      .rename_out(rename_out)
   );
   eu eu_comp (
       .reset (reset),
@@ -450,12 +450,12 @@ module cpu (
       .eu_in (eu_in),
       .eu_out(eu_out_s)
   );
-  ldu load_comp (
-      .reset(reset),
-      .clock(clock),
-      .flush(flush_all),
-      .load_in(ld_in),
-      .load_out(ld_out)
+  ldu ldu_comp (
+      .reset  (reset),
+      .clock  (clock),
+      .flush  (flush_all),
+      .ldu_in (ldu_in),
+      .ldu_out(ldu_out)
   );
   commit commit_comp (
       .reset(reset),

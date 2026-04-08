@@ -6,8 +6,8 @@ start=`date +%s`
 ${VERIBLE}-verilog-format --inplace \
             ${BASEDIR}/verilog/conf/configure.sv \
             ${BASEDIR}/verilog/rtl/constants.sv \
-            ${BASEDIR}/verilog/rtl/functions.sv \
             ${BASEDIR}/verilog/rtl/wires.sv \
+            ${BASEDIR}/verilog/rtl/functions.sv \
             ${BASEDIR}/verilog/rtl/bit_alu.sv \
             ${BASEDIR}/verilog/rtl/bit_clmul.sv \
             ${BASEDIR}/verilog/rtl/btac.sv \
@@ -42,7 +42,7 @@ ${VERIBLE}-verilog-format --inplace \
             ${BASEDIR}/verilog/rtl/rob.sv \
             ${BASEDIR}/verilog/rtl/rs_int.sv \
             ${BASEDIR}/verilog/rtl/rs_mem.sv \
-            ${BASEDIR}/verilog/rtl/rename_dispatch.sv \
+            ${BASEDIR}/verilog/rtl/rename.sv \
             ${BASEDIR}/verilog/rtl/eu.sv \
             ${BASEDIR}/verilog/rtl/ldu.sv \
             ${BASEDIR}/verilog/rtl/commit.sv \
