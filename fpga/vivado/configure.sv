@@ -3,15 +3,18 @@ package configure;
 
   parameter HARDWARE = 1;
 
-  parameter BUFFER_DEPTH = 4;
+  parameter PRF_DEPTH = 64;
+  parameter ARCH_REGS = 32;
+  parameter ROB_DEPTH = 16;
+  parameter RS_INT_DEPTH = 8;
+  parameter RS_MEM_DEPTH = 4;
 
-  parameter HAZARD_DEPTH = 4;
+  parameter BUFFER_DEPTH = 4;
 
   parameter TIM_WIDTH = 32;
   parameter TIM_DEPTH = 1024;
 
   parameter RAM_DEPTH = 1;
-
   parameter RAM_TYPE = 0;
 
   parameter BTAC_ENABLE = 1;

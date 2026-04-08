@@ -1,6 +1,8 @@
 package wires;
   timeunit 1ns; timeprecision 1ps;
 
+  import configure::*;
+
   typedef struct packed {
     logic [0:0] bit_sh1add;
     logic [0:0] bit_sh2add;
