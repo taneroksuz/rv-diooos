@@ -37,7 +37,7 @@ set_global_assignment -name SYSTEMVERILOG_FILE ../../verilog/rtl/spi.sv
 set_global_assignment -name SYSTEMVERILOG_FILE ../../verilog/rtl/uart_rx.sv
 set_global_assignment -name SYSTEMVERILOG_FILE ../../verilog/rtl/uart_tx.sv
 set_global_assignment -name SYSTEMVERILOG_FILE ../../verilog/rtl/prf.sv
-set_global_assignment -name SYSTEMVERILOG_FILE ../../verilog/rtl/free_list.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../../verilog/rtl/fl.sv
 set_global_assignment -name SYSTEMVERILOG_FILE ../../verilog/rtl/rat.sv
 set_global_assignment -name SYSTEMVERILOG_FILE ../../verilog/rtl/rob.sv
 set_global_assignment -name SYSTEMVERILOG_FILE ../../verilog/rtl/rs_int.sv

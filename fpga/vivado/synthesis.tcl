@@ -31,7 +31,7 @@ read_verilog -sv ../../verilog/rtl/spi.sv
 read_verilog -sv ../../verilog/rtl/uart_rx.sv
 read_verilog -sv ../../verilog/rtl/uart_tx.sv
 read_verilog -sv ../../verilog/rtl/prf.sv
-read_verilog -sv ../../verilog/rtl/free_list.sv
+read_verilog -sv ../../verilog/rtl/fl.sv
 read_verilog -sv ../../verilog/rtl/rat.sv
 read_verilog -sv ../../verilog/rtl/rob.sv
 read_verilog -sv ../../verilog/rtl/rs_int.sv

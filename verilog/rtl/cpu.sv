@@ -58,29 +58,29 @@ module cpu (
   decoder_in_type decoder0_in, decoder1_in;
   decoder_out_type decoder0_out, decoder1_out;
 
-  ifetch_out_type    ifetch_out;
-  idecode_out_type   idecode_out;
+  ifetch_out_type  ifetch_out;
+  idecode_out_type idecode_out;
 
-  prf_in_type        prf_in;
-  prf_out_type       prf_out;
-  free_list_in_type  fl_in;
-  free_list_out_type fl_out;
-  rat_in_type        rat_in;
-  rat_out_type       rat_out;
-  rob_in_type        rob_in;
-  rob_out_type       rob_out;
-  rs_int_in_type     rs_int_in;
-  rs_int_out_type    rs_int_out;
-  rs_mem_in_type     rs_mem_in;
-  rs_mem_out_type    rs_mem_out;
-  rename_in_type     rename_in;
-  rename_out_type    rename_out;
-  eu_in_type         eu_in;
-  eu_out_type        eu_out_s;
-  ldu_in_type        ldu_in;
-  ldu_out_type       ldu_out;
-  commit_in_type     commit_in;
-  commit_out_type    commit_out;
+  prf_in_type      prf_in;
+  prf_out_type     prf_out;
+  fl_in_type       fl_in;
+  fl_out_type      fl_out;
+  rat_in_type      rat_in;
+  rat_out_type     rat_out;
+  rob_in_type      rob_in;
+  rob_out_type     rob_out;
+  rs_int_in_type   rs_int_in;
+  rs_int_out_type  rs_int_out;
+  rs_mem_in_type   rs_mem_in;
+  rs_mem_out_type  rs_mem_out;
+  rename_in_type   rename_in;
+  rename_out_type  rename_out;
+  eu_in_type       eu_in;
+  eu_out_type      eu_out_s;
+  ldu_in_type      ldu_in;
+  ldu_out_type     ldu_out;
+  commit_in_type   commit_in;
+  commit_out_type  commit_out;
 
   always_comb begin
     btac_out = btac_out_raw;
@@ -408,7 +408,7 @@ module cpu (
       .rat_in (rat_in),
       .rat_out(rat_out)
   );
-  free_list fl_comp (
+  fl fl_comp (
       .reset (reset),
       .clock (clock),
       .flush (flush_all),

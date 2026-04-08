@@ -2,12 +2,12 @@ import configure::*;
 import wires::*;
 import functions::*;
 
-module free_list (
-    input  logic              reset,
-    input  logic              clock,
-    input  logic              flush,
-    input  free_list_in_type  fl_in,
-    output free_list_out_type fl_out
+module fl (
+    input  logic       reset,
+    input  logic       clock,
+    input  logic       flush,
+    input  fl_in_type  fl_in,
+    output fl_out_type fl_out
 );
   timeunit 1ns; timeprecision 1ps;
 

@@ -1086,7 +1086,7 @@ package wires;
     logic [0:0]               free_en0;
     logic [PRF_ADDR_BITS-1:0] free_tag1;
     logic [0:0]               free_en1;
-  } free_list_in_type;
+  } fl_in_type;
 
   typedef struct packed {
     logic [PRF_ADDR_BITS-1:0] alloc_tag0;
@@ -1095,10 +1095,10 @@ package wires;
     logic [0:0]               alloc_ok1;
     logic [0:0]               empty;
     logic [0:0]               has_two;
-  } free_list_out_type;
+  } fl_out_type;
 
-  localparam free_list_in_type init_free_list_in = 0;
-  localparam free_list_out_type init_free_list_out = 0;
+  localparam fl_in_type init_fl_in = 0;
+  localparam fl_out_type init_fl_out = 0;
 
   typedef struct packed {
     logic [4:0]               rsrc0_a;
@@ -1220,7 +1220,7 @@ package wires;
     logic [0:0]               rob_has_two;
     rat_out_type              rat;
     prf_out_type              prf;
-    free_list_out_type        fl;
+    fl_out_type               fl;
     logic [0:0]               rs_int_full;
     logic [0:0]               rs_int_has_two;
     logic [0:0]               rs_mem_full;
@@ -1244,7 +1244,7 @@ package wires;
     rob_entry_type rob_entry0;
     rob_entry_type rob_entry1;
     rat_in_type    rat;
-    free_list_in_type fl;
+    fl_in_type fl;
     logic [0:0]    stall;
   } rename_out_type;
 
@@ -1327,7 +1327,7 @@ package wires;
     csr_exception_in_type  csr_ein;
     rat_in_type            rat;
     prf_in_type            prf;
-    free_list_in_type      fl;
+    fl_in_type             fl;
     mem_in_type            dmem_in;
     lsu_in_type            lsu_in;
     logic [0:0]            flush;

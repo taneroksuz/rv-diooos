@@ -53,7 +53,7 @@ $VERILATOR --binary --timing --top-module testbench -Wno-UNOPTFLAT -Wno-WIDTHTRU
             $BASEDIR/verilog/rtl/uart_rx.sv \
             $BASEDIR/verilog/rtl/uart_tx.sv \
             $BASEDIR/verilog/rtl/prf.sv \
-            $BASEDIR/verilog/rtl/free_list.sv \
+            $BASEDIR/verilog/rtl/fl.sv \
             $BASEDIR/verilog/rtl/rat.sv \
             $BASEDIR/verilog/rtl/rob.sv \
             $BASEDIR/verilog/rtl/rs_int.sv \
