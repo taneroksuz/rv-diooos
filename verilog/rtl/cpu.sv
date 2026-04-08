@@ -20,9 +20,7 @@ module cpu (
 );
   timeunit 1ns; timeprecision 1ps;
 
-  logic        flush;
-  logic [31:0] flush_pc;
-  logic        flush_all;
+  cpu_ctrl_type cpu_ctrl;
 
   cdb_type cdb0, cdb1, cdb_load;
 
@@ -46,7 +44,6 @@ module cpu (
   lsu_out_type lsu0_out, lsu1_out;
 
   csr_out_type csr_out;
-  assign flush_all = flush | csr_out.trap | csr_out.mret;
   register_write_in_type register0_win, register1_win;
 
   btac_in_type btac_in;
@@ -82,11 +79,13 @@ module cpu (
   commit_in_type   commit_in;
   commit_out_type  commit_out;
 
+  assign cpu_ctrl.flush_all = cpu_ctrl.flush | csr_out.trap | csr_out.mret;
+
   always_comb begin
     btac_out = btac_out_raw;
-    if (flush) begin
+    if (cpu_ctrl.flush) begin
       btac_out.pred_miss  = 1'b1;
-      btac_out.pred_maddr = flush_pc;
+      btac_out.pred_maddr = cpu_ctrl.flush_pc;
     end else if (csr_out.trap) begin
       btac_out.pred_miss  = 1'b1;
       btac_out.pred_maddr = csr_out.mtvec;
@@ -96,8 +95,7 @@ module cpu (
     end
   end
 
-  logic backend_stall;
-  assign backend_stall            = rename_out.stall | rob_out.full;
+  assign cpu_ctrl.backend_stall   = rename_out.stall | rob_out.full;
 
 
   assign prf_in.raddr0            = rat_out.psrc0;
@@ -241,8 +239,8 @@ module cpu (
   assign commit_in.lsu_out        = lsu0_out;
   assign dmem0_in                 = commit_out.dmem_in;
   assign lsu0_in                  = commit_out.lsu_in;
-  assign flush                    = commit_out.flush;
-  assign flush_pc                 = commit_out.flush_pc;
+  assign cpu_ctrl.flush           = commit_out.flush;
+  assign cpu_ctrl.flush_pc        = commit_out.flush_pc;
   assign register0_win            = commit_out.register0_win;
   assign register1_win            = commit_out.register1_win;
 
@@ -285,14 +283,14 @@ module cpu (
   mul mul_comp (
       .reset  (reset),
       .clock  (clock),
-      .flush  (flush_all),
+      .flush  (cpu_ctrl.flush_all),
       .mul_in (mul_in),
       .mul_out(mul_out)
   );
   div div_comp (
       .reset  (reset),
       .clock  (clock),
-      .flush  (flush_all),
+      .flush  (cpu_ctrl.flush_all),
       .div_in (div_in),
       .div_out(div_out)
   );
@@ -307,7 +305,7 @@ module cpu (
   bit_clmul bit_clmul_comp (
       .reset(reset),
       .clock(clock),
-      .flush(flush_all),
+      .flush(cpu_ctrl.flush_all),
       .bit_clmul_in(bit_clmul_in),
       .bit_clmul_out(bit_clmul_out)
   );
@@ -364,8 +362,8 @@ module cpu (
   ifetch ifetch_comp (
       .reset(reset),
       .clock(clock),
-      .flush(flush_all),
-      .halt(backend_stall),
+      .flush(cpu_ctrl.flush_all),
+      .halt(cpu_ctrl.backend_stall),
       .buffer_out(buffer_out),
       .buffer_in(buffer_in),
       .csr_out(csr_out),
@@ -380,7 +378,7 @@ module cpu (
   idecode idecode_comp (
       .reset(reset),
       .clock(clock),
-      .flush(flush_all),
+      .flush(cpu_ctrl.flush_all),
       .decoder0_out(decoder0_out),
       .decoder0_in(decoder0_in),
       .decoder1_out(decoder1_out),
@@ -397,63 +395,63 @@ module cpu (
   prf prf_comp (
       .reset  (reset),
       .clock  (clock),
-      .flush  (flush_all),
+      .flush  (cpu_ctrl.flush_all),
       .prf_in (prf_in),
       .prf_out(prf_out)
   );
   rat rat_comp (
       .reset  (reset),
       .clock  (clock),
-      .flush  (flush_all),
+      .flush  (cpu_ctrl.flush_all),
       .rat_in (rat_in),
       .rat_out(rat_out)
   );
   fl fl_comp (
       .reset (reset),
       .clock (clock),
-      .flush (flush_all),
+      .flush (cpu_ctrl.flush_all),
       .fl_in (fl_in),
       .fl_out(fl_out)
   );
   rob rob_comp (
       .reset  (reset),
       .clock  (clock),
-      .flush  (flush_all),
+      .flush  (cpu_ctrl.flush_all),
       .rob_in (rob_in),
       .rob_out(rob_out)
   );
   rs_int rs_int_comp (
       .reset (reset),
       .clock (clock),
-      .flush (flush_all),
+      .flush (cpu_ctrl.flush_all),
       .rs_in (rs_int_in),
       .rs_out(rs_int_out)
   );
   rs_mem rs_mem_comp (
       .reset (reset),
       .clock (clock),
-      .flush (flush_all),
+      .flush (cpu_ctrl.flush_all),
       .rs_in (rs_mem_in),
       .rs_out(rs_mem_out)
   );
   rename rd_comp (
       .reset(reset),
       .clock(clock),
-      .flush(flush_all),
+      .flush(cpu_ctrl.flush_all),
       .rename_in(rename_in),
       .rename_out(rename_out)
   );
   eu eu_comp (
       .reset (reset),
       .clock (clock),
-      .flush (flush_all),
+      .flush (cpu_ctrl.flush_all),
       .eu_in (eu_in),
       .eu_out(eu_out_s)
   );
   ldu ldu_comp (
       .reset  (reset),
       .clock  (clock),
-      .flush  (flush_all),
+      .flush  (cpu_ctrl.flush_all),
       .ldu_in (ldu_in),
       .ldu_out(ldu_out)
   );

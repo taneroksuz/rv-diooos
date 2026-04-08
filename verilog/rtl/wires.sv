@@ -1334,4 +1334,18 @@ package wires;
     logic [31:0]           flush_pc;
   } commit_out_type;
 
+  typedef struct packed {
+    logic [0:0]  flush;
+    logic [31:0] flush_pc;
+    logic [0:0]  flush_all;
+    logic [0:0]  backend_stall;
+  } cpu_ctrl_type;
+
+  localparam cpu_ctrl_type init_cpu_ctrl = '{
+      flush         : 0,
+      flush_pc      : 0,
+      flush_all     : 0,
+      backend_stall : 0
+  };
+
 endpackage
