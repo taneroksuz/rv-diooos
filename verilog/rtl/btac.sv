@@ -173,13 +173,13 @@ module btac_ctrl (
     v_btb = r_btb;
     v_bht = r_bht;
 
-    if (btac_in.clear == 0) begin
+    if (btac_in.flush == 0) begin
       v_btb.pc0 = btac_in.get_pc0;
       v_btb.pc1 = btac_in.get_pc1;
       v_btb.raddr0 = btac_in.get_pc0[B_DEPTH:1];
       v_btb.raddr1 = btac_in.get_pc1[B_DEPTH:1];
     end
-    if (btac_in.clear == 0) begin
+    if (btac_in.flush == 0) begin
       v_bht.raddr0 = btac_in.get_pc0[T_DEPTH:1];
       v_bht.raddr1 = btac_in.get_pc1[T_DEPTH:1];
     end
@@ -189,14 +189,14 @@ module btac_ctrl (
     bht_in.raddr0 = v_bht.raddr0;
     bht_in.raddr1 = v_bht.raddr1;
 
-    if (btac_in.stall == 0 && btac_in.clear == 0) begin
+    if (btac_in.stall == 0 && btac_in.flush == 0) begin
       btac_out.pred0.taddr = btb_out.rdata0[31:0];
       btac_out.pred1.taddr = btb_out.rdata1[31:0];
     end else begin
       btac_out.pred0.taddr = 0;
       btac_out.pred1.taddr = 0;
     end
-    if (btac_in.stall == 0 && btac_in.clear == 0) begin
+    if (btac_in.stall == 0 && btac_in.flush == 0) begin
       btac_out.pred0.taken = bht_out.rdata0[1] & (~(|(btb_out.rdata0[62-B_DEPTH:32] ^ r_btb.pc0[31:B_DEPTH+1])));
       btac_out.pred1.taken = bht_out.rdata1[1] & (~(|(btb_out.rdata1[62-B_DEPTH:32] ^ r_btb.pc1[31:B_DEPTH+1])));
       btac_out.pred0.tsat = bht_out.rdata0;
@@ -217,7 +217,7 @@ module btac_ctrl (
     v_btb.hit0   = 0;
     v_btb.hit1   = 0;
 
-    if (btac_in.clear == 0) begin
+    if (btac_in.flush == 0) begin
       if (btac_in.upd_pred0.taken == 1 && btac_in.upd_jump0 == 1) begin
         v_btb.uaddr0 = btac_in.upd_addr0;
         v_btb.maddr0 = btac_in.upd_addr0;
@@ -259,13 +259,13 @@ module btac_ctrl (
     v_bht.waddr = 0;
     v_bht.wdata = 0;
 
-    if (btac_in.clear == 0) begin
+    if (btac_in.flush == 0) begin
       v_btb.wen = (v_btb.hit0 | v_btb.miss0) | (v_btb.hit1 | v_btb.miss1);
       v_btb.waddr = (v_btb.hit0 | v_btb.miss0) ? btac_in.upd_pc0[B_DEPTH:1] : btac_in.upd_pc1[B_DEPTH:1];
       v_btb.wdata = (v_btb.hit0 | v_btb.miss0) ? {btac_in.upd_pc0[31:B_DEPTH+1],v_btb.uaddr0} : {btac_in.upd_pc1[31:B_DEPTH+1],v_btb.uaddr1};
     end
 
-    if (btac_in.clear == 0) begin
+    if (btac_in.flush == 0) begin
       v_bht.wen = (v_btb.hit0 | v_btb.miss0) | (v_btb.hit1 | v_btb.miss1);
       v_bht.waddr = (v_btb.hit0 | v_btb.miss0) ? btac_in.upd_pc0[T_DEPTH:1] : btac_in.upd_pc1[T_DEPTH:1];
       v_bht.sat0 = saturation(btac_in.upd_pred0.tsat, btac_in.upd_jump0);

@@ -17,8 +17,8 @@ read_verilog -sv ../../verilog/rtl/decoder.sv
 read_verilog -sv ../../verilog/rtl/register.sv
 read_verilog -sv ../../verilog/rtl/csr.sv
 read_verilog -sv ../../verilog/rtl/buffer.sv
-read_verilog -sv ../../verilog/rtl/fetch_stage.sv
-read_verilog -sv ../../verilog/rtl/decode_stage.sv
+read_verilog -sv ../../verilog/rtl/ifetch.sv
+read_verilog -sv ../../verilog/rtl/idecode.sv
 read_verilog -sv ../../verilog/rtl/arbiter.sv
 read_verilog -sv ../../verilog/rtl/bridge.sv
 read_verilog -sv ../../verilog/rtl/bus.sv
@@ -38,7 +38,7 @@ read_verilog -sv ../../verilog/rtl/rs_int.sv
 read_verilog -sv ../../verilog/rtl/rs_mem.sv
 read_verilog -sv ../../verilog/rtl/rename_dispatch.sv
 read_verilog -sv ../../verilog/rtl/eu.sv
-read_verilog -sv ../../verilog/rtl/load.sv
+read_verilog -sv ../../verilog/rtl/ldu.sv
 read_verilog -sv ../../verilog/rtl/commit.sv
 read_verilog -sv ../../verilog/rtl/cpu.sv
 read_verilog -sv ../../verilog/rtl/soc.sv

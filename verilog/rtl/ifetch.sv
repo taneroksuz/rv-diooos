@@ -2,10 +2,10 @@ import constants::*;
 import functions::*;
 import wires::*;
 
-module fetch_stage (
+module ifetch (
     input logic reset,
-    input logic clear,
     input logic clock,
+    input logic flush,
     input buffer_out_type buffer_out,
     output buffer_in_type buffer_in,
     input csr_out_type csr_out,
@@ -15,8 +15,7 @@ module fetch_stage (
     input mem_out_type imem1_out,
     output mem_in_type imem0_in,
     output mem_in_type imem1_in,
-    input fetch_in_type a,
-    input fetch_in_type d,
+    input logic halt,
     output fetch_out_type y,
     output fetch_out_type q
 );
@@ -86,7 +85,7 @@ module fetch_stage (
       end
     endcase
 
-    if (clear == 1) begin
+    if (flush == 1) begin
       v.fence = 0;
       v.spec  = 1;
       v.ipc0  = 0;
@@ -102,10 +101,6 @@ module fetch_stage (
       v.fence = 0;
       v.spec  = 1;
       v.ipc0  = btac_out.pred_maddr;
-    end else if (d.m.calc0.op.fence == 1) begin
-      v.fence = 1;
-      v.spec  = 1;
-      v.ipc0  = d.m.calc0.npc;
     end else if (btac_out.pred0.taken == 1) begin
       v.fence = 0;
       v.spec  = 1;
@@ -124,7 +119,7 @@ module fetch_stage (
 
     case (v.state)
       idle: begin
-        if (clear == 0) begin
+        if (flush == 0) begin
           v.state = busy;
           v.valid = 1;
         end
@@ -172,8 +167,8 @@ module fetch_stage (
     buffer_in.pc1 = r.ipc1;
     buffer_in.rdata = v.rdata;
     buffer_in.ready = v.ready;
-    buffer_in.clear = v.spec;
-    buffer_in.stall = a.i.halt;
+    buffer_in.flush = v.spec;
+    buffer_in.stall = halt;
 
     imem0_in.mem_valid = v.valid;
     imem0_in.mem_instr = 1;
@@ -191,24 +186,8 @@ module fetch_stage (
 
     btac_in.get_pc0 = v.pc0;
     btac_in.get_pc1 = v.pc1;
-    btac_in.upd_pc0 = a.e.calc0.pc;
-    btac_in.upd_pc1 = a.e.calc1.pc;
-    btac_in.upd_npc0 = a.e.calc0.npc;
-    btac_in.upd_npc1 = a.e.calc1.npc;
-    btac_in.upd_addr0 = a.e.calc0.address;
-    btac_in.upd_addr1 = a.e.calc1.address;
-    btac_in.upd_jal0 = a.e.calc0.op.jal;
-    btac_in.upd_jal1 = a.e.calc1.op.jal;
-    btac_in.upd_jalr0 = a.e.calc0.op.jalr;
-    btac_in.upd_jalr1 = a.e.calc1.op.jalr;
-    btac_in.upd_branch0 = a.e.calc0.op.branch;
-    btac_in.upd_branch1 = a.e.calc1.op.branch;
-    btac_in.upd_jump0 = a.e.calc0.op.jump;
-    btac_in.upd_jump1 = a.e.calc1.op.jump;
-    btac_in.upd_pred0 = a.e.calc0.pred;
-    btac_in.upd_pred1 = a.e.calc1.pred;
     btac_in.stall = 0;
-    btac_in.clear = clear;
+    btac_in.flush = flush;
 
     rin = v;
 
@@ -229,7 +208,7 @@ module fetch_stage (
   end
 
   always_ff @(posedge clock) begin
-    if (reset == 0) begin
+    if (reset == 0 || flush == 1) begin
       r <= init_fetch_reg;
     end else begin
       r <= rin;

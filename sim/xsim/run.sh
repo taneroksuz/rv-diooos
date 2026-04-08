@@ -39,8 +39,8 @@ $XVLOG --sv \
             $BASEDIR/verilog/rtl/register.sv \
             $BASEDIR/verilog/rtl/csr.sv \
             $BASEDIR/verilog/rtl/buffer.sv \
-            $BASEDIR/verilog/rtl/fetch_stage.sv \
-            $BASEDIR/verilog/rtl/decode_stage.sv \
+            $BASEDIR/verilog/rtl/ifetch.sv \
+            $BASEDIR/verilog/rtl/idecode.sv \
             $BASEDIR/verilog/rtl/arbiter.sv \
             $BASEDIR/verilog/rtl/bridge.sv \
             $BASEDIR/verilog/rtl/bus.sv \
@@ -60,7 +60,7 @@ $XVLOG --sv \
             $BASEDIR/verilog/rtl/rs_mem.sv \
             $BASEDIR/verilog/rtl/rename_dispatch.sv \
             $BASEDIR/verilog/rtl/eu.sv \
-            $BASEDIR/verilog/rtl/load.sv \
+            $BASEDIR/verilog/rtl/ldu.sv \
             $BASEDIR/verilog/rtl/commit.sv \
             $BASEDIR/verilog/rtl/cpu.sv \
             $BASEDIR/verilog/rtl/soc.sv \

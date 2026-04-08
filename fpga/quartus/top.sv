@@ -22,7 +22,6 @@ module top
   logic CLOCK_CPU;
   logic LOCKED;
   logic RESET;
-  logic [1:0] CLEAR;
 
   logic SCLK;
   logic MOSI;
@@ -48,17 +47,8 @@ module top
 
   assign RESET = LOCKED & KEY[0];
 
-  always_ff @(posedge CLOCK_CPU) begin
-    if (RESET == 0) begin
-      CLEAR <= 2'b11;
-    end else begin
-      CLEAR <= {1'b0, CLEAR[1]};
-    end
-  end
-
   soc soc_comp (
       .reset(RESET),
-      .clear(CLEAR[0]),
       .clock(CLOCK_CPU),
       .sclk(SCLK),
       .mosi(MOSI),
@@ -77,7 +67,7 @@ module top
       REG_LED <= 0;
     end else begin
       if (ram_in.mem_valid) begin
-        REG_LED[9:0] <= ram_in.mem_addr[18:9];
+        REG_LED <= ram_in.mem_addr[18:9];
       end
     end
   end

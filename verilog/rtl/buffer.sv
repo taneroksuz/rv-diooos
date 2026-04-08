@@ -176,20 +176,20 @@ module buffer_ctrl (
 
     v = r;
 
-    if (buffer_in.clear == 1) begin
+    if (buffer_in.flush == 1) begin
       v.wid   = 0;
       v.rid   = 0;
       v.count = 0;
       v.clear = 1;
     end
 
-    if (r.clear == 1 && buffer_in.clear == 0 && buffer_in.ready == 1) begin
+    if (r.clear == 1 && buffer_in.flush == 0 && buffer_in.ready == 1) begin
       v.rid   = {{DEPTH + 1{1'b0}}, buffer_in.pc0[1]};
       v.align = {{DEPTH + 1{1'b0}}, buffer_in.pc0[1]};
       v.clear = 0;
     end
 
-    v.wen = (~buffer_in.clear) & (~r.stall) & buffer_in.ready;
+    v.wen = (~buffer_in.flush) & (~r.stall) & buffer_in.ready;
 
     v.wdata0 = {buffer_in.pc0[31:2], 2'b00, buffer_in.rdata[15:0]};
     v.wdata1 = {buffer_in.pc0[31:2], 2'b10, buffer_in.rdata[31:16]};

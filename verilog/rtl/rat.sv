@@ -4,9 +4,9 @@ import wires::*;
 module rat (
     input  logic        reset,
     input  logic        clock,
+    input  logic        flush,
     input  rat_in_type  rat_in,
-    output rat_out_type rat_out,
-    input  logic        flush
+    output rat_out_type rat_out
 );
   timeunit 1ns; timeprecision 1ps;
 

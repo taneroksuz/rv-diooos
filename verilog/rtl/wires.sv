@@ -380,7 +380,7 @@ package wires;
     prediction_type upd_pred0;
     prediction_type upd_pred1;
     logic [0 : 0]   stall;
-    logic [0 : 0]   clear;
+    logic [0 : 0]   flush;
   } btac_in_type;
 
   typedef struct packed {
@@ -592,7 +592,7 @@ package wires;
     logic [31 : 0] pc1;
     logic [63 : 0] rdata;
     logic [0 : 0]  ready;
-    logic [0 : 0]  clear;
+    logic [0 : 0]  flush;
     logic [0 : 0]  stall;
   } buffer_in_type;
 
@@ -761,87 +761,6 @@ package wires;
   };
 
   typedef struct packed {
-    calculation_type calc0;
-    calculation_type calc1;
-    logic [0 : 0] halt;
-    logic [0 : 0] stall;
-  } issue_out_type;
-
-  typedef struct packed {
-    instruction_type instr0;
-    instruction_type instr1;
-    calculation_type calc0;
-    calculation_type calc1;
-    logic [0 : 0] halt;
-    logic [0 : 0] stall;
-  } issue_reg_type;
-
-  parameter issue_reg_type init_issue_reg = '{
-      instr0 : init_instruction,
-      instr1 : init_instruction,
-      calc0 : init_calculation,
-      calc1 : init_calculation,
-      halt : 0,
-      stall : 0
-  };
-
-  typedef struct packed {
-    calculation_type calc0;
-    calculation_type calc1;
-    logic [0 : 0] stall;
-  } execute_out_type;
-
-  typedef struct packed {
-    calculation_type calc0;
-    calculation_type calc1;
-    logic [0 : 0] enable;
-    logic [0 : 0] stall;
-  } execute_reg_type;
-
-  parameter execute_reg_type init_execute_reg = '{
-      calc0 : init_calculation,
-      calc1 : init_calculation,
-      enable : 0,
-      stall : 0
-  };
-
-  typedef struct packed {
-    calculation_type calc0;
-    calculation_type calc1;
-    logic [0 : 0] stall;
-  } memory_out_type;
-
-  typedef struct packed {
-    calculation_type calc0;
-    calculation_type calc1;
-    logic [0 : 0] ready0;
-    logic [0 : 0] ready1;
-    logic [0 : 0] stall;
-  } memory_reg_type;
-
-  parameter memory_reg_type init_memory_reg = '{
-      calc0 : init_calculation,
-      calc1 : init_calculation,
-      ready0 : 0,
-      ready1 : 0,
-      stall : 0
-  };
-
-  typedef struct packed {logic [0 : 0] stall;} writeback_out_type;
-
-  typedef struct packed {
-    calculation_type calc0;
-    calculation_type calc1;
-    logic [0 : 0] stall;
-  } writeback_reg_type;
-
-  parameter writeback_reg_type init_writeback_reg = '{
-      calc0 : init_calculation,
-      calc1 : init_calculation,
-      stall : 0
-  };
-
-  typedef struct packed {
     logic [11:11] meip;
     logic [9:9]   seip;
     logic [8:8]   ueip;
@@ -956,11 +875,6 @@ package wires;
   };
 
   typedef struct packed {
-    logic [0 : 0]  crden;
-    logic [11 : 0] craddr;
-  } csr_read_in_type;
-
-  typedef struct packed {
     logic [0 : 0]  cwren;
     logic [11 : 0] cwaddr;
     logic [31 : 0] cdata;
@@ -987,6 +901,12 @@ package wires;
   } csr_out_type;
 
   typedef struct packed {
+    logic [0 : 0]  crden;
+    logic [11 : 0] craddr;
+  } csr_read_in_type;
+
+
+  typedef struct packed {
     logic [0 : 0]  cwren;
     logic [0 : 0]  crden;
     logic [11 : 0] cwaddr;
@@ -999,24 +919,6 @@ package wires;
     logic [31 : 0] crdata;
     logic [0 : 0]  cready;
   } csr_pmp_out_type;
-
-  typedef struct packed {
-    fetch_out_type f;
-    decode_out_type d;
-    issue_out_type i;
-    execute_out_type e;
-    memory_out_type m;
-    writeback_out_type w;
-  } fetch_in_type;
-
-  typedef struct packed {
-    fetch_out_type f;
-    decode_out_type d;
-    issue_out_type i;
-    execute_out_type e;
-    memory_out_type m;
-    writeback_out_type w;
-  } decode_in_type;
 
   typedef struct packed {
     logic [0 : 0]  mem_valid;

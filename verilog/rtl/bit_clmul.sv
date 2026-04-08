@@ -4,6 +4,7 @@ import functions::*;
 module bit_clmul (
     input logic reset,
     input logic clock,
+    input logic flush,
     input bit_clmul_in_type bit_clmul_in,
     output bit_clmul_out_type bit_clmul_out
 );
@@ -74,7 +75,7 @@ module bit_clmul (
   end
 
   always_ff @(posedge clock) begin
-    if (reset == 0) begin
+    if (reset == 0 || flush == 1) begin
       r <= init_bit_clmul_reg;
     end else begin
       r <= rin;

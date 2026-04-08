@@ -3,6 +3,7 @@ import wires::*;
 module div (
     input logic reset,
     input logic clock,
+    input logic flush,
     input div_in_type div_in,
     output div_out_type div_out
 );
@@ -134,7 +135,7 @@ module div (
   end
 
   always_ff @(posedge clock) begin
-    if (reset == 0) begin
+    if (reset == 0 || flush == 1) begin
       r <= init_div_reg;
     end else begin
       r <= rin;

@@ -3,12 +3,12 @@ import constants::*;
 import wires::*;
 import functions::*;
 
-module load (
+module ldu (
     input  logic         reset,
     input  logic         clock,
+    input  logic         flush,
     input  load_in_type  load_in,
-    output load_out_type load_out,
-    input  logic         flush
+    output load_out_type load_out
 );
   timeunit 1ns; timeprecision 1ps;
 

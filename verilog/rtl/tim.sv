@@ -146,6 +146,8 @@ module tim_ctrl (
   back_type v_b;
 
   always_comb begin
+    logic tim0_is_store;
+    logic tim1_is_store;
 
     v_f = r_f;
 
@@ -154,20 +156,27 @@ module tim_ctrl (
     v_f.strb0 = 0;
     v_f.strb1 = 0;
 
+    tim0_is_store = tim0_in.mem_valid && (tim0_in.mem_wstrb != 4'h0);
+    tim1_is_store = tim1_in.mem_valid && (tim1_in.mem_wstrb != 4'h0);
+
     if (tim0_in.mem_valid == 1) begin
-      v_f.valid0 = tim0_in.mem_valid;
-      v_f.strb0  = tim0_in.mem_wstrb;
-      v_f.data0  = tim0_in.mem_wdata;
-      v_f.did0   = tim0_in.mem_addr[(DEPTH+WIDTH+1):(WIDTH+2)];
-      v_f.wid0   = tim0_in.mem_addr[(WIDTH+1):2];
+      if (tim1_in.mem_valid == 0 || (tim0_is_store == tim1_is_store)) begin
+        v_f.valid0 = tim0_in.mem_valid;
+        v_f.strb0  = tim0_in.mem_wstrb;
+        v_f.data0  = tim0_in.mem_wdata;
+        v_f.did0   = tim0_in.mem_addr[(DEPTH+WIDTH+1):(WIDTH+2)];
+        v_f.wid0   = tim0_in.mem_addr[(WIDTH+1):2];
+      end
     end
 
     if (tim1_in.mem_valid == 1) begin
-      v_f.valid1 = tim1_in.mem_valid;
-      v_f.strb1  = tim1_in.mem_wstrb;
-      v_f.data1  = tim1_in.mem_wdata;
-      v_f.did1   = tim1_in.mem_addr[(DEPTH+WIDTH+1):(WIDTH+2)];
-      v_f.wid1   = tim1_in.mem_addr[(WIDTH+1):2];
+      if (tim0_in.mem_valid == 0 || (tim0_is_store == tim1_is_store)) begin
+        v_f.valid1 = tim1_in.mem_valid;
+        v_f.strb1  = tim1_in.mem_wstrb;
+        v_f.data1  = tim1_in.mem_wdata;
+        v_f.did1   = tim1_in.mem_addr[(DEPTH+WIDTH+1):(WIDTH+2)];
+        v_f.wid1   = tim1_in.mem_addr[(WIDTH+1):2];
+      end
     end
 
     dvec0_in = init_tim_vec_in;

@@ -4,9 +4,9 @@ import wires::*;
 module free_list (
     input  logic              reset,
     input  logic              clock,
+    input  logic              flush,
     input  free_list_in_type  fl_in,
-    output free_list_out_type fl_out,
-    input  logic              flush
+    output free_list_out_type fl_out
 );
   timeunit 1ns; timeprecision 1ps;
 

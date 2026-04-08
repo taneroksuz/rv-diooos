@@ -5,9 +5,9 @@ import wires::*;
 module rs_int (
     input  logic           reset,
     input  logic           clock,
+    input  logic           flush,
     input  rs_int_in_type  rs_in,
-    output rs_int_out_type rs_out,
-    input  logic           flush
+    output rs_int_out_type rs_out
 );
   timeunit 1ns; timeprecision 1ps;
 

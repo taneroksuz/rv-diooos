@@ -6,9 +6,9 @@ import functions::*;
 module eu (
     input  logic       reset,
     input  logic       clock,
+    input  logic       flush,
     input  eu_in_type  eu_in,
-    output eu_out_type eu_out,
-    input  logic       flush
+    output eu_out_type eu_out
 );
   timeunit 1ns; timeprecision 1ps;
 

@@ -4,7 +4,6 @@ import wires::*;
 
 module cpu (
     input logic reset,
-    input logic clear,
     input logic clock,
     input mem_out_type imem0_out,
     input mem_out_type imem1_out,
@@ -24,7 +23,6 @@ module cpu (
   logic        flush;
   logic [31:0] flush_pc;
   logic        flush_all;
-  assign flush_all = flush | csr_out.trap | csr_out.mret | clear;
 
   cdb_type cdb0, cdb1, cdb_load;
 
@@ -47,8 +45,8 @@ module cpu (
   lsu_in_type lsu0_in, lsu1_in;
   lsu_out_type lsu0_out, lsu1_out;
 
-  csr_read_in_type csr_rin;
-  csr_out_type     csr_out;
+  csr_out_type csr_out;
+  assign flush_all = flush | csr_out.trap | csr_out.mret;
   register_write_in_type register0_win, register1_win;
 
   btac_in_type btac_in;
@@ -59,14 +57,8 @@ module cpu (
   compress_out_type compress0_out, compress1_out;
   decoder_in_type decoder0_in, decoder1_in;
   decoder_out_type decoder0_out, decoder1_out;
-  fetch_in_type fetch_in_a, fetch_in_d;
   fetch_out_type fetch_out_y, fetch_out_q;
-  decode_in_type decode_in_a, decode_in_d;
   decode_out_type decode_out_y, decode_out_q;
-  issue_out_type issue_dummy_y, issue_dummy_q;
-  execute_out_type exec_dummy_y, exec_dummy_q;
-  memory_out_type mem_dummy_y, mem_dummy_q;
-  writeback_out_type wb_dummy_y, wb_dummy_q;
 
   prf_in_type        prf_in;
   prf_out_type       prf_out;
@@ -104,203 +96,154 @@ module cpu (
   end
 
   logic backend_stall;
-  assign backend_stall = ren_out.stall | rob_out.full;
+  assign backend_stall          = ren_out.stall | rob_out.full;
 
-  always_ff @(posedge clock) begin
-    if (reset == 0 || flush_all) begin
-      issue_dummy_y <= '{calc0: init_calculation, calc1: init_calculation, halt: 0, stall: 0};
-      issue_dummy_q <= '{calc0: init_calculation, calc1: init_calculation, halt: 0, stall: 0};
-      exec_dummy_y  <= '{calc0: init_calculation, calc1: init_calculation, stall: 0};
-      exec_dummy_q  <= '{calc0: init_calculation, calc1: init_calculation, stall: 0};
-      mem_dummy_y   <= '{calc0: init_calculation, calc1: init_calculation, stall: 0};
-      mem_dummy_q   <= '{calc0: init_calculation, calc1: init_calculation, stall: 0};
-      wb_dummy_y    <= '{stall: 0};
-      wb_dummy_q <= '{stall: 0};
-    end else begin
-      issue_dummy_y.halt <= backend_stall;
-      issue_dummy_q.halt <= backend_stall;
-    end
-  end
 
-  assign fetch_in_a = '{
-          f: fetch_out_y,
-          i: issue_dummy_y,
-          d: decode_out_y,
-          e: exec_dummy_y,
-          m: mem_dummy_y,
-          w: wb_dummy_y
-      };
-  assign fetch_in_d = '{
-          f: fetch_out_q,
-          i: issue_dummy_q,
-          d: decode_out_q,
-          e: exec_dummy_q,
-          m: mem_dummy_q,
-          w: wb_dummy_q
-      };
-  assign decode_in_a = '{
-          f: fetch_out_y,
-          i: issue_dummy_y,
-          d: decode_out_y,
-          e: exec_dummy_y,
-          m: mem_dummy_y,
-          w: wb_dummy_y
-      };
-  assign decode_in_d = '{
-          f: fetch_out_q,
-          i: issue_dummy_q,
-          d: decode_out_q,
-          e: exec_dummy_q,
-          m: mem_dummy_q,
-          w: wb_dummy_q
-      };
-  assign csr_rin = '{crden: 0, craddr: 0};
+  assign prf_in.raddr0          = rat_out.psrc0;
+  assign prf_in.raddr1          = rat_out.psrc1;
+  assign prf_in.raddr2          = rat_out.psrc2;
+  assign prf_in.raddr3          = rat_out.psrc3;
+  assign prf_in.waddr0          = commit_out.prf.waddr0;
+  assign prf_in.wdata0          = commit_out.prf.wdata0;
+  assign prf_in.wren0           = commit_out.prf.wren0;
+  assign prf_in.waddr1          = commit_out.prf.waddr1;
+  assign prf_in.wdata1          = commit_out.prf.wdata1;
+  assign prf_in.wren1           = commit_out.prf.wren1;
 
-  assign prf_in.raddr0 = rat_out.psrc0;
-  assign prf_in.raddr1 = rat_out.psrc1;
-  assign prf_in.raddr2 = rat_out.psrc2;
-  assign prf_in.raddr3 = rat_out.psrc3;
-  assign prf_in.waddr0 = commit_out.prf.waddr0;
-  assign prf_in.wdata0 = commit_out.prf.wdata0;
-  assign prf_in.wren0 = commit_out.prf.wren0;
-  assign prf_in.waddr1 = commit_out.prf.waddr1;
-  assign prf_in.wdata1 = commit_out.prf.wdata1;
-  assign prf_in.wren1 = commit_out.prf.wren1;
+  assign rat_in.rsrc0_a         = ren_out.rat.rsrc0_a;
+  assign rat_in.rsrc1_a         = ren_out.rat.rsrc1_a;
+  assign rat_in.rsrc2_a         = ren_out.rat.rsrc2_a;
+  assign rat_in.rsrc3_a         = ren_out.rat.rsrc3_a;
+  assign rat_in.waddr0_a        = ren_out.rat.waddr0_a;
+  assign rat_in.waddr0_p        = ren_out.rat.waddr0_p;
+  assign rat_in.wren0           = ren_out.rat.wren0;
+  assign rat_in.waddr1_a        = ren_out.rat.waddr1_a;
+  assign rat_in.waddr1_p        = ren_out.rat.waddr1_p;
+  assign rat_in.wren1           = ren_out.rat.wren1;
+  assign rat_in.commit_addr0    = commit_out.rat.commit_addr0;
+  assign rat_in.commit_tag0     = commit_out.rat.commit_tag0;
+  assign rat_in.commit_en0      = commit_out.rat.commit_en0;
+  assign rat_in.commit_addr1    = commit_out.rat.commit_addr1;
+  assign rat_in.commit_tag1     = commit_out.rat.commit_tag1;
+  assign rat_in.commit_en1      = commit_out.rat.commit_en1;
 
-  assign rat_in.rsrc0_a = ren_out.rat.rsrc0_a;
-  assign rat_in.rsrc1_a = ren_out.rat.rsrc1_a;
-  assign rat_in.rsrc2_a = ren_out.rat.rsrc2_a;
-  assign rat_in.rsrc3_a = ren_out.rat.rsrc3_a;
-  assign rat_in.waddr0_a = ren_out.rat.waddr0_a;
-  assign rat_in.waddr0_p = ren_out.rat.waddr0_p;
-  assign rat_in.wren0 = ren_out.rat.wren0;
-  assign rat_in.waddr1_a = ren_out.rat.waddr1_a;
-  assign rat_in.waddr1_p = ren_out.rat.waddr1_p;
-  assign rat_in.wren1 = ren_out.rat.wren1;
-  assign rat_in.commit_addr0 = commit_out.rat.commit_addr0;
-  assign rat_in.commit_tag0 = commit_out.rat.commit_tag0;
-  assign rat_in.commit_en0 = commit_out.rat.commit_en0;
-  assign rat_in.commit_addr1 = commit_out.rat.commit_addr1;
-  assign rat_in.commit_tag1 = commit_out.rat.commit_tag1;
-  assign rat_in.commit_en1 = commit_out.rat.commit_en1;
+  assign fl_in.alloc0           = ren_out.fl.alloc0;
+  assign fl_in.alloc1           = ren_out.fl.alloc1;
+  assign fl_in.free_tag0        = commit_out.fl.free_tag0;
+  assign fl_in.free_en0         = commit_out.fl.free_en0;
+  assign fl_in.free_tag1        = commit_out.fl.free_tag1;
+  assign fl_in.free_en1         = commit_out.fl.free_en1;
 
-  assign fl_in.alloc0 = ren_out.fl.alloc0;
-  assign fl_in.alloc1 = ren_out.fl.alloc1;
-  assign fl_in.free_tag0 = commit_out.fl.free_tag0;
-  assign fl_in.free_en0 = commit_out.fl.free_en0;
-  assign fl_in.free_tag1 = commit_out.fl.free_tag1;
-  assign fl_in.free_en1 = commit_out.fl.free_en1;
+  assign rob_in.alloc0          = ren_out.rob_alloc0;
+  assign rob_in.alloc_entry0    = ren_out.rob_entry0;
+  assign rob_in.alloc1          = ren_out.rob_alloc1;
+  assign rob_in.alloc_entry1    = ren_out.rob_entry1;
+  assign rob_in.write_tag0      = eu_out_s.rob_wtag0;
+  assign rob_in.write_entry0    = eu_out_s.rob_wentry0;
+  assign rob_in.write_en0       = eu_out_s.rob_wen0;
+  assign rob_in.write_tag1      = eu_out_s.rob_wtag1;
+  assign rob_in.write_entry1    = eu_out_s.rob_wentry1;
+  assign rob_in.write_en1       = eu_out_s.rob_wen1;
+  assign rob_in.write_tag2      = ld_out.rob_wtag;
+  assign rob_in.write_entry2    = ld_out.rob_wentry;
+  assign rob_in.write_en2       = ld_out.rob_wen;
+  assign rob_in.cdb0            = cdb0;
+  assign rob_in.cdb1            = cdb1;
 
-  assign rob_in.alloc0 = ren_out.rob_alloc0;
-  assign rob_in.alloc_entry0 = ren_out.rob_entry0;
-  assign rob_in.alloc1 = ren_out.rob_alloc1;
-  assign rob_in.alloc_entry1 = ren_out.rob_entry1;
-  assign rob_in.write_tag0 = eu_out_s.rob_wtag0;
-  assign rob_in.write_entry0 = eu_out_s.rob_wentry0;
-  assign rob_in.write_en0 = eu_out_s.rob_wen0;
-  assign rob_in.write_tag1 = eu_out_s.rob_wtag1;
-  assign rob_in.write_entry1 = eu_out_s.rob_wentry1;
-  assign rob_in.write_en1 = eu_out_s.rob_wen1;
-  assign rob_in.write_tag2 = ld_out.rob_wtag;
-  assign rob_in.write_entry2 = ld_out.rob_wentry;
-  assign rob_in.write_en2 = ld_out.rob_wen;
-  assign rob_in.cdb0 = cdb0;
-  assign rob_in.cdb1 = cdb1;
+  assign rs_int_in.entry0       = ren_out.rs_int_entry0;
+  assign rs_int_in.alloc0       = ren_out.rs_int_alloc0;
+  assign rs_int_in.entry1       = ren_out.rs_int_entry1;
+  assign rs_int_in.alloc1       = ren_out.rs_int_alloc1;
+  assign rs_int_in.cdb0         = cdb0;
+  assign rs_int_in.cdb1         = cdb1;
+  assign rs_int_in.cdb_load     = cdb_load;
 
-  assign rs_int_in.entry0 = ren_out.rs_int_entry0;
-  assign rs_int_in.alloc0 = ren_out.rs_int_alloc0;
-  assign rs_int_in.entry1 = ren_out.rs_int_entry1;
-  assign rs_int_in.alloc1 = ren_out.rs_int_alloc1;
-  assign rs_int_in.cdb0 = cdb0;
-  assign rs_int_in.cdb1 = cdb1;
-  assign rs_int_in.cdb_load = cdb_load;
+  assign rs_mem_in.entry0       = ren_out.rs_mem_entry0;
+  assign rs_mem_in.alloc0       = ren_out.rs_mem_alloc0;
+  assign rs_mem_in.entry1       = ren_out.rs_mem_entry1;
+  assign rs_mem_in.alloc1       = ren_out.rs_mem_alloc1;
+  assign rs_mem_in.cdb0         = cdb0;
+  assign rs_mem_in.cdb1         = cdb1;
+  assign rs_mem_in.cdb_load     = cdb_load;
+  assign rs_mem_in.rob_array    = rob_out.array;
+  assign rs_mem_in.rob_head     = rob_out.head_ptr;
 
-  assign rs_mem_in.entry0 = ren_out.rs_mem_entry0;
-  assign rs_mem_in.alloc0 = ren_out.rs_mem_alloc0;
-  assign rs_mem_in.entry1 = ren_out.rs_mem_entry1;
-  assign rs_mem_in.alloc1 = ren_out.rs_mem_alloc1;
-  assign rs_mem_in.cdb0 = cdb0;
-  assign rs_mem_in.cdb1 = cdb1;
-  assign rs_mem_in.cdb_load = cdb_load;
-  assign rs_mem_in.rob_array = rob_out.array;
-  assign rs_mem_in.rob_head = rob_out.head_ptr;
+  assign ren_in.instr0          = decode_out_y.instr0;
+  assign ren_in.instr0_valid    = decode_out_y.instr0.op.valid;
+  assign ren_in.instr1          = decode_out_y.instr1;
+  assign ren_in.instr1_valid    = decode_out_y.instr1.op.valid;
+  assign ren_in.rob_tag0        = rob_out.alloc_tag0;
+  assign ren_in.rob_tag1        = rob_out.alloc_tag1;
+  assign ren_in.rob_full        = rob_out.full;
+  assign ren_in.rob_has_two     = rob_out.has_two_free;
+  assign ren_in.rat             = rat_out;
+  assign ren_in.prf             = prf_out;
+  assign ren_in.fl              = fl_out;
+  assign ren_in.rs_int_full     = rs_int_out.full;
+  assign ren_in.rs_int_has_two  = rs_int_out.has_two_free;
+  assign ren_in.rs_mem_full     = rs_mem_out.full;
+  assign ren_in.rs_mem_has_two  = rs_mem_out.has_two_free;
+  assign ren_in.cdb0            = cdb0;
+  assign ren_in.cdb1            = cdb1;
+  assign ren_in.cdb_load        = cdb_load;
 
-  assign ren_in.instr0 = decode_out_y.instr0;
-  assign ren_in.instr0_valid = decode_out_y.instr0.op.valid;
-  assign ren_in.instr1 = decode_out_y.instr1;
-  assign ren_in.instr1_valid = decode_out_y.instr1.op.valid;
-  assign ren_in.rob_tag0 = rob_out.alloc_tag0;
-  assign ren_in.rob_tag1 = rob_out.alloc_tag1;
-  assign ren_in.rob_full = rob_out.full;
-  assign ren_in.rob_has_two = rob_out.has_two_free;
-  assign ren_in.rat = rat_out;
-  assign ren_in.prf = prf_out;
-  assign ren_in.fl = fl_out;
-  assign ren_in.rs_int_full = rs_int_out.full;
-  assign ren_in.rs_int_has_two = rs_int_out.has_two_free;
-  assign ren_in.rs_mem_full = rs_mem_out.full;
-  assign ren_in.rs_mem_has_two = rs_mem_out.has_two_free;
-  assign ren_in.cdb0 = cdb0;
-  assign ren_in.cdb1 = cdb1;
-  assign ren_in.cdb_load = cdb_load;
-
-  assign eu_in.int_issue0 = rs_int_out.issue0;
+  assign eu_in.int_issue0       = rs_int_out.issue0;
   assign eu_in.int_issue0_valid = rs_int_out.issue0_valid;
-  assign eu_in.int_issue1 = rs_int_out.issue1;
+  assign eu_in.int_issue1       = rs_int_out.issue1;
   assign eu_in.int_issue1_valid = rs_int_out.issue1_valid;
-  assign eu_in.mem_issue0 = rs_mem_out.issue0;
+  assign eu_in.mem_issue0       = rs_mem_out.issue0;
   assign eu_in.mem_issue0_valid = rs_mem_out.issue0_valid && rs_mem_out.issue0.op.store;
-  assign eu_in.csr = csr_out;
-  assign eu_in.alu0_out = alu0_out;
-  assign eu_in.alu1_out = alu1_out;
-  assign eu_in.agu0_out = agu0_out;
-  assign eu_in.agu1_out = agu1_out;
-  assign eu_in.bcu0_out = bcu0_out;
-  assign eu_in.bcu1_out = bcu1_out;
-  assign eu_in.mul_out = mul_out;
-  assign eu_in.div_out = div_out;
-  assign eu_in.bit_alu0_out = bit_alu0_out;
-  assign eu_in.bit_alu1_out = bit_alu1_out;
-  assign eu_in.bit_clmul_out = bit_clmul_out;
-  assign eu_in.csr_alu_out = csr_alu_out;
+  assign eu_in.csr              = csr_out;
+  assign eu_in.alu0_out         = alu0_out;
+  assign eu_in.alu1_out         = alu1_out;
+  assign eu_in.agu0_out         = agu0_out;
+  assign eu_in.agu1_out         = agu1_out;
+  assign eu_in.bcu0_out         = bcu0_out;
+  assign eu_in.bcu1_out         = bcu1_out;
+  assign eu_in.mul_out          = mul_out;
+  assign eu_in.div_out          = div_out;
+  assign eu_in.bit_alu0_out     = bit_alu0_out;
+  assign eu_in.bit_alu1_out     = bit_alu1_out;
+  assign eu_in.bit_clmul_out    = bit_clmul_out;
+  assign eu_in.csr_alu_out      = csr_alu_out;
 
-  assign alu0_in = eu_out_s.alu0_in;
-  assign alu1_in = eu_out_s.alu1_in;
-  assign agu0_in = eu_out_s.agu0_in;
-  assign agu1_in = eu_out_s.agu1_in;
-  assign bcu0_in = eu_out_s.bcu0_in;
-  assign bcu1_in = eu_out_s.bcu1_in;
-  assign mul_in = eu_out_s.mul_in;
-  assign div_in = eu_out_s.div_in;
-  assign bit_alu0_in = eu_out_s.bit_alu0_in;
-  assign bit_alu1_in = eu_out_s.bit_alu1_in;
-  assign bit_clmul_in = eu_out_s.bit_clmul_in;
-  assign csr_alu_in = eu_out_s.csr_alu_in;
-  assign cdb0 = eu_out_s.cdb0;
-  assign cdb1 = eu_out_s.cdb1;
+  assign alu0_in                = eu_out_s.alu0_in;
+  assign alu1_in                = eu_out_s.alu1_in;
+  assign agu0_in                = eu_out_s.agu0_in;
+  assign agu1_in                = eu_out_s.agu1_in;
+  assign bcu0_in                = eu_out_s.bcu0_in;
+  assign bcu1_in                = eu_out_s.bcu1_in;
+  assign mul_in                 = eu_out_s.mul_in;
+  assign div_in                 = eu_out_s.div_in;
+  assign bit_alu0_in            = eu_out_s.bit_alu0_in;
+  assign bit_alu1_in            = eu_out_s.bit_alu1_in;
+  assign bit_clmul_in           = eu_out_s.bit_clmul_in;
+  assign csr_alu_in             = eu_out_s.csr_alu_in;
+  assign cdb0                   = eu_out_s.cdb0;
+  assign cdb1                   = eu_out_s.cdb1;
 
-  assign ld_in.issue = rs_mem_out.issue0;
-  assign ld_in.issue_valid = rs_mem_out.issue0_valid && rs_mem_out.issue0.op.load;
-  assign ld_in.dmem_out = dmem1_out;
-  assign ld_in.lsu_out = lsu1_out;
-  assign dmem1_in = ld_out.dmem_in;
-  assign lsu1_in = ld_out.lsu_in;
-  assign cdb_load = ld_out.cdb;
+  assign ld_in.issue            = rs_mem_out.issue0;
+  assign ld_in.issue_valid      = rs_mem_out.issue0_valid && rs_mem_out.issue0.op.load;
+  assign ld_in.dmem_out         = dmem1_out;
+  assign ld_in.lsu_out          = lsu1_out;
+  assign dmem1_in               = ld_out.dmem_in;
+  assign lsu1_in                = ld_out.lsu_in;
+  assign cdb_load               = ld_out.cdb;
 
-  assign commit_in.commit0 = rob_out.commit0;
-  assign commit_in.commit1 = rob_out.commit1;
-  assign commit_in.commit_ctrl = rob_out.commit_ctrl;
-  assign commit_in.entry0 = rob_out.entry0;
-  assign commit_in.entry1 = rob_out.entry1;
-  assign commit_in.csr = csr_out;
-  assign commit_in.dmem_out = dmem0_out;
-  assign commit_in.lsu_out = lsu0_out;
-  assign dmem0_in = commit_out.dmem_in;
-  assign lsu0_in = commit_out.lsu_in;
-  assign flush = commit_out.flush;
-  assign flush_pc = commit_out.flush_pc;
-  assign register0_win = commit_out.register0_win;
-  assign register1_win = commit_out.register1_win;
+  assign commit_in.commit0      = rob_out.commit0;
+  assign commit_in.commit1      = rob_out.commit1;
+  assign commit_in.commit_ctrl  = rob_out.commit_ctrl;
+  assign commit_in.entry0       = rob_out.entry0;
+  assign commit_in.entry1       = rob_out.entry1;
+  assign commit_in.csr          = csr_out;
+  assign commit_in.dmem_out     = dmem0_out;
+  assign commit_in.lsu_out      = lsu0_out;
+  assign dmem0_in               = commit_out.dmem_in;
+  assign lsu0_in                = commit_out.lsu_in;
+  assign flush                  = commit_out.flush;
+  assign flush_pc               = commit_out.flush_pc;
+  assign register0_win          = commit_out.register0_win;
+  assign register1_win          = commit_out.register1_win;
 
   alu alu0_comp (
       .alu_in (alu0_in),
@@ -341,12 +284,14 @@ module cpu (
   mul mul_comp (
       .reset  (reset),
       .clock  (clock),
+      .flush  (flush_all),
       .mul_in (mul_in),
       .mul_out(mul_out)
   );
   div div_comp (
       .reset  (reset),
       .clock  (clock),
+      .flush  (flush_all),
       .div_in (div_in),
       .div_out(div_out)
   );
@@ -361,6 +306,7 @@ module cpu (
   bit_clmul bit_clmul_comp (
       .reset(reset),
       .clock(clock),
+      .flush(flush_all),
       .bit_clmul_in(bit_clmul_in),
       .bit_clmul_out(bit_clmul_out)
   );
@@ -395,8 +341,8 @@ module cpu (
   register register_comp (
       .reset(reset),
       .clock(clock),
-      .register0_rin('{rden1: 0, raddr1: 0, rden2: 0, raddr2: 0}),
-      .register1_rin('{rden1: 0, raddr1: 0, rden2: 0, raddr2: 0}),
+      .register0_rin('0),
+      .register1_rin('0),
       .register0_win(register0_win),
       .register1_win(register1_win),
       .register0_out(),
@@ -405,7 +351,7 @@ module cpu (
   csr csr_comp (
       .reset(reset),
       .clock(clock),
-      .csr_rin(csr_rin),
+      .csr_rin('0),
       .csr_win(commit_out.csr_win),
       .csr_ein(commit_out.csr_ein),
       .csr_out(csr_out),
@@ -414,10 +360,11 @@ module cpu (
       .mtip(mtip),
       .mtime(mtime)
   );
-  fetch_stage fetch_stage_comp (
+  ifetch ifetch_comp (
       .reset(reset),
-      .clear(flush_all),
       .clock(clock),
+      .flush(flush_all),
+      .halt(backend_stall),
       .buffer_out(buffer_out),
       .buffer_in(buffer_in),
       .csr_out(csr_out),
@@ -427,15 +374,13 @@ module cpu (
       .imem1_out(imem1_out),
       .imem0_in(imem0_in),
       .imem1_in(imem1_in),
-      .a(fetch_in_a),
-      .d(fetch_in_d),
       .y(fetch_out_y),
       .q(fetch_out_q)
   );
-  decode_stage decode_stage_comp (
+  idecode idecode_comp (
       .reset(reset),
-      .clear(flush_all),
       .clock(clock),
+      .flush(flush_all),
       .decoder0_out(decoder0_out),
       .decoder0_in(decoder0_in),
       .decoder1_out(decoder1_out),
@@ -446,73 +391,72 @@ module cpu (
       .compress1_in(compress1_in),
       .csr_out(csr_out),
       .btac_out(btac_out),
-      .a(decode_in_a),
-      .d(decode_in_d),
+      .fetch_out(fetch_out_y),
       .y(decode_out_y),
       .q(decode_out_q)
   );
   prf prf_comp (
       .reset  (reset),
       .clock  (clock),
+      .flush  (flush_all),
       .prf_in (prf_in),
-      .prf_out(prf_out),
-      .flush  (flush_all)
+      .prf_out(prf_out)
   );
   rat rat_comp (
       .reset  (reset),
       .clock  (clock),
+      .flush  (flush_all),
       .rat_in (rat_in),
-      .rat_out(rat_out),
-      .flush  (flush_all)
+      .rat_out(rat_out)
   );
   free_list fl_comp (
       .reset (reset),
       .clock (clock),
+      .flush (flush_all),
       .fl_in (fl_in),
-      .fl_out(fl_out),
-      .flush (flush_all)
+      .fl_out(fl_out)
   );
   rob rob_comp (
       .reset  (reset),
       .clock  (clock),
+      .flush  (flush_all),
       .rob_in (rob_in),
-      .rob_out(rob_out),
-      .flush  (flush_all)
+      .rob_out(rob_out)
   );
   rs_int rs_int_comp (
       .reset (reset),
       .clock (clock),
+      .flush (flush_all),
       .rs_in (rs_int_in),
-      .rs_out(rs_int_out),
-      .flush (flush_all)
+      .rs_out(rs_int_out)
   );
   rs_mem rs_mem_comp (
       .reset (reset),
       .clock (clock),
+      .flush (flush_all),
       .rs_in (rs_mem_in),
-      .rs_out(rs_mem_out),
-      .flush (flush_all)
+      .rs_out(rs_mem_out)
   );
   rename_dispatch rd_comp (
       .reset(reset),
       .clock(clock),
+      .flush(flush_all),
       .rin  (ren_in),
-      .rout (ren_out),
-      .flush(flush_all)
+      .rout (ren_out)
   );
   eu eu_comp (
       .reset (reset),
       .clock (clock),
+      .flush (flush_all),
       .eu_in (eu_in),
-      .eu_out(eu_out_s),
-      .flush (flush_all)
+      .eu_out(eu_out_s)
   );
-  load load_comp (
+  ldu load_comp (
       .reset(reset),
       .clock(clock),
+      .flush(flush_all),
       .load_in(ld_in),
-      .load_out(ld_out),
-      .flush(flush_all)
+      .load_out(ld_out)
   );
   commit commit_comp (
       .reset(reset),

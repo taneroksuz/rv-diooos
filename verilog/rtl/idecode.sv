@@ -2,10 +2,10 @@ import constants::*;
 import wires::*;
 import functions::*;
 
-module decode_stage (
+module idecode (
     input logic reset,
-    input logic clear,
     input logic clock,
+    input logic flush,
     input decoder_out_type decoder0_out,
     output decoder_in_type decoder0_in,
     input decoder_out_type decoder1_out,
@@ -16,8 +16,7 @@ module decode_stage (
     output compress_in_type compress1_in,
     input csr_out_type csr_out,
     input btac_out_type btac_out,
-    input decode_in_type a,
-    input decode_in_type d,
+    input fetch_out_type fetch_out,
     output decode_out_type y,
     output decode_out_type q
 );
@@ -30,10 +29,10 @@ module decode_stage (
 
     v = r;
 
-    v.instr0.pc = a.f.ready0 ? a.f.pc0 : 32'hFFFFFFFF;
-    v.instr1.pc = a.f.ready1 ? a.f.pc1 : 32'hFFFFFFFF;
-    v.instr0.instr = a.f.ready0 ? a.f.instr0 : 0;
-    v.instr1.instr = a.f.ready1 ? a.f.instr1 : 0;
+    v.instr0.pc = fetch_out.ready0 ? fetch_out.pc0 : 32'hFFFFFFFF;
+    v.instr1.pc = fetch_out.ready1 ? fetch_out.pc1 : 32'hFFFFFFFF;
+    v.instr0.instr = fetch_out.ready0 ? fetch_out.instr0 : 0;
+    v.instr1.instr = fetch_out.ready1 ? fetch_out.instr1 : 0;
 
     v.instr0.npc = v.instr0.pc + ((&v.instr0.instr[1:0]) ? 4 : 2);
     v.instr1.npc = v.instr1.pc + ((&v.instr1.instr[1:0]) ? 4 : 2);
@@ -178,14 +177,14 @@ module decode_stage (
       v.instr1.lsu_op = compress1_out.lsu_op;
     end
 
-    if (a.f.ready0 == 1) begin
+    if (fetch_out.ready0 == 1) begin
       if (v.instr0.op.valid == 0) begin
         v.instr0.op.exception = 1;
         v.instr0.op.valid = 1;
       end
     end
 
-    if (a.f.ready1 == 1) begin
+    if (fetch_out.ready1 == 1) begin
       if (v.instr1.op.valid == 0) begin
         v.instr1.op.exception = 1;
         v.instr1.op.valid = 1;
@@ -197,7 +196,7 @@ module decode_stage (
       v.instr1 = init_instruction;
     end
 
-    if ((a.m.calc0.op.fence | csr_out.trap | csr_out.mret | btac_out.pred_miss | clear) == 1) begin
+    if ((csr_out.trap | csr_out.mret | btac_out.pred_miss | flush) == 1) begin
       v.instr0 = init_instruction;
       v.instr1 = init_instruction;
     end
@@ -215,7 +214,7 @@ module decode_stage (
   end
 
   always_ff @(posedge clock) begin
-    if (reset == 0) begin
+    if (reset == 0 || flush == 1) begin
       r <= init_decode_reg;
     end else begin
       r <= rin;

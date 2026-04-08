@@ -5,9 +5,9 @@ import wires::*;
 module rename_dispatch (
     input  logic           reset,
     input  logic           clock,
+    input  logic           flush,
     input  rename_in_type  rin,
-    output rename_out_type rout,
-    input  logic           flush
+    output rename_out_type rout
 );
   timeunit 1ns; timeprecision 1ps;
 

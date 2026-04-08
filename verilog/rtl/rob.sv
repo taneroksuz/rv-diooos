@@ -5,9 +5,9 @@ import wires::*;
 module rob (
     input  logic        reset,
     input  logic        clock,
+    input  logic        flush,
     input  rob_in_type  rob_in,
-    output rob_out_type rob_out,
-    input  logic        flush
+    output rob_out_type rob_out
 );
   timeunit 1ns; timeprecision 1ps;
 

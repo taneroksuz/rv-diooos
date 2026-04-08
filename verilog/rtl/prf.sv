@@ -4,9 +4,9 @@ import wires::*;
 module prf (
     input  logic        reset,
     input  logic        clock,
+    input  logic        flush,
     input  prf_in_type  prf_in,
-    output prf_out_type prf_out,
-    input  logic        flush
+    output prf_out_type prf_out
 );
   timeunit 1ns; timeprecision 1ps;
 
