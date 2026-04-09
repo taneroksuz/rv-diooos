@@ -47,6 +47,7 @@ module fl (
       nsc = nsc + 1;
       nch = nch + 1;
     end
+
     if (fl_in.alloc0 && nsc >= 1) begin
       nsh = nsh + 1;
       nsc = nsc - 1;

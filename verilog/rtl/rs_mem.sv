@@ -61,12 +61,14 @@ module rs_mem (
           end
           ready_vec[ii] = !store_ahead;
         end else begin
+
           store_ahead   = 1'b0;
           ready_vec[ii] = 1'b1;
         end
       end else begin
         store_ahead = 1'b0;
       end
+
       if (!e.valid && !free_found0) begin
         free_idx0   = MEM_ADDR_BITS'(unsigned'(ii));
         free_found0 = 1'b1;
@@ -84,11 +86,12 @@ module rs_mem (
     end
 
     if (sel_found) begin
-      e = rs_mem_read(v.array, sel_idx);
+      e       = rs_mem_read(v.array, sel_idx);
       e.valid = 1'b0;
       v.array = rs_mem_write(v.array, sel_idx, e);
       v.count = v.count - 1;
     end
+
     if (rs_in.alloc0 && free_found0) begin
       v.array = rs_mem_write(v.array, free_idx0, rs_in.entry0);
       v.count = v.count + 1;
@@ -109,6 +112,8 @@ module rs_mem (
 
   always_ff @(posedge clock) begin
     if (reset == 0) begin
+      r <= init_rs_mem_reg;
+    end else if (flush) begin
       r <= init_rs_mem_reg;
     end else begin
       r <= rin;

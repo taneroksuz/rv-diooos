@@ -4,10 +4,6 @@ package functions;
   import configure::*;
   import wires::*;
 
-  // -------------------------------------------------------------------------
-  // General utility functions
-  // -------------------------------------------------------------------------
-
   function automatic [31:0] multiplexer;
     input [31:0] data0;
     input [31:0] data1;
@@ -30,10 +26,6 @@ package functions;
       else store_data = 0;
     end
   endfunction
-
-  // -------------------------------------------------------------------------
-  // Bit-manipulation functions
-  // -------------------------------------------------------------------------
 
   function automatic [31:0] bit_andn;
     input [31:0] rs1;
@@ -236,10 +228,6 @@ package functions;
     end
   endfunction
 
-  // -------------------------------------------------------------------------
-  // PRF array access
-  // -------------------------------------------------------------------------
-
   function automatic logic [31:0] prf_slot_data;
     input prf_arr_type arr;
     input logic [PRF_ADDR_BITS-1:0] idx;
@@ -269,10 +257,6 @@ package functions;
       prf_slot_write = t;
     end
   endfunction
-
-  // -------------------------------------------------------------------------
-  // RAT array access
-  // -------------------------------------------------------------------------
 
   function automatic logic [PRF_ADDR_BITS-1:0] rat_tag;
     input rat_arr_type arr;
@@ -336,10 +320,6 @@ package functions;
     end
   endfunction
 
-  // -------------------------------------------------------------------------
-  // Free-list array access
-  // -------------------------------------------------------------------------
-
   function automatic logic [PRF_ADDR_BITS-1:0] fl_read;
     input fl_arr_type arr;
     input logic [FL_IDX_BITS-1:0] idx;
@@ -359,10 +339,6 @@ package functions;
       fl_write = t;
     end
   endfunction
-
-  // -------------------------------------------------------------------------
-  // ROB array access
-  // -------------------------------------------------------------------------
 
   function automatic rob_entry_type rob_read;
     input rob_arr_type arr;
@@ -384,10 +360,6 @@ package functions;
     end
   endfunction
 
-  // -------------------------------------------------------------------------
-  // RS-INT array access
-  // -------------------------------------------------------------------------
-
   function automatic rs_entry_type rs_int_read;
     input rs_int_arr_type arr;
     input logic [RS_ADDR_BITS-1:0] idx;
@@ -407,10 +379,6 @@ package functions;
       rs_int_write = t;
     end
   endfunction
-
-  // -------------------------------------------------------------------------
-  // RS-MEM array access
-  // -------------------------------------------------------------------------
 
   function automatic rs_entry_type rs_mem_read;
     input rs_mem_arr_type arr;
@@ -432,10 +400,6 @@ package functions;
     end
   endfunction
 
-  // -------------------------------------------------------------------------
-  // RS wakeup (shared by rs_int and rs_mem)
-  // -------------------------------------------------------------------------
-
   function automatic rs_entry_type rs_wakeup;
     input rs_entry_type e;
     input cdb_type c;
@@ -455,10 +419,6 @@ package functions;
       rs_wakeup = t;
     end
   endfunction
-
-  // -------------------------------------------------------------------------
-  // Rename/dispatch operand forwarding
-  // -------------------------------------------------------------------------
 
   function automatic logic [31:0] prf_or_cdb;
     input logic [PRF_ADDR_BITS-1:0] tag;
@@ -489,10 +449,6 @@ package functions;
       else src_ready = prf_valid;
     end
   endfunction
-
-  // -------------------------------------------------------------------------
-  // EU result-select and completion
-  // -------------------------------------------------------------------------
 
   function automatic logic [31:0] eu_result;
     input rs_entry_type e;

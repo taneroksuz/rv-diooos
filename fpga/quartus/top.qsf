@@ -44,7 +44,7 @@ set_global_assignment -name SYSTEMVERILOG_FILE ../../verilog/rtl/rs_int.sv
 set_global_assignment -name SYSTEMVERILOG_FILE ../../verilog/rtl/rs_mem.sv
 set_global_assignment -name SYSTEMVERILOG_FILE ../../verilog/rtl/rename.sv
 set_global_assignment -name SYSTEMVERILOG_FILE ../../verilog/rtl/eu.sv
-set_global_assignment -name SYSTEMVERILOG_FILE ../../verilog/rtl/ldu.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../../verilog/rtl/msu.sv
 set_global_assignment -name SYSTEMVERILOG_FILE ../../verilog/rtl/commit.sv
 set_global_assignment -name SYSTEMVERILOG_FILE ../../verilog/rtl/cpu.sv
 set_global_assignment -name SYSTEMVERILOG_FILE ../../verilog/rtl/soc.sv

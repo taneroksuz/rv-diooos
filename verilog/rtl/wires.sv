@@ -123,71 +123,71 @@ package wires;
   } bit_clmul_reg_type;
 
   parameter bit_clmul_reg_type init_bit_clmul_reg = '{
-      state   : 0,
+      state : 0,
       counter : 0,
-      index   : 0,
-      rdata1  : 0,
-      rdata2  : 0,
-      swap    : 0,
+      index : 0,
+      rdata1 : 0,
+      rdata2 : 0,
+      swap  : 0,
       result  : 0,
-      ready   : 0,
-      op      : init_zbc_op
+      ready : 0,
+      op     : init_zbc_op
   };
 
   typedef struct packed {
-    logic [0 : 0] alu_add;
-    logic [0 : 0] alu_sub;
-    logic [0 : 0] alu_sll;
-    logic [0 : 0] alu_srl;
-    logic [0 : 0] alu_sra;
-    logic [0 : 0] alu_slt;
-    logic [0 : 0] alu_sltu;
-    logic [0 : 0] alu_and;
-    logic [0 : 0] alu_or;
-    logic [0 : 0] alu_xor;
+    logic [0:0] alu_add;
+    logic [0:0] alu_sub;
+    logic [0:0] alu_sll;
+    logic [0:0] alu_srl;
+    logic [0:0] alu_sra;
+    logic [0:0] alu_slt;
+    logic [0:0] alu_sltu;
+    logic [0:0] alu_and;
+    logic [0:0] alu_or;
+    logic [0:0] alu_xor;
   } alu_op_type;
 
   parameter alu_op_type init_alu_op = '{
-      alu_add : 0,
-      alu_sub : 0,
-      alu_sll : 0,
-      alu_srl : 0,
-      alu_sra : 0,
-      alu_slt : 0,
+      alu_add  : 0,
+      alu_sub  : 0,
+      alu_sll  : 0,
+      alu_srl  : 0,
+      alu_sra  : 0,
+      alu_slt  : 0,
       alu_sltu : 0,
-      alu_and : 0,
-      alu_or : 0,
-      alu_xor : 0
+      alu_and  : 0,
+      alu_or   : 0,
+      alu_xor  : 0
   };
 
   typedef struct packed {
-    logic [0 : 0] divs;
-    logic [0 : 0] divu;
-    logic [0 : 0] rem;
-    logic [0 : 0] remu;
+    logic [0:0] divs;
+    logic [0:0] divu;
+    logic [0:0] rem;
+    logic [0:0] remu;
   } div_op_type;
 
   parameter div_op_type init_div_op = '{divs : 0, divu : 0, rem : 0, remu : 0};
 
   typedef struct packed {
-    logic [0 : 0] muls;
-    logic [0 : 0] mulh;
-    logic [0 : 0] mulhsu;
-    logic [0 : 0] mulhu;
+    logic [0:0] muls;
+    logic [0:0] mulh;
+    logic [0:0] mulhsu;
+    logic [0:0] mulhu;
   } mul_op_type;
 
   parameter mul_op_type init_mul_op = '{muls : 0, mulh : 0, mulhsu : 0, mulhu : 0};
 
   typedef struct packed {
-    logic [0 : 0] lsu_lb;
-    logic [0 : 0] lsu_lbu;
-    logic [0 : 0] lsu_lh;
-    logic [0 : 0] lsu_lhu;
-    logic [0 : 0] lsu_lw;
-    logic [0 : 0] lsu_ld;
-    logic [0 : 0] lsu_sb;
-    logic [0 : 0] lsu_sh;
-    logic [0 : 0] lsu_sw;
+    logic [0:0] lsu_lb;
+    logic [0:0] lsu_lbu;
+    logic [0:0] lsu_lh;
+    logic [0:0] lsu_lhu;
+    logic [0:0] lsu_lw;
+    logic [0:0] lsu_ld;
+    logic [0:0] lsu_sb;
+    logic [0:0] lsu_sh;
+    logic [0:0] lsu_sw;
   } lsu_op_type;
 
   parameter lsu_op_type init_lsu_op = '{
@@ -197,18 +197,18 @@ package wires;
       lsu_lhu : 0,
       lsu_lw : 0,
       lsu_ld : 0,
-      lsu_sb : 0,
-      lsu_sh : 0,
-      lsu_sw : 0
+      lsu_sb  : 0,
+      lsu_sh  : 0,
+      lsu_sw  : 0
   };
 
   typedef struct packed {
-    logic [0 : 0] bcu_beq;
-    logic [0 : 0] bcu_bne;
-    logic [0 : 0] bcu_blt;
-    logic [0 : 0] bcu_bge;
-    logic [0 : 0] bcu_bltu;
-    logic [0 : 0] bcu_bgeu;
+    logic [0:0] bcu_beq;
+    logic [0:0] bcu_bne;
+    logic [0:0] bcu_blt;
+    logic [0:0] bcu_bge;
+    logic [0:0] bcu_bltu;
+    logic [0:0] bcu_bgeu;
   } bcu_op_type;
 
   parameter bcu_op_type init_bcu_op = '{
@@ -221,12 +221,12 @@ package wires;
   };
 
   typedef struct packed {
-    logic [0 : 0] csrrw;
-    logic [0 : 0] csrrs;
-    logic [0 : 0] csrrc;
-    logic [0 : 0] csrrwi;
-    logic [0 : 0] csrrsi;
-    logic [0 : 0] csrrci;
+    logic [0:0] csrrw;
+    logic [0:0] csrrs;
+    logic [0:0] csrrc;
+    logic [0:0] csrrwi;
+    logic [0:0] csrrsi;
+    logic [0:0] csrrci;
   } csr_op_type;
 
   parameter csr_op_type init_csr_op = '{
@@ -239,43 +239,43 @@ package wires;
   };
 
   typedef struct packed {
-    logic [31 : 0] rdata1;
-    logic [31 : 0] rdata2;
-    logic [31 : 0] imm;
-    logic [0 : 0] sel;
-    alu_op_type alu_op;
+    logic [31:0] rdata1;
+    logic [31:0] rdata2;
+    logic [31:0] imm;
+    logic [0:0]  sel;
+    alu_op_type  alu_op;
   } alu_in_type;
 
-  typedef struct packed {logic [31 : 0] result;} alu_out_type;
+  typedef struct packed {logic [31:0] result;} alu_out_type;
 
   typedef struct packed {
-    logic [31 : 0] rdata1;
-    logic [31 : 0] rdata2;
-    logic [0 : 0] enable;
-    div_op_type div_op;
+    logic [31:0] rdata1;
+    logic [31:0] rdata2;
+    logic [0:0]  enable;
+    div_op_type  div_op;
   } div_in_type;
 
   typedef struct packed {
-    logic [31 : 0] result;
-    logic [0 : 0]  ready;
+    logic [31:0] result;
+    logic [0:0]  ready;
   } div_out_type;
 
   typedef struct packed {
-    logic [31 : 0] data1;
-    logic [31 : 0] data2;
-    logic [31 : 0] op1;
-    logic [31 : 0] op2;
-    logic [0 : 0] op1_signed;
-    logic [0 : 0] op2_signed;
-    logic [0 : 0] op1_neg;
-    logic [5 : 0] counter;
-    logic [64 : 0] result;
-    logic [0 : 0] division;
-    logic [0 : 0] negativ;
-    logic [0 : 0] divisionbyzero;
-    logic [0 : 0] overflow;
-    logic [0 : 0] ready;
-    div_op_type div_op;
+    logic [31:0] data1;
+    logic [31:0] data2;
+    logic [31:0] op1;
+    logic [31:0] op2;
+    logic [0:0]  op1_signed;
+    logic [0:0]  op2_signed;
+    logic [0:0]  op1_neg;
+    logic [5:0]  counter;
+    logic [64:0] result;
+    logic [0:0]  division;
+    logic [0:0]  negativ;
+    logic [0:0]  divisionbyzero;
+    logic [0:0]  overflow;
+    logic [0:0]  ready;
+    div_op_type  div_op;
   } div_reg_type;
 
   parameter div_reg_type init_div_reg = '{
@@ -297,128 +297,149 @@ package wires;
   };
 
   typedef struct packed {
-    logic [31 : 0] rdata1;
-    logic [31 : 0] rdata2;
-    mul_op_type mul_op;
+    logic [31:0] rdata1;
+    logic [31:0] rdata2;
+    mul_op_type  mul_op;
   } mul_in_type;
 
-  typedef struct packed {logic [31 : 0] result;} mul_out_type;
+  typedef struct packed {logic [31:0] result;} mul_out_type;
 
   typedef struct packed {
-    logic [31 : 0] rdata1;
-    logic [31 : 0] rdata2;
-    logic [0 : 0] enable;
-    bcu_op_type bcu_op;
+    logic [31:0] rdata1;
+    logic [31:0] rdata2;
+    logic [0:0]  enable;
+    bcu_op_type  bcu_op;
   } bcu_in_type;
 
-  typedef struct packed {logic [0 : 0] branch;} bcu_out_type;
+  typedef struct packed {logic [0:0] branch;} bcu_out_type;
 
   typedef struct packed {
-    logic [31 : 0] rdata1;
-    logic [31 : 0] imm;
-    logic [31 : 0] pc;
-    logic [0 : 0] auipc;
-    logic [0 : 0] jal;
-    logic [0 : 0] jalr;
-    logic [0 : 0] branch;
-    logic [0 : 0] load;
-    logic [0 : 0] store;
-    lsu_op_type lsu_op;
+    logic [31:0] rdata1;
+    logic [31:0] imm;
+    logic [31:0] pc;
+    logic [0:0]  auipc;
+    logic [0:0]  jal;
+    logic [0:0]  jalr;
+    logic [0:0]  branch;
+    logic [0:0]  load;
+    logic [0:0]  store;
+    lsu_op_type  lsu_op;
   } agu_in_type;
 
+  localparam agu_in_type init_agu_in = '{
+      rdata1 : 0,
+      imm : 0,
+      pc : 32'hFFFFFFFF,
+      auipc  : 0,
+      jal : 0,
+      jalr : 0,
+      branch : 0,
+      load   : 0,
+      store : 0,
+      lsu_op : init_lsu_op
+  };
+
   typedef struct packed {
-    logic [31 : 0] address;
-    logic [3 : 0]  byteenable;
-    logic [0 : 0]  exception;
-    logic [7 : 0]  ecause;
-    logic [31 : 0] etval;
+    logic [31:0] address;
+    logic [3:0]  byteenable;
+    logic [0:0]  exception;
+    logic [7:0]  ecause;
+    logic [31:0] etval;
   } agu_out_type;
 
+  localparam agu_out_type init_agu_out = '{
+      address : 0,
+      byteenable : 0,
+      exception : 0,
+      ecause : 0,
+      etval : 0
+  };
+
   typedef struct packed {
-    logic [31 : 0] ldata;
-    logic [3 : 0] byteenable;
-    lsu_op_type lsu_op;
+    logic [31:0] ldata;
+    logic [3:0]  byteenable;
+    lsu_op_type  lsu_op;
   } lsu_in_type;
 
-  typedef struct packed {logic [31 : 0] result;} lsu_out_type;
+  typedef struct packed {logic [31:0] result;} lsu_out_type;
 
   typedef struct packed {
-    logic [31 : 0] cdata;
-    logic [31 : 0] rdata1;
-    logic [31 : 0] imm;
-    logic [0 : 0] sel;
-    csr_op_type csr_op;
+    logic [31:0] cdata;
+    logic [31:0] rdata1;
+    logic [31:0] imm;
+    logic [0:0]  sel;
+    csr_op_type  csr_op;
   } csr_alu_in_type;
 
-  typedef struct packed {logic [31 : 0] cdata;} csr_alu_out_type;
+  typedef struct packed {logic [31:0] cdata;} csr_alu_out_type;
 
   typedef struct packed {
-    logic [0 : 0]  taken;
-    logic [31 : 0] taddr;
-    logic [1 : 0]  tsat;
+    logic [0:0]  taken;
+    logic [31:0] taddr;
+    logic [1:0]  tsat;
   } prediction_type;
 
   parameter prediction_type init_prediction = '{taken : 0, taddr : 0, tsat : 0};
 
   typedef struct packed {
-    logic [31 : 0]  get_pc0;
-    logic [31 : 0]  get_pc1;
-    logic [31 : 0]  upd_pc0;
-    logic [31 : 0]  upd_pc1;
-    logic [31 : 0]  upd_npc0;
-    logic [31 : 0]  upd_npc1;
-    logic [31 : 0]  upd_addr0;
-    logic [31 : 0]  upd_addr1;
-    logic [0 : 0]   upd_jal0;
-    logic [0 : 0]   upd_jal1;
-    logic [0 : 0]   upd_jalr0;
-    logic [0 : 0]   upd_jalr1;
-    logic [0 : 0]   upd_branch0;
-    logic [0 : 0]   upd_branch1;
-    logic [0 : 0]   upd_jump0;
-    logic [0 : 0]   upd_jump1;
+    logic [31:0] get_pc0;
+    logic [31:0] get_pc1;
+    logic [31:0] upd_pc0;
+    logic [31:0] upd_pc1;
+    logic [31:0] upd_npc0;
+    logic [31:0] upd_npc1;
+    logic [31:0] upd_addr0;
+    logic [31:0] upd_addr1;
+    logic [0:0] upd_jal0;
+    logic [0:0] upd_jal1;
+    logic [0:0] upd_jalr0;
+    logic [0:0] upd_jalr1;
+    logic [0:0] upd_branch0;
+    logic [0:0] upd_branch1;
+    logic [0:0] upd_jump0;
+    logic [0:0] upd_jump1;
     prediction_type upd_pred0;
     prediction_type upd_pred1;
-    logic [0 : 0]   stall;
-    logic [0 : 0]   flush;
+    logic [0:0] stall;
+    logic [0:0] flush;
   } btac_in_type;
 
   typedef struct packed {
     prediction_type pred0;
     prediction_type pred1;
-    logic [31 : 0]  pred_maddr;
-    logic [0 : 0]   pred_miss;
-    logic [0 : 0]   pred_hazard;
+    logic [31:0]    pred_maddr;
+    logic [0:0]     pred_miss;
+    logic [0:0]     pred_hazard;
   } btac_out_type;
 
   typedef struct packed {
-    logic [0 : 0] wren;
-    logic [0 : 0] rden1;
-    logic [0 : 0] rden2;
-    logic [0 : 0] cwren;
-    logic [0 : 0] crden;
-    logic [0 : 0] alunit;
-    logic [0 : 0] auipc;
-    logic [0 : 0] lui;
-    logic [0 : 0] jal;
-    logic [0 : 0] jalr;
-    logic [0 : 0] branch;
-    logic [0 : 0] load;
-    logic [0 : 0] store;
-    logic [0 : 0] nop;
-    logic [0 : 0] csreg;
-    logic [0 : 0] division;
-    logic [0 : 0] mult;
-    logic [0 : 0] bitm;
-    logic [0 : 0] bitc;
-    logic [0 : 0] fence;
-    logic [0 : 0] ecall;
-    logic [0 : 0] ebreak;
-    logic [0 : 0] mret;
-    logic [0 : 0] wfi;
-    logic [0 : 0] jump;
-    logic [0 : 0] exception;
-    logic [0 : 0] valid;
+    logic [0:0] wren;
+    logic [0:0] rden1;
+    logic [0:0] rden2;
+    logic [0:0] cwren;
+    logic [0:0] crden;
+    logic [0:0] alunit;
+    logic [0:0] auipc;
+    logic [0:0] lui;
+    logic [0:0] jal;
+    logic [0:0] jalr;
+    logic [0:0] branch;
+    logic [0:0] load;
+    logic [0:0] store;
+    logic [0:0] nop;
+    logic [0:0] csreg;
+    logic [0:0] division;
+    logic [0:0] mult;
+    logic [0:0] bitm;
+    logic [0:0] bitc;
+    logic [0:0] fence;
+    logic [0:0] ecall;
+    logic [0:0] ebreak;
+    logic [0:0] mret;
+    logic [0:0] wfi;
+    logic [0:0] jump;
+    logic [0:0] exception;
+    logic [0:0] valid;
   } operation_type;
 
   parameter operation_type init_operation = '{
@@ -452,26 +473,26 @@ package wires;
   };
 
   typedef struct packed {
-    logic [31 : 0] pc;
-    logic [31 : 0] npc;
-    logic [31 : 0] instr;
-    logic [79 : 0] instr_str;
-    logic [31 : 0] imm;
-    logic [4 : 0] waddr;
-    logic [4 : 0] raddr1;
-    logic [4 : 0] raddr2;
-    logic [4 : 0] raddr3;
-    logic [11 : 0] caddr;
-    logic [1 : 0] fmt;
-    logic [2 : 0] rm;
-    operation_type op;
-    alu_op_type alu_op;
-    bcu_op_type bcu_op;
-    lsu_op_type lsu_op;
-    csr_op_type csr_op;
-    div_op_type div_op;
-    mul_op_type mul_op;
-    bit_op_type bit_op;
+    logic [31:0]    pc;
+    logic [31:0]    npc;
+    logic [31:0]    instr;
+    logic [79:0]    instr_str;
+    logic [31:0]    imm;
+    logic [4:0]     waddr;
+    logic [4:0]     raddr1;
+    logic [4:0]     raddr2;
+    logic [4:0]     raddr3;
+    logic [11:0]    caddr;
+    logic [1:0]     fmt;
+    logic [2:0]     rm;
+    operation_type  op;
+    alu_op_type     alu_op;
+    bcu_op_type     bcu_op;
+    lsu_op_type     lsu_op;
+    csr_op_type     csr_op;
+    div_op_type     div_op;
+    mul_op_type     mul_op;
+    bit_op_type     bit_op;
     prediction_type pred;
   } instruction_type;
 
@@ -500,105 +521,105 @@ package wires;
   };
 
   typedef struct packed {
-    logic [31 : 0] pc0;
-    logic [31 : 0] pc1;
-    logic [63 : 0] rdata;
-    logic [0 : 0]  ready;
-    logic [0 : 0]  flush;
-    logic [0 : 0]  stall;
+    logic [31:0] pc0;
+    logic [31:0] pc1;
+    logic [63:0] rdata;
+    logic [0:0]  ready;
+    logic [0:0]  flush;
+    logic [0:0]  stall;
   } buffer_in_type;
 
   typedef struct packed {
-    logic [31 : 0] pc0;
-    logic [31 : 0] pc1;
-    logic [31 : 0] instr0;
-    logic [31 : 0] instr1;
-    logic [0 : 0]  ready0;
-    logic [0 : 0]  ready1;
-    logic [0 : 0]  stall;
+    logic [31:0] pc0;
+    logic [31:0] pc1;
+    logic [31:0] instr0;
+    logic [31:0] instr1;
+    logic [0:0]  ready0;
+    logic [0:0]  ready1;
+    logic [0:0]  stall;
   } buffer_out_type;
 
-  typedef struct packed {logic [31 : 0] instr;} decoder_in_type;
+  typedef struct packed {logic [31:0] instr;} decoder_in_type;
 
   typedef struct packed {
-    logic [79 : 0] instr_str;
-    logic [31 : 0] imm;
-    logic [0 : 0] wren;
-    logic [0 : 0] rden1;
-    logic [0 : 0] rden2;
-    logic [0 : 0] cwren;
-    logic [0 : 0] crden;
-    logic [0 : 0] alunit;
-    logic [0 : 0] auipc;
-    logic [0 : 0] lui;
-    logic [0 : 0] jal;
-    logic [0 : 0] jalr;
-    logic [0 : 0] branch;
-    logic [0 : 0] load;
-    logic [0 : 0] store;
-    logic [0 : 0] nop;
-    logic [0 : 0] csreg;
-    logic [0 : 0] division;
-    logic [0 : 0] mult;
-    logic [0 : 0] bitm;
-    logic [0 : 0] bitc;
-    logic [0 : 0] fence;
-    logic [0 : 0] ecall;
-    logic [0 : 0] ebreak;
-    logic [0 : 0] mret;
-    logic [0 : 0] wfi;
-    logic [0 : 0] valid;
-    alu_op_type alu_op;
-    bcu_op_type bcu_op;
-    lsu_op_type lsu_op;
-    csr_op_type csr_op;
-    div_op_type div_op;
-    mul_op_type mul_op;
-    bit_op_type bit_op;
+    logic [79:0] instr_str;
+    logic [31:0] imm;
+    logic [0:0]  wren;
+    logic [0:0]  rden1;
+    logic [0:0]  rden2;
+    logic [0:0]  cwren;
+    logic [0:0]  crden;
+    logic [0:0]  alunit;
+    logic [0:0]  auipc;
+    logic [0:0]  lui;
+    logic [0:0]  jal;
+    logic [0:0]  jalr;
+    logic [0:0]  branch;
+    logic [0:0]  load;
+    logic [0:0]  store;
+    logic [0:0]  nop;
+    logic [0:0]  csreg;
+    logic [0:0]  division;
+    logic [0:0]  mult;
+    logic [0:0]  bitm;
+    logic [0:0]  bitc;
+    logic [0:0]  fence;
+    logic [0:0]  ecall;
+    logic [0:0]  ebreak;
+    logic [0:0]  mret;
+    logic [0:0]  wfi;
+    logic [0:0]  valid;
+    alu_op_type  alu_op;
+    bcu_op_type  bcu_op;
+    lsu_op_type  lsu_op;
+    csr_op_type  csr_op;
+    div_op_type  div_op;
+    mul_op_type  mul_op;
+    bit_op_type  bit_op;
   } decoder_out_type;
 
-  typedef struct packed {logic [31 : 0] instr;} compress_in_type;
+  typedef struct packed {logic [31:0] instr;} compress_in_type;
 
   typedef struct packed {
-    logic [79 : 0] instr_str;
-    logic [31 : 0] imm;
-    logic [4 : 0] waddr;
-    logic [4 : 0] raddr1;
-    logic [4 : 0] raddr2;
-    logic [0 : 0] wren;
-    logic [0 : 0] rden1;
-    logic [0 : 0] rden2;
-    logic [0 : 0] alunit;
-    logic [0 : 0] lui;
-    logic [0 : 0] jal;
-    logic [0 : 0] jalr;
-    logic [0 : 0] branch;
-    logic [0 : 0] load;
-    logic [0 : 0] store;
-    logic [0 : 0] nop;
-    logic [0 : 0] ebreak;
-    logic [0 : 0] valid;
-    alu_op_type alu_op;
-    bcu_op_type bcu_op;
-    lsu_op_type lsu_op;
+    logic [79:0] instr_str;
+    logic [31:0] imm;
+    logic [4:0]  waddr;
+    logic [4:0]  raddr1;
+    logic [4:0]  raddr2;
+    logic [0:0]  wren;
+    logic [0:0]  rden1;
+    logic [0:0]  rden2;
+    logic [0:0]  alunit;
+    logic [0:0]  lui;
+    logic [0:0]  jal;
+    logic [0:0]  jalr;
+    logic [0:0]  branch;
+    logic [0:0]  load;
+    logic [0:0]  store;
+    logic [0:0]  nop;
+    logic [0:0]  ebreak;
+    logic [0:0]  valid;
+    alu_op_type  alu_op;
+    bcu_op_type  bcu_op;
+    lsu_op_type  lsu_op;
   } compress_out_type;
 
   typedef struct packed {
-    logic [0 : 0] rden1;
-    logic [4 : 0] raddr1;
-    logic [0 : 0] rden2;
-    logic [4 : 0] raddr2;
+    logic [0:0] rden1;
+    logic [4:0] raddr1;
+    logic [0:0] rden2;
+    logic [4:0] raddr2;
   } register_read_in_type;
 
   typedef struct packed {
-    logic [0 : 0]  wren;
-    logic [4 : 0]  waddr;
-    logic [31 : 0] wdata;
+    logic [0:0]  wren;
+    logic [4:0]  waddr;
+    logic [31:0] wdata;
   } register_write_in_type;
 
   typedef struct packed {
-    logic [31 : 0] rdata1;
-    logic [31 : 0] rdata2;
+    logic [31:0] rdata1;
+    logic [31:0] rdata2;
   } register_out_type;
 
   typedef struct packed {
@@ -691,13 +712,13 @@ package wires;
 
   typedef struct packed {
     csr_mstatus_reg_type mstatus;
-    logic [31 : 0] mtvec;
-    logic [63 : 0] mcycle;
-    logic [63 : 0] minstret;
-    logic [31 : 0] mscratch;
-    logic [31 : 0] mepc;
-    logic [31 : 0] mcause;
-    logic [31 : 0] mtval;
+    logic [31:0] mtvec;
+    logic [63:0] mcycle;
+    logic [63:0] minstret;
+    logic [31:0] mscratch;
+    logic [31:0] mepc;
+    logic [31:0] mcause;
+    logic [31:0] mtval;
     csr_mip_reg_type mip;
     csr_mie_reg_type mie;
   } csr_machine_reg_type;
@@ -716,66 +737,78 @@ package wires;
   };
 
   typedef struct packed {
-    logic [0 : 0]  cwren;
-    logic [11 : 0] cwaddr;
-    logic [31 : 0] cdata;
+    logic [0:0]  cwren;
+    logic [11:0] cwaddr;
+    logic [31:0] cdata;
   } csr_write_in_type;
 
-  typedef struct packed {
-    logic [0 : 0]  valid0;
-    logic [0 : 0]  valid1;
-    logic [31 : 0] pc;
-    logic [0 : 0]  mret;
-    logic [0 : 0]  exception;
-    logic [31 : 0] epc;
-    logic [7 : 0]  ecause;
-    logic [31 : 0] etval;
-  } csr_exception_in_type;
+  localparam csr_write_in_type init_csr_write_in = '{cwren : 0, cwaddr : 0, cdata : 0};
 
   typedef struct packed {
-    logic [0 : 0]  trap;
-    logic [0 : 0]  mret;
-    logic [31 : 0] mtvec;
-    logic [31 : 0] mepc;
-    logic [31 : 0] cdata;
-    logic [1 : 0]  fs;
+    logic [0:0]  valid0;
+    logic [0:0]  valid1;
+    logic [31:0] pc;
+    logic [0:0]  mret;
+    logic [0:0]  exception;
+    logic [31:0] epc;
+    logic [7:0]  ecause;
+    logic [31:0] etval;
+  } csr_exception_in_type;
+
+  localparam csr_exception_in_type init_csr_exception_in = '{
+      valid0 : 0,
+      valid1 : 0,
+      pc : 0,
+      mret : 0,
+      exception : 0,
+      epc : 0,
+      ecause : 0,
+      etval : 0
+  };
+
+  typedef struct packed {
+    logic [0:0]  trap;
+    logic [0:0]  mret;
+    logic [31:0] mtvec;
+    logic [31:0] mepc;
+    logic [31:0] cdata;
+    logic [1:0]  fs;
   } csr_out_type;
 
   typedef struct packed {
-    logic [0 : 0]  crden;
-    logic [11 : 0] craddr;
+    logic [0:0]  crden;
+    logic [11:0] craddr;
   } csr_read_in_type;
 
-
   typedef struct packed {
-    logic [0 : 0]  cwren;
-    logic [0 : 0]  crden;
-    logic [11 : 0] cwaddr;
-    logic [11 : 0] craddr;
-    logic [31 : 0] cwdata;
-    logic [1 : 0]  mode;
+    logic [0:0]  cwren;
+    logic [0:0]  crden;
+    logic [11:0] cwaddr;
+    logic [11:0] craddr;
+    logic [31:0] cwdata;
+    logic [1:0]  mode;
   } csr_pmp_in_type;
 
   typedef struct packed {
-    logic [31 : 0] crdata;
-    logic [0 : 0]  cready;
+    logic [31:0] crdata;
+    logic [0:0]  cready;
   } csr_pmp_out_type;
 
   typedef struct packed {
-    logic [0 : 0]  mem_valid;
-    logic [0 : 0]  mem_instr;
-    logic [1 : 0]  mem_mode;
-    logic [31 : 0] mem_addr;
-    logic [31 : 0] mem_wdata;
-    logic [3 : 0]  mem_wstrb;
+    logic [0:0]  mem_valid;
+    logic [0:0]  mem_instr;
+    logic [1:0]  mem_mode;
+    logic [31:0] mem_addr;
+    logic [31:0] mem_wdata;
+    logic [3:0]  mem_wstrb;
   } mem_in_type;
 
   localparam mem_in_type init_mem_in = 0;
 
   typedef struct packed {
-    logic [0 : 0]  mem_ready;
-    logic [0 : 0]  mem_error;
-    logic [31 : 0] mem_rdata;
+    logic [0:0]  mem_ready;
+    logic [0:0]  mem_error;
+    logic [31:0] mem_rdata;
   } mem_out_type;
 
   localparam mem_out_type init_mem_out = 0;
@@ -794,23 +827,23 @@ package wires;
   } ifetch_state;
 
   typedef struct packed {
-    ifetch_state   state;
-    logic [31 : 0] ipc0;
-    logic [31 : 0] ipc1;
-    logic [31 : 0] irdata0;
-    logic [31 : 0] irdata1;
-    logic [0 : 0]  iready0;
-    logic [0 : 0]  iready1;
-    logic [63 : 0] rdata;
-    logic [0 : 0]  ready;
-    logic [31 : 0] pc0;
-    logic [31 : 0] pc1;
-    logic [31 : 0] instr0;
-    logic [31 : 0] instr1;
-    logic [0 : 0]  ready0;
-    logic [0 : 0]  ready1;
-    logic [0 : 0]  valid;
-    logic [0 : 0]  stall;
+    ifetch_state state;
+    logic [31:0] ipc0;
+    logic [31:0] ipc1;
+    logic [31:0] irdata0;
+    logic [31:0] irdata1;
+    logic [0:0]  iready0;
+    logic [0:0]  iready1;
+    logic [63:0] rdata;
+    logic [0:0]  ready;
+    logic [31:0] pc0;
+    logic [31:0] pc1;
+    logic [31:0] instr0;
+    logic [31:0] instr1;
+    logic [0:0]  ready0;
+    logic [0:0]  ready1;
+    logic [0:0]  valid;
+    logic [0:0]  stall;
   } ifetch_reg_type;
 
   parameter ifetch_reg_type init_ifetch_reg = '{
@@ -836,7 +869,7 @@ package wires;
   typedef struct packed {
     instruction_type instr0;
     instruction_type instr1;
-    logic [0 : 0] stall;
+    logic [0:0] stall;
   } idecode_reg_type;
 
   parameter idecode_reg_type init_idecode_reg = '{
@@ -878,35 +911,35 @@ package wires;
   } rob_entry_type;
 
   localparam rob_entry_type init_rob_entry = '{
-      valid      : 0,
-      done       : 0,
-      exception  : 0,
-      ecause     : 0,
-      etval      : 0,
-      pc         : 32'hFFFFFFFF,
+      valid : 0,
+      done : 0,
+      exception : 0,
+      ecause : 0,
+      etval : 0,
+      pc : 32'hFFFFFFFF,
       npc : 32'hFFFFFFFF,
       result : 0,
-      pdest      : 0,
-      old_pdest  : 0,
+      pdest : 0,
+      old_pdest : 0,
       adest : 0,
-      wren       : 0,
-      store      : 0,
-      load  : 0,
+      wren : 0,
+      store : 0,
+      load : 0,
       store_addr : 0,
       store_data : 0,
       store_strb : 0,
-      lsu_op     : init_lsu_op,
-      branch     : 0,
-      jump       : 0,
-      mret  : 0,
-      fence  : 0,
-      ecall      : 0,
-      ebreak     : 0,
-      wfi   : 0,
-      csreg  : 0,
-      cwren      : 0,
-      caddr      : 0,
-      cwdata: 0
+      lsu_op : init_lsu_op,
+      branch : 0,
+      jump : 0,
+      mret : 0,
+      fence : 0,
+      ecall : 0,
+      ebreak : 0,
+      wfi : 0,
+      csreg : 0,
+      cwren : 0,
+      caddr : 0,
+      cwdata : 0
   };
 
   typedef struct packed {
@@ -934,31 +967,31 @@ package wires;
   } rs_entry_type;
 
   localparam rs_entry_type init_rs_entry = '{
-      valid      : 0,
+      valid : 0,
       src1_ready : 0,
       src2_ready : 0,
-      psrc1      : 0,
-      psrc2      : 0,
-      pdest      : 0,
+      psrc1 : 0,
+      psrc2 : 0,
+      pdest : 0,
       rob_tag : 0,
-      rdata1     : 0,
-      rdata2     : 0,
-      imm        : 0,
-      pc         : 32'hFFFFFFFF,
+      rdata1 : 0,
+      rdata2 : 0,
+      imm : 0,
+      pc : 32'hFFFFFFFF,
       npc : 32'hFFFFFFFF,
       caddr : 0,
-      op         : init_operation,
+      op : init_operation,
       alu_op : init_alu_op,
-      bcu_op     : init_bcu_op,
+      bcu_op : init_bcu_op,
       lsu_op : init_lsu_op,
-      csr_op     : init_csr_op,
+      csr_op : init_csr_op,
       div_op : init_div_op,
-      mul_op     : init_mul_op,
+      mul_op : init_mul_op,
       bit_op : init_bit_op
   };
 
   typedef struct packed {
-    logic [0:0]               valid;
+    logic [0:0] valid;
     logic [PRF_ADDR_BITS-1:0] tag;
   } rat_entry_type;
 
@@ -967,15 +1000,15 @@ package wires;
     logic [31:0] flush_pc;
   } commit_type;
 
-  localparam commit_type init_commit = '{flush: 0, flush_pc: 0};
+  localparam commit_type init_commit = '{flush : 0, flush_pc : 0};
 
   typedef struct packed {
-    logic [0:0]               valid;
+    logic [0:0] valid;
     logic [PRF_ADDR_BITS-1:0] tag;
-    logic [31:0]              data;
+    logic [31:0] data;
   } cdb_type;
 
-  localparam cdb_type init_cdb = '{valid: 0, tag: 0, data: 0};
+  localparam cdb_type init_cdb = '{valid : 0, tag : 0, data : 0};
 
   localparam PRF_SLOT_W = 33;
   localparam PRF_ARR_W = PRF_DEPTH * PRF_SLOT_W;
@@ -1000,7 +1033,7 @@ package wires;
 
   typedef struct packed {prf_arr_type array;} prf_reg_type;
 
-  localparam prf_reg_type init_prf_reg = '{array: {PRF_DEPTH{1'b1, 32'h0}}};
+  localparam prf_reg_type init_prf_reg = '{array : {PRF_DEPTH{1'b1, 32'h0}}};
 
   typedef struct packed {
     fl_arr_type             list;
@@ -1023,52 +1056,21 @@ package wires;
     logic [ROB_ADDR_BITS:0]   count;
   } rob_reg_type;
 
-  localparam rob_reg_type init_rob_reg = 0;
+  localparam rob_reg_type init_rob_reg = '{array : '0, head : '0, tail : '0, count : '0};
 
   typedef struct packed {
-    rs_int_arr_type        array;
+    rs_int_arr_type array;
     logic [RS_ADDR_BITS:0] count;
   } rs_int_reg_type;
 
-  localparam rs_int_reg_type init_rs_int_reg = 0;
+  localparam rs_int_reg_type init_rs_int_reg = '{array : '0, count : '0};
 
   typedef struct packed {
-    rs_mem_arr_type        array;
+    rs_mem_arr_type array;
     logic [RS_ADDR_BITS:0] count;
   } rs_mem_reg_type;
 
-  localparam rs_mem_reg_type init_rs_mem_reg = 0;
-
-  typedef struct packed {
-    csr_out_type  csr_out;
-    btac_out_type btac_out;
-    mem_out_type  imem0_out;
-    mem_out_type  imem1_out;
-  } ifetch_in_type;
-
-  typedef struct packed {
-    buffer_in_type buffer_in;
-    btac_in_type btac_in;
-    mem_in_type imem0_in;
-    mem_in_type imem1_in;
-  } ifetch_out_type;
-
-  typedef struct packed {
-    buffer_out_type   buffer_out;
-    decoder_out_type  decoder0_out;
-    decoder_out_type  decoder1_out;
-    compress_out_type compress0_out;
-    compress_out_type compress1_out;
-  } idecode_in_type;
-
-  typedef struct packed {
-    decoder_in_type  decoder0_in;
-    decoder_in_type  decoder1_in;
-    compress_in_type compress0_in;
-    compress_in_type compress1_in;
-    instruction_type instr0;
-    instruction_type instr1;
-  } idecode_out_type;
+  localparam rs_mem_reg_type init_rs_mem_reg = '{array : '0, count : '0};
 
   typedef struct packed {
     logic [PRF_ADDR_BITS-1:0] raddr0;
@@ -1262,7 +1264,7 @@ package wires;
     rob_entry_type rob_entry0;
     rob_entry_type rob_entry1;
     rat_in_type    rat;
-    fl_in_type fl;
+    fl_in_type     fl;
     logic [0:0]    stall;
   } rename_out_type;
 
@@ -1278,6 +1280,8 @@ package wires;
     alu_out_type       alu1_out;
     agu_out_type       agu0_out;
     agu_out_type       agu1_out;
+    agu_out_type       agu2_out;
+    agu_out_type       agu3_out;
     bcu_out_type       bcu0_out;
     bcu_out_type       bcu1_out;
     mul_out_type       mul_out;
@@ -1293,6 +1297,8 @@ package wires;
     alu_in_type               alu1_in;
     agu_in_type               agu0_in;
     agu_in_type               agu1_in;
+    agu_in_type               agu2_in;
+    agu_in_type               agu3_in;
     bcu_in_type               bcu0_in;
     bcu_in_type               bcu1_in;
     mul_in_type               mul_in;
@@ -1313,19 +1319,49 @@ package wires;
 
   typedef struct packed {
     rs_entry_type issue;
-    logic [0:0]   issue_valid;
-    lsu_out_type  lsu_out;
-    mem_out_type  dmem_out;
-  } ldu_in_type;
+    logic [0:0]    issue_valid;
+    agu_out_type  agu2_out;
+    lsu_out_type  lsu1_out;
+    mem_out_type   dmem1_out;
+    logic [0:0]   commit_store;
+    rob_entry_type commit_entry;
+    lsu_out_type  lsu0_out;
+    mem_out_type   dmem0_out;
+  } msu_in_type;
+
+  localparam msu_in_type init_msu_in = '{
+      issue        : init_rs_entry,
+      issue_valid  : 0,
+      agu2_out     : init_agu_out,
+      lsu1_out     : '{result : 0},
+      dmem1_out    : init_mem_out,
+      commit_store : 0,
+      commit_entry : init_rob_entry,
+      lsu0_out     : '{result : 0},
+      dmem0_out    : init_mem_out
+  };
 
   typedef struct packed {
     cdb_type                  cdb;
     logic [ROB_ADDR_BITS-1:0] rob_wtag;
     rob_entry_type            rob_wentry;
     logic [0:0]               rob_wen;
-    mem_in_type               dmem_in;
-    lsu_in_type               lsu_in;
-  } ldu_out_type;
+    mem_in_type               dmem1_in;
+    lsu_in_type               lsu1_in;
+    mem_in_type               dmem0_in;
+    lsu_in_type               lsu0_in;
+  } msu_out_type;
+
+  localparam msu_out_type init_msu_out = '{
+      cdb       : init_cdb,
+      rob_wtag  : '0,
+      rob_wentry : init_rob_entry,
+      rob_wen : 0,
+      dmem1_in  : init_mem_in,
+      lsu1_in   : '{ldata : 0, byteenable : 0, lsu_op : init_lsu_op},
+      dmem0_in  : init_mem_in,
+      lsu0_in   : '{ldata : 0, byteenable : 0, lsu_op : init_lsu_op}
+  };
 
   typedef struct packed {
     logic [0:0]    commit0;
@@ -1334,9 +1370,16 @@ package wires;
     rob_entry_type entry0;
     rob_entry_type entry1;
     csr_out_type   csr;
-    lsu_out_type   lsu_out;
-    mem_out_type   dmem_out;
   } commit_in_type;
+
+  localparam commit_in_type init_commit_in = '{
+      commit0 : 0,
+      commit1 : 0,
+      commit_ctrl : init_commit,
+      entry0  : init_rob_entry,
+      entry1 : init_rob_entry,
+      csr     : '{trap : 0, mret : 0, mtvec : 0, mepc : 0, cdata : 0, fs : 0}
+  };
 
   typedef struct packed {
     register_write_in_type register0_win;
@@ -1346,11 +1389,56 @@ package wires;
     rat_in_type            rat;
     prf_in_type            prf;
     fl_in_type             fl;
-    mem_in_type            dmem_in;
-    lsu_in_type            lsu_in;
     logic [0:0]            flush;
     logic [31:0]           flush_pc;
+    logic [0:0]            commit_store;
+    rob_entry_type         commit_entry;
   } commit_out_type;
+
+  localparam commit_out_type init_commit_out = '{
+      register0_win : '{wren : 0, waddr : 0, wdata : 0},
+      register1_win : '{wren : 0, waddr : 0, wdata : 0},
+      csr_win       : init_csr_write_in,
+      csr_ein : init_csr_exception_in,
+      rat           : init_rat_in,
+      prf     : init_prf_in,
+      fl            : init_fl_in,
+      flush         : 0,
+      flush_pc : 0,
+      commit_store  : 0,
+      commit_entry : init_rob_entry
+  };
+
+  typedef struct packed {
+    csr_out_type  csr_out;
+    btac_out_type btac_out;
+    mem_out_type  imem0_out;
+    mem_out_type  imem1_out;
+  } ifetch_in_type;
+
+  typedef struct packed {
+    buffer_in_type buffer_in;
+    btac_in_type btac_in;
+    mem_in_type    imem0_in;
+    mem_in_type  imem1_in;
+  } ifetch_out_type;
+
+  typedef struct packed {
+    buffer_out_type   buffer_out;
+    decoder_out_type  decoder0_out;
+    decoder_out_type  decoder1_out;
+    compress_out_type compress0_out;
+    compress_out_type compress1_out;
+  } idecode_in_type;
+
+  typedef struct packed {
+    decoder_in_type  decoder0_in;
+    decoder_in_type  decoder1_in;
+    compress_in_type compress0_in;
+    compress_in_type compress1_in;
+    instruction_type instr0;
+    instruction_type instr1;
+  } idecode_out_type;
 
   typedef struct packed {
     logic [0:0]  flush;

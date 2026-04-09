@@ -117,6 +117,7 @@ module rob (
       e.cwdata     = rob_in.write_entry1.cwdata;
       v.array      = rob_write(v.array, rob_in.write_tag1, e);
     end
+
     if (rob_in.write_en2) begin
       e           = rob_read(v.array, rob_in.write_tag2);
       e.done      = 1'b1;
@@ -144,6 +145,8 @@ module rob (
 
   always_ff @(posedge clock) begin
     if (reset == 0) begin
+      r <= init_rob_reg;
+    end else if (flush) begin
       r <= init_rob_reg;
     end else begin
       r <= rin;

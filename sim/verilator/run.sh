@@ -60,7 +60,7 @@ $VERILATOR --binary --trace --trace-structs --timing --top-module testbench -Wno
             $BASEDIR/verilog/rtl/rs_mem.sv \
             $BASEDIR/verilog/rtl/rename.sv \
             $BASEDIR/verilog/rtl/eu.sv \
-            $BASEDIR/verilog/rtl/ldu.sv \
+            $BASEDIR/verilog/rtl/msu.sv \
             $BASEDIR/verilog/rtl/commit.sv \
             $BASEDIR/verilog/rtl/cpu.sv \
             $BASEDIR/verilog/rtl/soc.sv \

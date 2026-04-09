@@ -71,17 +71,18 @@ module rs_int (
     end
 
     if (sel0_found) begin
-      e = rs_int_read(v.array, sel0_idx);
+      e       = rs_int_read(v.array, sel0_idx);
       e.valid = 1'b0;
       v.array = rs_int_write(v.array, sel0_idx, e);
       v.count = v.count - 1;
     end
     if (sel1_found) begin
-      e = rs_int_read(v.array, sel1_idx);
+      e       = rs_int_read(v.array, sel1_idx);
       e.valid = 1'b0;
       v.array = rs_int_write(v.array, sel1_idx, e);
       v.count = v.count - 1;
     end
+
     if (rs_in.alloc0 && free_found0) begin
       v.array = rs_int_write(v.array, free_idx0, rs_in.entry0);
       v.count = v.count + 1;
@@ -104,6 +105,8 @@ module rs_int (
 
   always_ff @(posedge clock) begin
     if (reset == 0) begin
+      r <= init_rs_int_reg;
+    end else if (flush) begin
       r <= init_rs_int_reg;
     end else begin
       r <= rin;

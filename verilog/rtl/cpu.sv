@@ -3,20 +3,20 @@ import constants::*;
 import wires::*;
 
 module cpu (
-    input logic reset,
-    input logic clock,
-    input mem_out_type imem0_out,
-    input mem_out_type imem1_out,
-    output mem_in_type imem0_in,
-    output mem_in_type imem1_in,
-    input mem_out_type dmem0_out,
-    input mem_out_type dmem1_out,
-    output mem_in_type dmem0_in,
-    output mem_in_type dmem1_in,
-    input logic [0:0] meip,
-    input logic [0:0] msip,
-    input logic [0:0] mtip,
-    input logic [63:0] mtime
+    input  logic               reset,
+    input  logic               clock,
+    input  mem_out_type        imem0_out,
+    input  mem_out_type        imem1_out,
+    output mem_in_type         imem0_in,
+    output mem_in_type         imem1_in,
+    input  mem_out_type        dmem0_out,
+    input  mem_out_type        dmem1_out,
+    output mem_in_type         dmem0_in,
+    output mem_in_type         dmem1_in,
+    input  logic        [ 0:0] meip,
+    input  logic        [ 0:0] msip,
+    input  logic        [ 0:0] mtip,
+    input  logic        [63:0] mtime
 );
   timeunit 1ns; timeprecision 1ps;
 
@@ -26,8 +26,6 @@ module cpu (
 
   alu_in_type alu0_in, alu1_in;
   alu_out_type alu0_out, alu1_out;
-  agu_in_type agu0_in, agu1_in;
-  agu_out_type agu0_out, agu1_out;
   bcu_in_type bcu0_in, bcu1_in;
   bcu_out_type bcu0_out, bcu1_out;
   mul_in_type  mul_in;
@@ -43,6 +41,9 @@ module cpu (
   lsu_in_type lsu0_in, lsu1_in;
   lsu_out_type lsu0_out, lsu1_out;
   csr_out_type csr_out;
+
+  agu_in_type agu0_in, agu1_in, agu2_in, agu3_in;
+  agu_out_type agu0_out, agu1_out, agu2_out, agu3_out;
 
   register_write_in_type register0_win, register1_win;
 
@@ -75,11 +76,13 @@ module cpu (
   rename_out_type  rename_out;
   eu_in_type       eu_in;
   eu_out_type      eu_out_s;
-  ldu_in_type      ldu_in;
-  ldu_out_type     ldu_out;
+  msu_in_type      msu_in;
+  msu_out_type     msu_out;
   commit_in_type   commit_in;
   commit_out_type  commit_out;
 
+  assign cpu_ctrl.flush           = commit_out.flush;
+  assign cpu_ctrl.flush_pc        = commit_out.flush_pc;
   assign cpu_ctrl.flush_all       = cpu_ctrl.flush | csr_out.trap | csr_out.mret;
   assign cpu_ctrl.backend_stall   = rename_out.stall | rob_out.full;
 
@@ -149,9 +152,9 @@ module cpu (
   assign rob_in.write_tag1        = eu_out_s.rob_wtag1;
   assign rob_in.write_entry1      = eu_out_s.rob_wentry1;
   assign rob_in.write_en1         = eu_out_s.rob_wen1;
-  assign rob_in.write_tag2        = ldu_out.rob_wtag;
-  assign rob_in.write_entry2      = ldu_out.rob_wentry;
-  assign rob_in.write_en2         = ldu_out.rob_wen;
+  assign rob_in.write_tag2        = msu_out.rob_wtag;
+  assign rob_in.write_entry2      = msu_out.rob_wentry;
+  assign rob_in.write_en2         = msu_out.rob_wen;
   assign rob_in.cdb0              = cdb0;
   assign rob_in.cdb1              = cdb1;
 
@@ -196,6 +199,7 @@ module cpu (
   assign eu_in.int_issue0_valid   = rs_int_out.issue0_valid;
   assign eu_in.int_issue1         = rs_int_out.issue1;
   assign eu_in.int_issue1_valid   = rs_int_out.issue1_valid;
+
   assign eu_in.mem_issue0         = rs_mem_out.issue0;
   assign eu_in.mem_issue0_valid   = rs_mem_out.issue0_valid && rs_mem_out.issue0.op.store;
   assign eu_in.csr                = csr_out;
@@ -203,6 +207,8 @@ module cpu (
   assign eu_in.alu1_out           = alu1_out;
   assign eu_in.agu0_out           = agu0_out;
   assign eu_in.agu1_out           = agu1_out;
+  assign eu_in.agu2_out           = agu2_out;
+  assign eu_in.agu3_out           = agu3_out;
   assign eu_in.bcu0_out           = bcu0_out;
   assign eu_in.bcu1_out           = bcu1_out;
   assign eu_in.mul_out            = mul_out;
@@ -214,8 +220,6 @@ module cpu (
 
   assign alu0_in                  = eu_out_s.alu0_in;
   assign alu1_in                  = eu_out_s.alu1_in;
-  assign agu0_in                  = eu_out_s.agu0_in;
-  assign agu1_in                  = eu_out_s.agu1_in;
   assign bcu0_in                  = eu_out_s.bcu0_in;
   assign bcu1_in                  = eu_out_s.bcu1_in;
   assign mul_in                   = eu_out_s.mul_in;
@@ -227,14 +231,26 @@ module cpu (
   assign cdb0                     = eu_out_s.cdb0;
   assign cdb1                     = eu_out_s.cdb1;
 
-  assign ldu_in.issue             = rs_mem_out.issue0;
-  assign ldu_in.issue_valid       = rs_mem_out.issue0_valid && rs_mem_out.issue0.op.load;
-  assign ldu_in.dmem_out          = dmem1_out;
-  assign ldu_in.lsu_out           = lsu1_out;
+  assign agu0_in                  = eu_out_s.agu0_in;
+  assign agu1_in                  = eu_out_s.agu1_in;
+  assign agu2_in                  = eu_out_s.agu2_in;
+  assign agu3_in                  = eu_out_s.agu3_in;
 
-  assign dmem1_in                 = ldu_out.dmem_in;
-  assign lsu1_in                  = ldu_out.lsu_in;
-  assign cdb_load                 = ldu_out.cdb;
+  assign msu_in.issue             = rs_mem_out.issue0;
+  assign msu_in.issue_valid       = rs_mem_out.issue0_valid && rs_mem_out.issue0.op.load;
+  assign msu_in.agu2_out          = agu2_out;
+  assign msu_in.lsu1_out          = lsu1_out;
+  assign msu_in.dmem1_out         = dmem1_out;
+  assign msu_in.commit_store      = commit_out.commit_store;
+  assign msu_in.commit_entry      = commit_out.commit_entry;
+  assign msu_in.lsu0_out          = lsu0_out;
+  assign msu_in.dmem0_out         = dmem0_out;
+
+  assign dmem1_in                 = msu_out.dmem1_in;
+  assign lsu1_in                  = msu_out.lsu1_in;
+  assign dmem0_in                 = msu_out.dmem0_in;
+  assign lsu0_in                  = msu_out.lsu0_in;
+  assign cdb_load                 = msu_out.cdb;
 
   assign commit_in.commit0        = rob_out.commit0;
   assign commit_in.commit1        = rob_out.commit1;
@@ -242,13 +258,7 @@ module cpu (
   assign commit_in.entry0         = rob_out.entry0;
   assign commit_in.entry1         = rob_out.entry1;
   assign commit_in.csr            = csr_out;
-  assign commit_in.dmem_out       = dmem0_out;
-  assign commit_in.lsu_out        = lsu0_out;
 
-  assign dmem0_in                 = commit_out.dmem_in;
-  assign lsu0_in                  = commit_out.lsu_in;
-  assign cpu_ctrl.flush           = commit_out.flush;
-  assign cpu_ctrl.flush_pc        = commit_out.flush_pc;
   assign register0_win            = commit_out.register0_win;
   assign register1_win            = commit_out.register1_win;
 
@@ -260,14 +270,27 @@ module cpu (
       .alu_in (alu1_in),
       .alu_out(alu1_out)
   );
+
   agu agu0_comp (
       .agu_in (agu0_in),
       .agu_out(agu0_out)
   );
+
   agu agu1_comp (
       .agu_in (agu1_in),
       .agu_out(agu1_out)
   );
+
+  agu agu2_comp (
+      .agu_in (agu2_in),
+      .agu_out(agu2_out)
+  );
+
+  agu agu3_comp (
+      .agu_in (agu3_in),
+      .agu_out(agu3_out)
+  );
+
   bcu bcu0_comp (
       .bcu_in (bcu0_in),
       .bcu_out(bcu0_out)
@@ -276,18 +299,22 @@ module cpu (
       .bcu_in (bcu1_in),
       .bcu_out(bcu1_out)
   );
+
   lsu lsu0_comp (
       .lsu_in (lsu0_in),
       .lsu_out(lsu0_out)
   );
+
   lsu lsu1_comp (
       .lsu_in (lsu1_in),
       .lsu_out(lsu1_out)
   );
+
   csr_alu csr_alu_comp (
       .csr_alu_in (csr_alu_in),
       .csr_alu_out(csr_alu_out)
   );
+
   mul mul_comp (
       .reset  (reset),
       .clock  (clock),
@@ -302,6 +329,7 @@ module cpu (
       .div_in (div_in),
       .div_out(div_out)
   );
+
   bit_alu bit_alu0_comp (
       .bit_alu_in (bit_alu0_in),
       .bit_alu_out(bit_alu0_out)
@@ -310,6 +338,7 @@ module cpu (
       .bit_alu_in (bit_alu1_in),
       .bit_alu_out(bit_alu1_out)
   );
+
   bit_clmul bit_clmul_comp (
       .reset(reset),
       .clock(clock),
@@ -317,18 +346,21 @@ module cpu (
       .bit_clmul_in(bit_clmul_in),
       .bit_clmul_out(bit_clmul_out)
   );
+
   btac btac_comp (
       .reset(reset),
       .clock(clock),
       .btac_in(btac_in),
       .btac_out(btac_out)
   );
+
   buffer buffer_comp (
       .reset(reset),
       .clock(clock),
       .buffer_in(buffer_in),
       .buffer_out(buffer_out)
   );
+
   decoder decoder0_comp (
       .decoder_in (decoder0_in),
       .decoder_out(decoder0_out)
@@ -337,6 +369,7 @@ module cpu (
       .decoder_in (decoder1_in),
       .decoder_out(decoder1_out)
   );
+
   compress compress0_comp (
       .compress_in (compress0_in),
       .compress_out(compress0_out)
@@ -345,6 +378,7 @@ module cpu (
       .compress_in (compress1_in),
       .compress_out(compress1_out)
   );
+
   register register_comp (
       .reset(reset),
       .clock(clock),
@@ -355,6 +389,7 @@ module cpu (
       .register0_out(),
       .register1_out()
   );
+
   csr csr_comp (
       .reset(reset),
       .clock(clock),
@@ -367,6 +402,7 @@ module cpu (
       .mtip(mtip),
       .mtime(mtime)
   );
+
   ifetch ifetch_comp (
       .reset(reset),
       .clock(clock),
@@ -375,6 +411,7 @@ module cpu (
       .ifetch_in(ifetch_in),
       .ifetch_out(ifetch_out)
   );
+
   idecode idecode_comp (
       .reset(reset),
       .clock(clock),
@@ -382,6 +419,7 @@ module cpu (
       .idecode_in(idecode_in),
       .idecode_out(idecode_out)
   );
+
   prf prf_comp (
       .reset  (reset),
       .clock  (clock),
@@ -389,6 +427,7 @@ module cpu (
       .prf_in (prf_in),
       .prf_out(prf_out)
   );
+
   rat rat_comp (
       .reset  (reset),
       .clock  (clock),
@@ -396,6 +435,7 @@ module cpu (
       .rat_in (rat_in),
       .rat_out(rat_out)
   );
+
   fl fl_comp (
       .reset (reset),
       .clock (clock),
@@ -403,6 +443,7 @@ module cpu (
       .fl_in (fl_in),
       .fl_out(fl_out)
   );
+
   rob rob_comp (
       .reset  (reset),
       .clock  (clock),
@@ -410,6 +451,7 @@ module cpu (
       .rob_in (rob_in),
       .rob_out(rob_out)
   );
+
   rs_int rs_int_comp (
       .reset (reset),
       .clock (clock),
@@ -417,6 +459,7 @@ module cpu (
       .rs_in (rs_int_in),
       .rs_out(rs_int_out)
   );
+
   rs_mem rs_mem_comp (
       .reset (reset),
       .clock (clock),
@@ -424,6 +467,7 @@ module cpu (
       .rs_in (rs_mem_in),
       .rs_out(rs_mem_out)
   );
+
   rename rd_comp (
       .reset(reset),
       .clock(clock),
@@ -431,6 +475,7 @@ module cpu (
       .rename_in(rename_in),
       .rename_out(rename_out)
   );
+
   eu eu_comp (
       .reset (reset),
       .clock (clock),
@@ -438,13 +483,15 @@ module cpu (
       .eu_in (eu_in),
       .eu_out(eu_out_s)
   );
-  ldu ldu_comp (
+
+  msu msu_comp (
       .reset  (reset),
       .clock  (clock),
       .flush  (cpu_ctrl.flush_all),
-      .ldu_in (ldu_in),
-      .ldu_out(ldu_out)
+      .msu_in (msu_in),
+      .msu_out(msu_out)
   );
+
   commit commit_comp (
       .reset(reset),
       .clock(clock),

@@ -38,7 +38,7 @@ read_verilog -sv ../../verilog/rtl/rs_int.sv
 read_verilog -sv ../../verilog/rtl/rs_mem.sv
 read_verilog -sv ../../verilog/rtl/rename.sv
 read_verilog -sv ../../verilog/rtl/eu.sv
-read_verilog -sv ../../verilog/rtl/ldu.sv
+read_verilog -sv ../../verilog/rtl/msu.sv
 read_verilog -sv ../../verilog/rtl/commit.sv
 read_verilog -sv ../../verilog/rtl/cpu.sv
 read_verilog -sv ../../verilog/rtl/soc.sv
