@@ -12,7 +12,7 @@ module csr_alu (
 
   always_comb begin
 
-    rdata1 = multiplexer(csr_alu_in.imm, csr_alu_in.rdata1, csr_alu_in.sel);
+    rdata1 = multiplexer(csr_alu_in.rdata1, csr_alu_in.imm, csr_alu_in.sel);
     cdata  = 0;
 
     if (csr_alu_in.csr_op.csrrw == 1 | csr_alu_in.csr_op.csrrwi == 1) begin

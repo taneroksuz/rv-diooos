@@ -90,8 +90,12 @@ module fl (
       init_v.list[k*PRF_ADDR_BITS+:PRF_ADDR_BITS] = PRF_ADDR_BITS'(ARCH_REGS + k);
       r <= init_v;
     end else if (flush) begin
-      r.spec_head  <= r.comm_head;
-      r.spec_count <= r.comm_count;
+      r.list       <= rin.list;
+      r.tail       <= rin.tail;
+      r.comm_head  <= rin.comm_head;
+      r.comm_count <= rin.comm_count;
+      r.spec_head  <= rin.comm_head;
+      r.spec_count <= rin.comm_count;
     end else begin
       r <= rin;
     end

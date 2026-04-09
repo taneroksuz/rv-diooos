@@ -50,10 +50,10 @@ module rename (
   assign rename_out.fl.free_tag1 = '0;
   assign rename_out.fl.free_en1 = 1'b0;
 
-  assign rename_out.rat.rsrc0_a = rename_in.instr0.raddr1;
-  assign rename_out.rat.rsrc1_a = rename_in.instr0.raddr2;
-  assign rename_out.rat.rsrc2_a = rename_in.instr1.raddr1;
-  assign rename_out.rat.rsrc3_a = rename_in.instr1.raddr2;
+  assign rename_out.rat.rsrc0_a = rename_in.instr0.op.rden1 ? rename_in.instr0.raddr1 : 5'h0;
+  assign rename_out.rat.rsrc1_a = rename_in.instr0.op.rden2 ? rename_in.instr0.raddr2 : 5'h0;
+  assign rename_out.rat.rsrc2_a = rename_in.instr1.op.rden1 ? rename_in.instr1.raddr1 : 5'h0;
+  assign rename_out.rat.rsrc3_a = rename_in.instr1.op.rden2 ? rename_in.instr1.raddr2 : 5'h0;
   assign rename_out.rat.waddr0_a = rename_in.instr0.waddr;
   assign rename_out.rat.waddr0_p = pdest0;
   assign rename_out.rat.wren0 = can_dispatch0 && rename_in.instr0.op.wren;
@@ -99,22 +99,22 @@ module rename (
       rename_in.cdb1,
       rename_in.cdb_load
     );
-    e0.rdata1 = prf_or_cdb(
+    e0.rdata1 = rename_in.instr0.op.rden1 ? prf_or_cdb(
       rename_in.rat.psrc0,
       rename_in.rat.psrc0_valid,
       rename_in.prf.rdata0,
       rename_in.cdb0,
       rename_in.cdb1,
       rename_in.cdb_load
-    );
-    e0.rdata2 = prf_or_cdb(
+    ) : 32'h0;
+    e0.rdata2 = rename_in.instr0.op.rden2 ? prf_or_cdb(
       rename_in.rat.psrc1,
       rename_in.rat.psrc1_valid,
       rename_in.prf.rdata1,
       rename_in.cdb0,
       rename_in.cdb1,
       rename_in.cdb_load
-    );
+    ) : 32'h0;
     e0.pdest = pdest0;
     e0.rob_tag = rename_in.rob_tag0;
     e0.imm = rename_in.instr0.imm;
@@ -148,22 +148,22 @@ module rename (
       rename_in.cdb1,
       rename_in.cdb_load
     );
-    e1.rdata1 = prf_or_cdb(
+    e1.rdata1 = rename_in.instr1.op.rden1 ? prf_or_cdb(
       rename_in.rat.psrc2,
       rename_in.rat.psrc2_valid,
       rename_in.prf.rdata2,
       rename_in.cdb0,
       rename_in.cdb1,
       rename_in.cdb_load
-    );
-    e1.rdata2 = prf_or_cdb(
+    ) : 32'h0;
+    e1.rdata2 = rename_in.instr1.op.rden2 ? prf_or_cdb(
       rename_in.rat.psrc3,
       rename_in.rat.psrc3_valid,
       rename_in.prf.rdata3,
       rename_in.cdb0,
       rename_in.cdb1,
       rename_in.cdb_load
-    );
+    ) : 32'h0;
     e1.pdest = pdest1;
     e1.rob_tag = rename_in.rob_tag1;
     e1.imm = rename_in.instr1.imm;
