@@ -37,7 +37,7 @@ module prf (
   end
 
   always_ff @(posedge clock) begin
-    if (reset == 0 || flush == 1) begin
+    if (reset == 0) begin
       r <= init_prf_reg;
     end else begin
       r <= rin;

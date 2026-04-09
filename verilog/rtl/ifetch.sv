@@ -6,6 +6,7 @@ module ifetch (
     input logic reset,
     input logic clock,
     input logic flush,
+    input logic [31:0] flush_pc,
     input ifetch_in_type ifetch_in,
     output ifetch_out_type ifetch_out
 );
@@ -17,10 +18,6 @@ module ifetch (
   always_comb begin
 
     v = r;
-
-    v.valid = 0;
-    v.fence = 0;
-    v.spec = 0;
 
     if (ifetch_in.imem0_out.mem_ready == 1) begin
       v.irdata0 = ifetch_in.imem0_out.mem_rdata;
@@ -42,34 +39,45 @@ module ifetch (
       v.ready = 0;
     end
 
+    case (r.state)
+      IDLE: begin
+        v.valid = 1;
+        v.stall = 0;
+        if (v.ready == 0) begin
+          v.state = BUSY;
+          v.stall = 1;
+        end
+      end
+      BUSY: begin
+        v.valid = 0;
+        v.stall = 1;
+        if (flush == 1) begin
+          v.state = INVALID;
+          v.stall = 1;
+        end
+        if (v.ready == 1) begin
+          v.state = IDLE;
+          v.stall = 0;
+        end
+      end
+      INVALID: begin
+        v.valid = 0;
+        v.stall = 1;
+        if (v.ready == 1) begin
+          v.state = IDLE;
+          v.stall = 1;
+        end
+      end
+      default: begin
+        v.valid = 0;
+        v.stall = 1;
+      end
+    endcase
+
     if (flush == 1) begin
-      v.fence = 0;
-      v.spec  = 1;
-      v.ipc0  = 0;
-    end else if (ifetch_in.csr_out.trap == 1) begin
-      v.fence = 0;
-      v.spec  = 1;
-      v.ipc0  = ifetch_in.csr_out.mtvec;
-    end else if (ifetch_in.csr_out.mret == 1) begin
-      v.fence = 0;
-      v.spec  = 1;
-      v.ipc0  = ifetch_in.csr_out.mepc;
-    end else if (ifetch_in.btac_out.pred_miss == 1) begin
-      v.fence = 0;
-      v.spec  = 1;
-      v.ipc0  = ifetch_in.btac_out.pred_maddr;
-    end else if (ifetch_in.btac_out.pred0.taken == 1) begin
-      v.fence = 0;
-      v.spec  = 1;
-      v.ipc0  = ifetch_in.btac_out.pred0.taddr;
-    end else if (ifetch_in.btac_out.pred1.taken == 1) begin
-      v.fence = 0;
-      v.spec  = 1;
-      v.ipc0  = ifetch_in.btac_out.pred1.taddr;
+      v.ipc0 = flush_pc;
     end else if (v.stall == 0) begin
-      v.fence = 0;
-      v.spec  = 0;
-      v.ipc0  = v.ipc0 + 8;
+      v.ipc0 = v.ipc0 + 8;
     end
 
     v.ipc1 = v.ipc0 + 4;
@@ -94,16 +102,12 @@ module ifetch (
     ifetch_out.imem1_in.mem_wdata = 0;
     ifetch_out.imem1_in.mem_wstrb = 0;
 
-    ifetch_out.btac_in.get_pc0 = v.pc0;
-    ifetch_out.btac_in.get_pc1 = v.pc1;
-    ifetch_out.btac_in.flush = flush;
-
     rin = v;
 
   end
 
   always_ff @(posedge clock) begin
-    if (reset == 0 || flush == 1) begin
+    if (reset == 0) begin
       r <= init_ifetch_reg;
     end else begin
       r <= rin;

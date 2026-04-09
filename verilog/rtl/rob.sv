@@ -143,7 +143,7 @@ module rob (
   end
 
   always_ff @(posedge clock) begin
-    if (reset == 0 || flush) begin
+    if (reset == 0) begin
       r <= init_rob_reg;
     end else begin
       r <= rin;

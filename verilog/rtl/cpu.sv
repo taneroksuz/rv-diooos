@@ -371,6 +371,7 @@ module cpu (
       .reset(reset),
       .clock(clock),
       .flush(cpu_ctrl.flush_all),
+      .flush_pc(cpu_ctrl.flush_pc),
       .ifetch_in(ifetch_in),
       .ifetch_out(ifetch_out)
   );

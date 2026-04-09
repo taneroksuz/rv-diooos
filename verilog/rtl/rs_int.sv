@@ -103,7 +103,7 @@ module rs_int (
   end
 
   always_ff @(posedge clock) begin
-    if (reset == 0 || flush) begin
+    if (reset == 0) begin
       r <= init_rs_int_reg;
     end else begin
       r <= rin;
