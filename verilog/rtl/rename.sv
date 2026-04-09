@@ -12,45 +12,6 @@ module rename (
 );
   timeunit 1ns; timeprecision 1ps;
 
-  typedef struct packed {
-    rs_entry_type  rs_int_entry0;
-    logic [0:0]    rs_int_alloc0;
-    rs_entry_type  rs_int_entry1;
-    logic [0:0]    rs_int_alloc1;
-    rs_entry_type  rs_mem_entry0;
-    logic [0:0]    rs_mem_alloc0;
-    rs_entry_type  rs_mem_entry1;
-    logic [0:0]    rs_mem_alloc1;
-    logic [0:0]    rob_alloc0;
-    logic [0:0]    rob_alloc1;
-    rob_entry_type rob_entry0;
-    rob_entry_type rob_entry1;
-    rat_in_type    rat;
-    fl_in_type     fl;
-    logic [0:0]    stall;
-  } rename_reg_type;
-
-  localparam rename_reg_type init_rename_reg = '{
-      rs_int_entry0 : init_rs_entry,
-      rs_int_alloc0 : 0,
-      rs_int_entry1 : init_rs_entry,
-      rs_int_alloc1 : 0,
-      rs_mem_entry0 : init_rs_entry,
-      rs_mem_alloc0 : 0,
-      rs_mem_entry1 : init_rs_entry,
-      rs_mem_alloc1 : 0,
-      rob_alloc0    : 0,
-      rob_alloc1    : 0,
-      rob_entry0    : init_rob_entry,
-      rob_entry1    : init_rob_entry,
-      rat           : init_rat_in,
-      fl            : init_fl_in,
-      stall         : 0
-  };
-
-  rename_reg_type r, rin;
-  rename_reg_type v;
-
   logic i0_is_mem, i1_is_mem;
   logic need_fl0, need_fl1;
   logic rs0_ok, rs1_ok;
@@ -80,9 +41,45 @@ module rename (
                                        : rename_in.fl.alloc_tag0)
                            : PRF_ADDR_BITS'(0);
 
-  always_comb begin
+  assign rename_out.stall = rename_in.instr0_valid && !can_dispatch0;
 
-    v = r;
+  assign rename_out.fl.alloc0 = need_fl0;
+  assign rename_out.fl.alloc1 = need_fl1;
+  assign rename_out.fl.free_tag0 = '0;
+  assign rename_out.fl.free_en0 = 1'b0;
+  assign rename_out.fl.free_tag1 = '0;
+  assign rename_out.fl.free_en1 = 1'b0;
+
+  assign rename_out.rat.rsrc0_a = rename_in.instr0.raddr1;
+  assign rename_out.rat.rsrc1_a = rename_in.instr0.raddr2;
+  assign rename_out.rat.rsrc2_a = rename_in.instr1.raddr1;
+  assign rename_out.rat.rsrc3_a = rename_in.instr1.raddr2;
+  assign rename_out.rat.waddr0_a = rename_in.instr0.waddr;
+  assign rename_out.rat.waddr0_p = pdest0;
+  assign rename_out.rat.wren0 = can_dispatch0 && rename_in.instr0.op.wren;
+  assign rename_out.rat.waddr1_a = rename_in.instr1.waddr;
+  assign rename_out.rat.waddr1_p = pdest1;
+  assign rename_out.rat.wren1 = can_dispatch1 && rename_in.instr1.op.wren;
+  assign rename_out.rat.commit_addr0 = '0;
+  assign rename_out.rat.commit_tag0 = '0;
+  assign rename_out.rat.commit_en0 = 1'b0;
+  assign rename_out.rat.commit_addr1 = '0;
+  assign rename_out.rat.commit_tag1 = '0;
+  assign rename_out.rat.commit_en1 = 1'b0;
+
+  assign rename_out.rob_alloc0 = can_dispatch0;
+  assign rename_out.rob_alloc1 = can_dispatch1;
+
+  assign rename_out.rs_int_alloc0 = e0.valid;
+  assign rename_out.rs_int_entry0 = e0;
+  assign rename_out.rs_int_alloc1 = e1.valid;
+  assign rename_out.rs_int_entry1 = e1;
+  assign rename_out.rs_mem_alloc0 = em0.valid;
+  assign rename_out.rs_mem_entry0 = em0;
+  assign rename_out.rs_mem_alloc1 = em1.valid;
+  assign rename_out.rs_mem_entry1 = em1;
+
+  always_comb begin
 
     e0 = init_rs_entry;
     e0.valid = can_dispatch0 && !i0_is_mem;
@@ -187,116 +184,50 @@ module rename (
     em1 = e1;
     em1.valid = can_dispatch1 && i1_is_mem;
 
-    v.stall = rename_in.instr0_valid && !can_dispatch0;
+    rename_out.rob_entry0 = init_rob_entry;
+    rename_out.rob_entry0.valid = 1'b1;
+    rename_out.rob_entry0.pc = rename_in.instr0.pc;
+    rename_out.rob_entry0.npc = rename_in.instr0.npc;
+    rename_out.rob_entry0.pdest = pdest0;
+    rename_out.rob_entry0.adest = rename_in.instr0.waddr;
+    rename_out.rob_entry0.wren = rename_in.instr0.op.wren;
+    rename_out.rob_entry0.old_pdest = rename_in.rat.old_pdest0;
+    rename_out.rob_entry0.store = rename_in.instr0.op.store;
+    rename_out.rob_entry0.load = rename_in.instr0.op.load;
+    rename_out.rob_entry0.lsu_op = rename_in.instr0.lsu_op;
+    rename_out.rob_entry0.branch = rename_in.instr0.op.branch;
+    rename_out.rob_entry0.jump = rename_in.instr0.op.jal | rename_in.instr0.op.jalr;
+    rename_out.rob_entry0.mret = rename_in.instr0.op.mret;
+    rename_out.rob_entry0.fence = rename_in.instr0.op.fence;
+    rename_out.rob_entry0.ecall = rename_in.instr0.op.ecall;
+    rename_out.rob_entry0.ebreak = rename_in.instr0.op.ebreak;
+    rename_out.rob_entry0.wfi = rename_in.instr0.op.wfi;
+    rename_out.rob_entry0.csreg = rename_in.instr0.op.csreg;
+    rename_out.rob_entry0.cwren = rename_in.instr0.op.cwren;
+    rename_out.rob_entry0.caddr = rename_in.instr0.caddr;
 
-    v.fl.alloc0 = need_fl0;
-    v.fl.alloc1 = need_fl1;
-    v.fl.free_tag0 = '0;
-    v.fl.free_en0 = 1'b0;
-    v.fl.free_tag1 = '0;
-    v.fl.free_en1 = 1'b0;
+    rename_out.rob_entry1 = init_rob_entry;
+    rename_out.rob_entry1.valid = 1'b1;
+    rename_out.rob_entry1.pc = rename_in.instr1.pc;
+    rename_out.rob_entry1.npc = rename_in.instr1.npc;
+    rename_out.rob_entry1.pdest = pdest1;
+    rename_out.rob_entry1.adest = rename_in.instr1.waddr;
+    rename_out.rob_entry1.wren = rename_in.instr1.op.wren;
+    rename_out.rob_entry1.old_pdest = rename_in.rat.old_pdest1;
+    rename_out.rob_entry1.store = rename_in.instr1.op.store;
+    rename_out.rob_entry1.load = rename_in.instr1.op.load;
+    rename_out.rob_entry1.lsu_op = rename_in.instr1.lsu_op;
+    rename_out.rob_entry1.branch = rename_in.instr1.op.branch;
+    rename_out.rob_entry1.jump = rename_in.instr1.op.jal | rename_in.instr1.op.jalr;
+    rename_out.rob_entry1.mret = rename_in.instr1.op.mret;
+    rename_out.rob_entry1.fence = rename_in.instr1.op.fence;
+    rename_out.rob_entry1.ecall = rename_in.instr1.op.ecall;
+    rename_out.rob_entry1.ebreak = rename_in.instr1.op.ebreak;
+    rename_out.rob_entry1.wfi = rename_in.instr1.op.wfi;
+    rename_out.rob_entry1.csreg = rename_in.instr1.op.csreg;
+    rename_out.rob_entry1.cwren = rename_in.instr1.op.cwren;
+    rename_out.rob_entry1.caddr = rename_in.instr1.caddr;
 
-    v.rat.rsrc0_a = rename_in.instr0.raddr1;
-    v.rat.rsrc1_a = rename_in.instr0.raddr2;
-    v.rat.rsrc2_a = rename_in.instr1.raddr1;
-    v.rat.rsrc3_a = rename_in.instr1.raddr2;
-    v.rat.waddr0_a = rename_in.instr0.waddr;
-    v.rat.waddr0_p = pdest0;
-    v.rat.wren0 = can_dispatch0 && rename_in.instr0.op.wren;
-    v.rat.waddr1_a = rename_in.instr1.waddr;
-    v.rat.waddr1_p = pdest1;
-    v.rat.wren1 = can_dispatch1 && rename_in.instr1.op.wren;
-    v.rat.commit_addr0 = '0;
-    v.rat.commit_tag0 = '0;
-    v.rat.commit_en0 = 1'b0;
-    v.rat.commit_addr1 = '0;
-    v.rat.commit_tag1 = '0;
-    v.rat.commit_en1 = 1'b0;
-
-    v.rob_alloc0 = can_dispatch0;
-    v.rob_alloc1 = can_dispatch1;
-
-    v.rob_entry0 = init_rob_entry;
-    v.rob_entry0.valid = 1'b1;
-    v.rob_entry0.pc = rename_in.instr0.pc;
-    v.rob_entry0.npc = rename_in.instr0.npc;
-    v.rob_entry0.pdest = pdest0;
-    v.rob_entry0.adest = rename_in.instr0.waddr;
-    v.rob_entry0.wren = rename_in.instr0.op.wren;
-    v.rob_entry0.old_pdest = rename_in.rat.old_pdest0;
-    v.rob_entry0.store = rename_in.instr0.op.store;
-    v.rob_entry0.load = rename_in.instr0.op.load;
-    v.rob_entry0.lsu_op = rename_in.instr0.lsu_op;
-    v.rob_entry0.branch = rename_in.instr0.op.branch;
-    v.rob_entry0.jump = rename_in.instr0.op.jal | rename_in.instr0.op.jalr;
-    v.rob_entry0.mret = rename_in.instr0.op.mret;
-    v.rob_entry0.fence = rename_in.instr0.op.fence;
-    v.rob_entry0.ecall = rename_in.instr0.op.ecall;
-    v.rob_entry0.ebreak = rename_in.instr0.op.ebreak;
-    v.rob_entry0.wfi = rename_in.instr0.op.wfi;
-    v.rob_entry0.csreg = rename_in.instr0.op.csreg;
-    v.rob_entry0.cwren = rename_in.instr0.op.cwren;
-    v.rob_entry0.caddr = rename_in.instr0.caddr;
-
-    v.rob_entry1 = init_rob_entry;
-    v.rob_entry1.valid = 1'b1;
-    v.rob_entry1.pc = rename_in.instr1.pc;
-    v.rob_entry1.npc = rename_in.instr1.npc;
-    v.rob_entry1.pdest = pdest1;
-    v.rob_entry1.adest = rename_in.instr1.waddr;
-    v.rob_entry1.wren = rename_in.instr1.op.wren;
-    v.rob_entry1.old_pdest = rename_in.rat.old_pdest1;
-    v.rob_entry1.store = rename_in.instr1.op.store;
-    v.rob_entry1.load = rename_in.instr1.op.load;
-    v.rob_entry1.lsu_op = rename_in.instr1.lsu_op;
-    v.rob_entry1.branch = rename_in.instr1.op.branch;
-    v.rob_entry1.jump = rename_in.instr1.op.jal | rename_in.instr1.op.jalr;
-    v.rob_entry1.mret = rename_in.instr1.op.mret;
-    v.rob_entry1.fence = rename_in.instr1.op.fence;
-    v.rob_entry1.ecall = rename_in.instr1.op.ecall;
-    v.rob_entry1.ebreak = rename_in.instr1.op.ebreak;
-    v.rob_entry1.wfi = rename_in.instr1.op.wfi;
-    v.rob_entry1.csreg = rename_in.instr1.op.csreg;
-    v.rob_entry1.cwren = rename_in.instr1.op.cwren;
-    v.rob_entry1.caddr = rename_in.instr1.caddr;
-
-    v.rs_int_entry0 = e0;
-    v.rs_int_alloc0 = e0.valid;
-    v.rs_int_entry1 = e1;
-    v.rs_int_alloc1 = e1.valid;
-    v.rs_mem_entry0 = em0;
-    v.rs_mem_alloc0 = em0.valid;
-    v.rs_mem_entry1 = em1;
-    v.rs_mem_alloc1 = em1.valid;
-
-    rin = v;
-
-    rename_out.stall = r.stall;
-    rename_out.fl = r.fl;
-    rename_out.rat = r.rat;
-    rename_out.rob_alloc0 = r.rob_alloc0;
-    rename_out.rob_alloc1 = r.rob_alloc1;
-    rename_out.rob_entry0 = r.rob_entry0;
-    rename_out.rob_entry1 = r.rob_entry1;
-    rename_out.rs_int_entry0 = r.rs_int_entry0;
-    rename_out.rs_int_alloc0 = r.rs_int_alloc0;
-    rename_out.rs_int_entry1 = r.rs_int_entry1;
-    rename_out.rs_int_alloc1 = r.rs_int_alloc1;
-    rename_out.rs_mem_entry0 = r.rs_mem_entry0;
-    rename_out.rs_mem_alloc0 = r.rs_mem_alloc0;
-    rename_out.rs_mem_entry1 = r.rs_mem_entry1;
-    rename_out.rs_mem_alloc1 = r.rs_mem_alloc1;
-
-  end
-
-  always_ff @(posedge clock) begin
-    if (reset == 0) begin
-      r <= init_rename_reg;
-    end else if (flush) begin
-      r <= init_rename_reg;
-    end else begin
-      r <= rin;
-    end
   end
 
 endmodule

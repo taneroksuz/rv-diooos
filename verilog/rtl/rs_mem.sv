@@ -61,7 +61,6 @@ module rs_mem (
           end
           ready_vec[ii] = !store_ahead;
         end else begin
-
           store_ahead   = 1'b0;
           ready_vec[ii] = 1'b1;
         end
@@ -101,7 +100,7 @@ module rs_mem (
       v.count = v.count + 1;
     end
 
-    rs_out.issue0       = rs_mem_read(r.array, sel_idx);
+    rs_out.issue0       = rs_mem_read(v.array, sel_idx);
     rs_out.issue0_valid = sel_found;
     rs_out.full         = r.count >= (MEM_ADDR_BITS + 1)'(RS_MEM_DEPTH - 1);
     rs_out.has_two_free = r.count <= (MEM_ADDR_BITS + 1)'(RS_MEM_DEPTH - 2);

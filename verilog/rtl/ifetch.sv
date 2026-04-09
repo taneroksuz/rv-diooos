@@ -66,6 +66,7 @@ module ifetch (
         if (v.ready == 1) begin
           v.state = IDLE;
           v.stall = 1;
+          v.ready = 0;
         end
       end
       default: begin

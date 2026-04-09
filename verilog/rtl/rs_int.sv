@@ -92,9 +92,9 @@ module rs_int (
       v.count = v.count + 1;
     end
 
-    rs_out.issue0       = rs_int_read(r.array, sel0_idx);
+    rs_out.issue0       = rs_int_read(v.array, sel0_idx);
     rs_out.issue0_valid = sel0_found;
-    rs_out.issue1       = rs_int_read(r.array, sel1_idx);
+    rs_out.issue1       = rs_int_read(v.array, sel1_idx);
     rs_out.issue1_valid = sel1_found;
     rs_out.full         = r.count >= (RS_ADDR_BITS + 1)'(RS_INT_DEPTH - 1);
     rs_out.has_two_free = r.count <= (RS_ADDR_BITS + 1)'(RS_INT_DEPTH - 2);
