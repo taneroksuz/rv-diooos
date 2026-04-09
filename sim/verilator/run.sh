@@ -19,7 +19,7 @@ cd $BASEDIR/sim/verilator/work
 
 start=`date +%s`
 
-$VERILATOR --binary --timing --top-module testbench -Wno-UNOPTFLAT -Wno-WIDTHTRUNC -Wno-CASEINCOMPLETE -Wno-INITIALDLY -Wno-WIDTHEXPAND \
+$VERILATOR --binary --trace --trace-structs --timing --top-module testbench -Wno-UNOPTFLAT -Wno-WIDTHTRUNC -Wno-CASEINCOMPLETE -Wno-INITIALDLY -Wno-WIDTHEXPAND \
             $BASEDIR/verilog/conf/configure.sv \
             $BASEDIR/verilog/rtl/constants.sv \
             $BASEDIR/verilog/rtl/wires.sv \
