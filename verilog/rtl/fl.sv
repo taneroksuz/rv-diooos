@@ -90,12 +90,21 @@ module fl (
       init_v.list[k*PRF_ADDR_BITS+:PRF_ADDR_BITS] = PRF_ADDR_BITS'(ARCH_REGS + k);
       r <= init_v;
     end else if (flush) begin
-      r.list       <= rin.list;
-      r.tail       <= rin.tail;
-      r.comm_head  <= rin.comm_head;
-      r.comm_count <= rin.comm_count;
-      r.spec_head  <= rin.comm_head;
+      begin : rebuild
+        integer i;
+        logic [FL_IDX_BITS-1:0] src_pos;
+        logic [FL_CNT_BITS-1:0] start;
+        start = rin.tail - rin.comm_count;
+        for (i = 0; i < FLIST_DEPTH; i++) begin
+          src_pos = start[FL_IDX_BITS-1:0] + FL_IDX_BITS'(unsigned'(i));
+          r.list[i*PRF_ADDR_BITS+:PRF_ADDR_BITS] <= rin.list[src_pos*PRF_ADDR_BITS+:PRF_ADDR_BITS];
+        end
+      end
+      r.spec_head  <= '0;
+      r.comm_head  <= '0;
+      r.tail       <= rin.comm_count;
       r.spec_count <= rin.comm_count;
+      r.comm_count <= rin.comm_count;
     end else begin
       r <= rin;
     end

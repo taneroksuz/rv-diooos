@@ -43,46 +43,14 @@ module rat (
     rat_out.psrc1 = rat_tag(r.spec, rat_in.rsrc1_a);
     rat_out.psrc1_valid = rat_valid(r.spec, rat_in.rsrc1_a);
 
-    rat_out.psrc2 = rat_lookup_tag(
-      r.spec,
-      rat_in.rsrc2_a,
-      rat_in.waddr0_a,
-      rat_in.waddr0_p,
-      rat_in.wren0,
-      rat_in.waddr1_a,
-      rat_in.waddr1_p,
-      rat_in.wren1
-    );
-    rat_out.psrc2_valid = rat_lookup_valid(
-      r.spec,
-      rat_in.rsrc2_a,
-      rat_in.waddr0_a,
-      rat_in.waddr0_p,
-      rat_in.wren0,
-      rat_in.waddr1_a,
-      rat_in.waddr1_p,
-      rat_in.wren1
-    );
-    rat_out.psrc3 = rat_lookup_tag(
-      r.spec,
-      rat_in.rsrc3_a,
-      rat_in.waddr0_a,
-      rat_in.waddr0_p,
-      rat_in.wren0,
-      rat_in.waddr1_a,
-      rat_in.waddr1_p,
-      rat_in.wren1
-    );
-    rat_out.psrc3_valid = rat_lookup_valid(
-      r.spec,
-      rat_in.rsrc3_a,
-      rat_in.waddr0_a,
-      rat_in.waddr0_p,
-      rat_in.wren0,
-      rat_in.waddr1_a,
-      rat_in.waddr1_p,
-      rat_in.wren1
-    );
+    rat_out.psrc2 = rat_lookup_tag(r.spec, rat_in.rsrc2_a, rat_in.waddr0_a, rat_in.waddr0_p,
+                                   rat_in.wren0, 5'h0, '0, 1'b0);
+    rat_out.psrc2_valid = rat_lookup_valid(r.spec, rat_in.rsrc2_a, rat_in.waddr0_a, rat_in.waddr0_p,
+                                           rat_in.wren0, 5'h0, '0, 1'b0);
+    rat_out.psrc3 = rat_lookup_tag(r.spec, rat_in.rsrc3_a, rat_in.waddr0_a, rat_in.waddr0_p,
+                                   rat_in.wren0, 5'h0, '0, 1'b0);
+    rat_out.psrc3_valid = rat_lookup_valid(r.spec, rat_in.rsrc3_a, rat_in.waddr0_a, rat_in.waddr0_p,
+                                           rat_in.wren0, 5'h0, '0, 1'b0);
 
     rin = v;
 
