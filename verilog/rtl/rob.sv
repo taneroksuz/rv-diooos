@@ -41,7 +41,7 @@ module rob (
       if (h0.exception) begin
         rob_out.commit_ctrl.flush    = 1'b1;
         rob_out.commit_ctrl.flush_pc = h0.pc;
-      end else if (h0.jump && h0.npc != h0.pc + 4) begin
+      end else if (h0.jump && h0.npc != h0.pnpc) begin
         rob_out.commit_ctrl.flush    = 1'b1;
         rob_out.commit_ctrl.flush_pc = h0.npc;
       end else if (h1_done && !h0.exception &&
@@ -52,7 +52,7 @@ module rob (
         if (h1.exception) begin
           rob_out.commit_ctrl.flush    = 1'b1;
           rob_out.commit_ctrl.flush_pc = h1.pc;
-        end else if (h1.jump && h1.npc != h1.pc + 4) begin
+        end else if (h1.jump && h1.npc != h1.pnpc) begin
           rob_out.commit_ctrl.flush    = 1'b1;
           rob_out.commit_ctrl.flush_pc = h1.npc;
         end

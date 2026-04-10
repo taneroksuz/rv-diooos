@@ -884,6 +884,7 @@ package wires;
     logic [31:0]              etval;
     logic [31:0]              pc;
     logic [31:0]              npc;
+    logic [31:0]              pnpc;
     logic [31:0]              result;
     logic [PRF_ADDR_BITS-1:0] pdest;
     logic [PRF_ADDR_BITS-1:0] old_pdest;
@@ -916,6 +917,7 @@ package wires;
       etval : 0,
       pc : 32'hFFFFFFFF,
       npc : 32'hFFFFFFFF,
+      pnpc : 32'hFFFFFFFF,
       result : 0,
       pdest : 0,
       old_pdest : 0,
