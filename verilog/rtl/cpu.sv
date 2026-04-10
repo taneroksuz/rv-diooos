@@ -23,6 +23,7 @@ module cpu (
   cpu_ctrl_type cpu_ctrl;
 
   cdb_type cdb0, cdb1, cdb_load;
+  csr_read_in_type csr_rin;
 
   alu_in_type alu0_in, alu1_in;
   alu_out_type alu0_out, alu1_out;
@@ -98,6 +99,11 @@ module cpu (
   assign btac_in = ifetch_out.btac_in;
   assign imem0_in = ifetch_out.imem0_in;
   assign imem1_in = ifetch_out.imem1_in;
+
+  assign csr_rin.crden  = (rs_int_out.issue0_valid && rs_int_out.issue0.op.csreg) ||
+                          (rs_int_out.issue1_valid && rs_int_out.issue1.op.csreg);
+  assign csr_rin.craddr = rs_int_out.issue0.op.csreg ? rs_int_out.issue0.caddr
+                                                      : rs_int_out.issue1.caddr;
 
   assign idecode_in.decoder0_out = decoder0_out;
   assign idecode_in.decoder1_out = decoder1_out;
@@ -401,7 +407,7 @@ module cpu (
   csr csr_comp (
       .reset(reset),
       .clock(clock),
-      .csr_rin('0),
+      .csr_rin(csr_rin),
       .csr_win(commit_out.csr_win),
       .csr_ein(commit_out.csr_ein),
       .csr_out(csr_out),
@@ -415,6 +421,7 @@ module cpu (
       .reset(reset),
       .clock(clock),
       .flush(cpu_ctrl.flush_all),
+      .stall(cpu_ctrl.backend_stall),
       .flush_pc(cpu_ctrl.flush_pc),
       .ifetch_in(ifetch_in),
       .ifetch_out(ifetch_out)

@@ -869,13 +869,11 @@ package wires;
   typedef struct packed {
     instruction_type instr0;
     instruction_type instr1;
-    logic [0:0] stall;
   } idecode_reg_type;
 
   parameter idecode_reg_type init_idecode_reg = '{
       instr0 : init_instruction,
-      instr1 : init_instruction,
-      stall : 0
+      instr1 : init_instruction
   };
 
   typedef struct packed {

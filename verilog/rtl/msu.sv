@@ -39,9 +39,15 @@ module msu (
 
   logic load_enable;
   logic load_ready;
+  lsu_in_type lsu1_in_cur;
 
-  assign load_enable = msu_in.issue_valid && msu_in.issue.op.load && !flush;
-  assign load_ready  = msu_in.dmem1_out.mem_ready && load_enable;
+  assign load_enable            = msu_in.issue_valid && msu_in.issue.op.load && !flush;
+  assign load_ready             = msu_in.dmem1_out.mem_ready && load_enable;
+
+  // Use current mem_rdata with registered byteenable/lsu_op for correct load result
+  assign lsu1_in_cur.ldata      = msu_in.dmem1_out.mem_rdata;
+  assign lsu1_in_cur.byteenable = r.lsu1_in.byteenable;
+  assign lsu1_in_cur.lsu_op     = r.lsu1_in.lsu_op;
 
   always_comb begin
 
@@ -93,7 +99,7 @@ module msu (
     msu_out.rob_wentry = r.rob_wentry;
     msu_out.rob_wen    = r.rob_wen;
     msu_out.dmem1_in   = r.dmem1_in;
-    msu_out.lsu1_in    = r.lsu1_in;
+    msu_out.lsu1_in    = load_ready ? lsu1_in_cur : r.lsu1_in;
     msu_out.dmem0_in   = r.dmem0_in;
     msu_out.lsu0_in    = r.lsu0_in;
 

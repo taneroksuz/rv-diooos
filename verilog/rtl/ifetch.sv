@@ -6,6 +6,7 @@ module ifetch (
     input logic reset,
     input logic clock,
     input logic flush,
+    input logic stall,
     input logic [31:0] flush_pc,
     input ifetch_in_type ifetch_in,
     output ifetch_out_type ifetch_out
@@ -97,6 +98,7 @@ module ifetch (
     ifetch_out.buffer_in.rdata = v.rdata;
     ifetch_out.buffer_in.ready = v.ready;
     ifetch_out.buffer_in.flush = flush;
+    ifetch_out.buffer_in.stall = stall;
 
     ifetch_out.imem0_in.mem_valid = v.valid;
     ifetch_out.imem0_in.mem_instr = 1;

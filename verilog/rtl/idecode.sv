@@ -26,8 +26,6 @@ module idecode (
     v.instr0.npc = v.instr0.pc + ((&v.instr0.instr[1:0]) ? 4 : 2);
     v.instr1.npc = v.instr1.pc + ((&v.instr1.instr[1:0]) ? 4 : 2);
 
-    v.stall = 0;
-
     v.instr0.waddr = v.instr0.instr[11:7];
     v.instr0.raddr1 = v.instr0.instr[19:15];
     v.instr0.raddr2 = v.instr0.instr[24:20];
@@ -117,7 +115,7 @@ module idecode (
     idecode_out.compress0_in.instr = v.instr0.instr;
 
     if (idecode_in.compress0_out.valid == 1) begin
-      v.instr0.instr_str = idecode_in.decoder1_out.instr_str;
+      v.instr0.instr_str = idecode_in.compress0_out.instr_str;
       v.instr0.imm = idecode_in.compress0_out.imm;
       v.instr0.waddr = idecode_in.compress0_out.waddr;
       v.instr0.raddr1 = idecode_in.compress0_out.raddr1;
@@ -143,7 +141,7 @@ module idecode (
     idecode_out.compress1_in.instr = v.instr1.instr;
 
     if (idecode_in.compress1_out.valid == 1) begin
-      v.instr1.instr_str = idecode_in.decoder1_out.instr_str;
+      v.instr1.instr_str = idecode_in.compress1_out.instr_str;
       v.instr1.imm = idecode_in.compress1_out.imm;
       v.instr1.waddr = idecode_in.compress1_out.waddr;
       v.instr1.raddr1 = idecode_in.compress1_out.raddr1;
@@ -180,7 +178,7 @@ module idecode (
       end
     end
 
-    if (v.stall == 1) begin
+    if (flush == 1) begin
       v.instr0 = init_instruction;
       v.instr1 = init_instruction;
     end
