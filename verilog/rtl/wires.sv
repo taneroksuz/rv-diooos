@@ -1410,25 +1410,37 @@ package wires;
   };
 
   typedef struct packed {
-    csr_out_type  csr_out;
+    csr_out_type csr_out;
     btac_out_type btac_out;
-    mem_out_type  imem0_out;
-    mem_out_type  imem1_out;
+    mem_out_type imem0_out;
+    mem_out_type imem1_out;
+    buffer_out_type buffer_out;
   } ifetch_in_type;
 
   typedef struct packed {
     buffer_in_type buffer_in;
-    btac_in_type btac_in;
+    btac_in_type   btac_in;
     mem_in_type    imem0_in;
-    mem_in_type  imem1_in;
+    mem_in_type    imem1_in;
+    logic [31:0]   pc0;
+    logic [31:0]   pc1;
+    logic [31:0]   instr0;
+    logic [31:0]   instr1;
+    logic [0:0]    ready0;
+    logic [0:0]    ready1;
   } ifetch_out_type;
 
   typedef struct packed {
-    buffer_out_type   buffer_out;
-    decoder_out_type  decoder0_out;
-    decoder_out_type  decoder1_out;
+    decoder_out_type decoder0_out;
+    decoder_out_type decoder1_out;
     compress_out_type compress0_out;
     compress_out_type compress1_out;
+    logic [31:0] pc0;
+    logic [31:0] pc1;
+    logic [31:0] instr0;
+    logic [31:0] instr1;
+    logic [0:0] ready0;
+    logic [0:0] ready1;
   } idecode_in_type;
 
   typedef struct packed {

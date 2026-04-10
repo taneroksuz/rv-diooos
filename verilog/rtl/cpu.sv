@@ -75,7 +75,7 @@ module cpu (
   rename_in_type   rename_in;
   rename_out_type  rename_out;
   eu_in_type       eu_in;
-  eu_out_type      eu_out_s;
+  eu_out_type      eu_out;
   msu_in_type      msu_in;
   msu_out_type     msu_out;
   commit_in_type   commit_in;
@@ -83,26 +83,32 @@ module cpu (
 
   assign cpu_ctrl.flush = commit_out.flush;
   assign cpu_ctrl.flush_all = cpu_ctrl.flush | csr_out.trap | csr_out.mret;
-  assign cpu_ctrl.flush_pc      = csr_out.trap ? csr_out.mtvec :
-                                   csr_out.mret ? csr_out.mepc  :
-                                                  commit_out.flush_pc;
+  assign cpu_ctrl.flush_pc = csr_out.trap ? csr_out.mtvec :
+                             csr_out.mret ? csr_out.mepc  :
+                             commit_out.flush_pc;
   assign cpu_ctrl.backend_stall = rename_out.stall | rob_out.full;
 
   assign ifetch_in.csr_out = csr_out;
   assign ifetch_in.btac_out = btac_out;
   assign ifetch_in.imem0_out = imem0_out;
   assign ifetch_in.imem1_out = imem1_out;
+  assign ifetch_in.buffer_out = buffer_out;
 
   assign buffer_in = ifetch_out.buffer_in;
   assign btac_in = ifetch_out.btac_in;
   assign imem0_in = ifetch_out.imem0_in;
   assign imem1_in = ifetch_out.imem1_in;
 
-  assign idecode_in.buffer_out = buffer_out;
   assign idecode_in.decoder0_out = decoder0_out;
   assign idecode_in.decoder1_out = decoder1_out;
   assign idecode_in.compress0_out = compress0_out;
   assign idecode_in.compress1_out = compress1_out;
+  assign idecode_in.pc0 = ifetch_out.pc0;
+  assign idecode_in.pc1 = ifetch_out.pc1;
+  assign idecode_in.instr0 = ifetch_out.instr0;
+  assign idecode_in.instr1 = ifetch_out.instr1;
+  assign idecode_in.ready0 = ifetch_out.ready0;
+  assign idecode_in.ready1 = ifetch_out.ready1;
 
   assign decoder0_in = idecode_out.decoder0_in;
   assign decoder1_in = idecode_out.decoder1_in;
@@ -148,12 +154,12 @@ module cpu (
   assign rob_in.alloc_entry0 = rename_out.rob_entry0;
   assign rob_in.alloc1 = rename_out.rob_alloc1;
   assign rob_in.alloc_entry1 = rename_out.rob_entry1;
-  assign rob_in.write_tag0 = eu_out_s.rob_wtag0;
-  assign rob_in.write_entry0 = eu_out_s.rob_wentry0;
-  assign rob_in.write_en0 = eu_out_s.rob_wen0;
-  assign rob_in.write_tag1 = eu_out_s.rob_wtag1;
-  assign rob_in.write_entry1 = eu_out_s.rob_wentry1;
-  assign rob_in.write_en1 = eu_out_s.rob_wen1;
+  assign rob_in.write_tag0 = eu_out.rob_wtag0;
+  assign rob_in.write_entry0 = eu_out.rob_wentry0;
+  assign rob_in.write_en0 = eu_out.rob_wen0;
+  assign rob_in.write_tag1 = eu_out.rob_wtag1;
+  assign rob_in.write_entry1 = eu_out.rob_wentry1;
+  assign rob_in.write_en1 = eu_out.rob_wen1;
   assign rob_in.write_tag2 = msu_out.rob_wtag;
   assign rob_in.write_entry2 = msu_out.rob_wentry;
   assign rob_in.write_en2 = msu_out.rob_wen;
@@ -220,23 +226,23 @@ module cpu (
   assign eu_in.bit_clmul_out = bit_clmul_out;
   assign eu_in.csr_alu_out = csr_alu_out;
 
-  assign alu0_in = eu_out_s.alu0_in;
-  assign alu1_in = eu_out_s.alu1_in;
-  assign bcu0_in = eu_out_s.bcu0_in;
-  assign bcu1_in = eu_out_s.bcu1_in;
-  assign mul_in = eu_out_s.mul_in;
-  assign div_in = eu_out_s.div_in;
-  assign bit_alu0_in = eu_out_s.bit_alu0_in;
-  assign bit_alu1_in = eu_out_s.bit_alu1_in;
-  assign bit_clmul_in = eu_out_s.bit_clmul_in;
-  assign csr_alu_in = eu_out_s.csr_alu_in;
-  assign cdb0 = eu_out_s.cdb0;
-  assign cdb1 = eu_out_s.cdb1;
+  assign alu0_in = eu_out.alu0_in;
+  assign alu1_in = eu_out.alu1_in;
+  assign bcu0_in = eu_out.bcu0_in;
+  assign bcu1_in = eu_out.bcu1_in;
+  assign mul_in = eu_out.mul_in;
+  assign div_in = eu_out.div_in;
+  assign bit_alu0_in = eu_out.bit_alu0_in;
+  assign bit_alu1_in = eu_out.bit_alu1_in;
+  assign bit_clmul_in = eu_out.bit_clmul_in;
+  assign csr_alu_in = eu_out.csr_alu_in;
+  assign cdb0 = eu_out.cdb0;
+  assign cdb1 = eu_out.cdb1;
 
-  assign agu0_in = eu_out_s.agu0_in;
-  assign agu1_in = eu_out_s.agu1_in;
-  assign agu2_in = eu_out_s.agu2_in;
-  assign agu3_in = eu_out_s.agu3_in;
+  assign agu0_in = eu_out.agu0_in;
+  assign agu1_in = eu_out.agu1_in;
+  assign agu2_in = eu_out.agu2_in;
+  assign agu3_in = eu_out.agu3_in;
 
   assign msu_in.issue = rs_mem_out.issue0;
   assign msu_in.issue_valid = rs_mem_out.issue0_valid && rs_mem_out.issue0.op.load;
@@ -483,7 +489,7 @@ module cpu (
       .clock (clock),
       .flush (cpu_ctrl.flush_all),
       .eu_in (eu_in),
-      .eu_out(eu_out_s)
+      .eu_out(eu_out)
   );
 
   msu msu_comp (

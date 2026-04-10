@@ -75,6 +75,15 @@ module ifetch (
       end
     endcase
 
+    v.pc0 = ifetch_in.buffer_out.pc0;
+    v.pc1 = ifetch_in.buffer_out.pc1;
+    v.instr0 = ifetch_in.buffer_out.instr0;
+    v.instr1 = ifetch_in.buffer_out.instr1;
+    v.ready0 = ifetch_in.buffer_out.ready0;
+    v.ready1 = ifetch_in.buffer_out.ready1;
+
+    v.stall = v.stall | ifetch_in.buffer_out.stall;
+
     if (flush == 1) begin
       v.ipc0 = flush_pc;
     end else if (v.stall == 0) begin
@@ -102,6 +111,13 @@ module ifetch (
     ifetch_out.imem1_in.mem_addr = v.ipc1;
     ifetch_out.imem1_in.mem_wdata = 0;
     ifetch_out.imem1_in.mem_wstrb = 0;
+
+    ifetch_out.pc0 = r.pc0;
+    ifetch_out.pc1 = r.pc1;
+    ifetch_out.instr0 = r.instr0;
+    ifetch_out.instr1 = r.instr1;
+    ifetch_out.ready0 = r.ready0;
+    ifetch_out.ready1 = r.ready1;
 
     rin = v;
 

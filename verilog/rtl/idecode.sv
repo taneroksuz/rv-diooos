@@ -18,10 +18,10 @@ module idecode (
 
     v = r;
 
-    v.instr0.pc = idecode_in.buffer_out.ready0 ? idecode_in.buffer_out.pc0 : 32'hFFFFFFFF;
-    v.instr1.pc = idecode_in.buffer_out.ready1 ? idecode_in.buffer_out.pc1 : 32'hFFFFFFFF;
-    v.instr0.instr = idecode_in.buffer_out.ready0 ? idecode_in.buffer_out.instr0 : 0;
-    v.instr1.instr = idecode_in.buffer_out.ready1 ? idecode_in.buffer_out.instr1 : 0;
+    v.instr0.pc = idecode_in.ready0 ? idecode_in.pc0 : 32'hFFFFFFFF;
+    v.instr1.pc = idecode_in.ready1 ? idecode_in.pc1 : 32'hFFFFFFFF;
+    v.instr0.instr = idecode_in.ready0 ? idecode_in.instr0 : 0;
+    v.instr1.instr = idecode_in.ready1 ? idecode_in.instr1 : 0;
 
     v.instr0.npc = v.instr0.pc + ((&v.instr0.instr[1:0]) ? 4 : 2);
     v.instr1.npc = v.instr1.pc + ((&v.instr1.instr[1:0]) ? 4 : 2);
@@ -166,14 +166,14 @@ module idecode (
       v.instr1.lsu_op = idecode_in.compress1_out.lsu_op;
     end
 
-    if (idecode_in.buffer_out.ready0 == 1) begin
+    if (idecode_in.ready0 == 1) begin
       if (v.instr0.op.valid == 0) begin
         v.instr0.op.exception = 1;
         v.instr0.op.valid = 1;
       end
     end
 
-    if (idecode_in.buffer_out.ready1 == 1) begin
+    if (idecode_in.ready1 == 1) begin
       if (v.instr1.op.valid == 0) begin
         v.instr1.op.exception = 1;
         v.instr1.op.valid = 1;
