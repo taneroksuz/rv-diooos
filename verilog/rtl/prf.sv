@@ -1,7 +1,6 @@
 import configure::*;
 import wires::*;
 import functions::*;
-
 module prf (
     input  logic        reset,
     input  logic        clock,
@@ -10,38 +9,22 @@ module prf (
     output prf_out_type prf_out
 );
   timeunit 1ns; timeprecision 1ps;
-
-  prf_reg_type r, rin;
-  prf_reg_type v;
-
-  always_comb begin
-
-    v = r;
-
-    if (prf_in.wren0 && prf_in.waddr0 != 0)
-      v.array = prf_slot_write(v.array, prf_in.waddr0, prf_in.wdata0, 1'b1);
-    if (prf_in.wren1 && prf_in.waddr1 != 0)
-      v.array = prf_slot_write(v.array, prf_in.waddr1, prf_in.wdata1, 1'b1);
-
-    prf_out.rdata0 = prf_slot_data(r.array, prf_in.raddr0);
-    prf_out.rvalid0 = prf_slot_valid(r.array, prf_in.raddr0);
-    prf_out.rdata1 = prf_slot_data(r.array, prf_in.raddr1);
-    prf_out.rvalid1 = prf_slot_valid(r.array, prf_in.raddr1);
-    prf_out.rdata2 = prf_slot_data(r.array, prf_in.raddr2);
-    prf_out.rvalid2 = prf_slot_valid(r.array, prf_in.raddr2);
-    prf_out.rdata3 = prf_slot_data(r.array, prf_in.raddr3);
-    prf_out.rvalid3 = prf_slot_valid(r.array, prf_in.raddr3);
-
-    rin = v;
-
-  end
-
+  logic [32:0] mem[0:PRF_DEPTH-1];
   always_ff @(posedge clock) begin
     if (reset == 0) begin
-      r <= init_prf_reg;
+      integer k;
+      for (k = 0; k < PRF_DEPTH; k++) mem[k] <= 33'b1_00000000000000000000000000000000;
     end else begin
-      r <= rin;
+      if (prf_in.wren0 && prf_in.waddr0 != '0) mem[prf_in.waddr0] <= {1'b1, prf_in.wdata0};
+      if (prf_in.wren1 && prf_in.waddr1 != '0) mem[prf_in.waddr1] <= {1'b1, prf_in.wdata1};
     end
   end
-
+  assign prf_out.rdata0  = mem[prf_in.raddr0][31:0];
+  assign prf_out.rvalid0 = mem[prf_in.raddr0][32];
+  assign prf_out.rdata1  = mem[prf_in.raddr1][31:0];
+  assign prf_out.rvalid1 = mem[prf_in.raddr1][32];
+  assign prf_out.rdata2  = mem[prf_in.raddr2][31:0];
+  assign prf_out.rvalid2 = mem[prf_in.raddr2][32];
+  assign prf_out.rdata3  = mem[prf_in.raddr3][31:0];
+  assign prf_out.rvalid3 = mem[prf_in.raddr3][32];
 endmodule

@@ -1,7 +1,6 @@
 import configure::*;
 import wires::*;
 import functions::*;
-
 module fl (
     input  logic       reset,
     input  logic       clock,
@@ -10,44 +9,41 @@ module fl (
     output fl_out_type fl_out
 );
   timeunit 1ns; timeprecision 1ps;
-
-  fl_reg_type r, rin;
-  fl_reg_type v;
-
-  logic [FL_CNT_BITS-1:0] nt, nsc, ncc, nsh, nch, sh1;
-
+  logic [PRF_ADDR_BITS-1:0] list[0:FLIST_DEPTH-1];
+  logic [FL_CNT_BITS-1:0] spec_head;
+  logic [FL_CNT_BITS-1:0] comm_head;
+  logic [FL_CNT_BITS-1:0] tail;
+  logic [FL_CNT_BITS-1:0] spec_count;
+  logic [FL_CNT_BITS-1:0] comm_count;
+  logic [FL_CNT_BITS-1:0] nt, nsc, ncc, nsh, nch;
+  logic do_free0, do_free1;
+  logic [FL_IDX_BITS-1:0] free0_slot, free1_slot;
   always_comb begin
-
-    nt  = '0;
-    nsc = '0;
-    ncc = '0;
-    nsh = '0;
-    nch = '0;
-    sh1 = '0;
-
-    v   = r;
-
-    nt  = r.tail;
-    nsc = r.spec_count;
-    ncc = r.comm_count;
-    nsh = r.spec_head;
-    nch = r.comm_head;
-
-    if (fl_in.free_en0 && nsc < FL_CNT_BITS'(FLIST_DEPTH)) begin
-      v.list = fl_write(v.list, nt[FL_IDX_BITS-1:0], fl_in.free_tag0);
+    nt = tail;
+    nsc = spec_count;
+    ncc = comm_count;
+    nsh = spec_head;
+    nch = comm_head;
+    do_free0 = fl_in.free_en0 && (nsc < FL_CNT_BITS'(FLIST_DEPTH));
+    if (do_free0) begin
+      free0_slot = nt[FL_IDX_BITS-1:0];
       nt = nt + 1;
       ncc = ncc + 1;
       nsc = nsc + 1;
       nch = nch + 1;
+    end else begin
+      free0_slot = '0;
     end
-    if (fl_in.free_en1 && nsc < FL_CNT_BITS'(FLIST_DEPTH)) begin
-      v.list = fl_write(v.list, nt[FL_IDX_BITS-1:0], fl_in.free_tag1);
+    do_free1 = fl_in.free_en1 && (nsc < FL_CNT_BITS'(FLIST_DEPTH));
+    if (do_free1) begin
+      free1_slot = nt[FL_IDX_BITS-1:0];
       nt = nt + 1;
       ncc = ncc + 1;
       nsc = nsc + 1;
       nch = nch + 1;
+    end else begin
+      free1_slot = '0;
     end
-
     if (fl_in.alloc0 && nsc >= 1) begin
       nsh = nsh + 1;
       nsc = nsc - 1;
@@ -56,56 +52,38 @@ module fl (
       nsh = nsh + 1;
       nsc = nsc - 1;
     end
-
-    v.tail            = nt;
-    v.spec_count      = nsc;
-    v.comm_count      = ncc;
-    v.spec_head       = nsh;
-    v.comm_head       = nch;
-
-    sh1               = r.spec_head + 1;
-
-    fl_out.alloc_tag0 = fl_read(r.list, r.spec_head[FL_IDX_BITS-1:0]);
-    fl_out.alloc_tag1 = fl_read(r.list, sh1[FL_IDX_BITS-1:0]);
-    fl_out.alloc_ok0  = r.spec_count >= 1;
-    fl_out.alloc_ok1  = r.spec_count >= 2;
-    fl_out.empty      = (r.spec_count == 0);
-    fl_out.has_two    = r.spec_count >= 2;
-
-    rin               = v;
-
   end
-
+  assign fl_out.alloc_tag0 = list[spec_head[FL_IDX_BITS-1:0]];
+  assign fl_out.alloc_tag1 = list[FL_IDX_BITS'(spec_head+1'b1)];
+  assign fl_out.alloc_ok0  = (spec_count >= 1);
+  assign fl_out.alloc_ok1  = (spec_count >= 2);
+  assign fl_out.empty      = (spec_count == '0);
+  assign fl_out.has_two    = (spec_count >= 2);
   always_ff @(posedge clock) begin
+    integer i;
     if (reset == 0) begin
-      fl_reg_type init_v;
-      integer k;
-      init_v.list       = '0;
-      init_v.spec_head  = '0;
-      init_v.comm_head  = '0;
-      init_v.tail       = FL_CNT_BITS'(FLIST_DEPTH);
-      init_v.spec_count = FL_CNT_BITS'(FLIST_DEPTH);
-      init_v.comm_count = FL_CNT_BITS'(FLIST_DEPTH);
-      for (k = 0; k < FLIST_DEPTH; k++)
-      init_v.list[k*PRF_ADDR_BITS+:PRF_ADDR_BITS] = PRF_ADDR_BITS'(ARCH_REGS + k);
-      r <= init_v;
+      spec_head  <= '0;
+      comm_head  <= '0;
+      tail       <= FL_CNT_BITS'(FLIST_DEPTH);
+      spec_count <= FL_CNT_BITS'(FLIST_DEPTH);
+      comm_count <= FL_CNT_BITS'(FLIST_DEPTH);
+      for (i = 0; i < FLIST_DEPTH; i++) list[i] <= PRF_ADDR_BITS'(ARCH_REGS + i);
     end else if (flush) begin
-      begin : rebuild
-        integer i;
-        logic [FL_IDX_BITS-1:0] src_pos;
-        for (i = 0; i < FLIST_DEPTH; i++) begin
-          src_pos = rin.spec_head[FL_IDX_BITS-1:0] + FL_IDX_BITS'(unsigned'(i));
-          r.list[i*PRF_ADDR_BITS+:PRF_ADDR_BITS] <= rin.list[src_pos*PRF_ADDR_BITS+:PRF_ADDR_BITS];
-        end
-      end
-      r.spec_head  <= '0;
-      r.comm_head  <= '0;
-      r.tail       <= rin.spec_count;
-      r.spec_count <= rin.spec_count;
-      r.comm_count <= rin.spec_count;
+      for (i = 0; i < FLIST_DEPTH; i++)
+      list[i] <= list[(spec_head[FL_IDX_BITS-1:0]+FL_IDX_BITS'(unsigned'(i)))&{FL_IDX_BITS{1'b1}}];
+      spec_head  <= '0;
+      comm_head  <= '0;
+      tail       <= spec_count;
+      spec_count <= spec_count;
+      comm_count <= spec_count;
     end else begin
-      r <= rin;
+      if (do_free0) list[free0_slot] <= fl_in.free_tag0;
+      if (do_free1) list[free1_slot] <= fl_in.free_tag1;
+      spec_head  <= nsh;
+      comm_head  <= nch;
+      tail       <= nt;
+      spec_count <= nsc;
+      comm_count <= ncc;
     end
   end
-
 endmodule
