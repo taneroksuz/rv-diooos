@@ -93,24 +93,16 @@ module fl (
       begin : rebuild
         integer i;
         logic [FL_IDX_BITS-1:0] src_pos;
-        logic [FL_CNT_BITS-1:0] start;
-        logic [FL_CNT_BITS-1:0] eff_count;
-        eff_count = (rin.comm_count > FL_CNT_BITS'(FLIST_DEPTH)) ?
-                     FL_CNT_BITS'(FLIST_DEPTH) : rin.comm_count;
-        start = rin.tail - eff_count;
         for (i = 0; i < FLIST_DEPTH; i++) begin
-          src_pos = start[FL_IDX_BITS-1:0] + FL_IDX_BITS'(unsigned'(i));
+          src_pos = rin.spec_head[FL_IDX_BITS-1:0] + FL_IDX_BITS'(unsigned'(i));
           r.list[i*PRF_ADDR_BITS+:PRF_ADDR_BITS] <= rin.list[src_pos*PRF_ADDR_BITS+:PRF_ADDR_BITS];
         end
       end
-      r.spec_head <= '0;
-      r.comm_head <= '0;
-      r.tail       <= rin.comm_count > FL_CNT_BITS'(FLIST_DEPTH) ?
-                       FL_CNT_BITS'(FLIST_DEPTH) : rin.comm_count;
-      r.spec_count <= rin.comm_count > FL_CNT_BITS'(FLIST_DEPTH) ?
-                       FL_CNT_BITS'(FLIST_DEPTH) : rin.comm_count;
-      r.comm_count <= rin.comm_count > FL_CNT_BITS'(FLIST_DEPTH) ?
-                       FL_CNT_BITS'(FLIST_DEPTH) : rin.comm_count;
+      r.spec_head  <= '0;
+      r.comm_head  <= '0;
+      r.tail       <= rin.spec_count;
+      r.spec_count <= rin.spec_count;
+      r.comm_count <= rin.spec_count;
     end else begin
       r <= rin;
     end
