@@ -483,7 +483,7 @@ module cpu (
       .rs_out(rs_mem_out)
   );
 
-  rename rd_comp (
+  rename rename_comp (
       .reset(reset),
       .clock(clock),
       .flush(cpu_ctrl.flush_all),
