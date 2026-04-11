@@ -33,14 +33,14 @@ module fl (
     nsh = r.spec_head;
     nch = r.comm_head;
 
-    if (fl_in.free_en0) begin
+    if (fl_in.free_en0 && nsc < FL_CNT_BITS'(FLIST_DEPTH)) begin
       v.list = fl_write(v.list, nt[FL_IDX_BITS-1:0], fl_in.free_tag0);
       nt = nt + 1;
       ncc = ncc + 1;
       nsc = nsc + 1;
       nch = nch + 1;
     end
-    if (fl_in.free_en1) begin
+    if (fl_in.free_en1 && nsc < FL_CNT_BITS'(FLIST_DEPTH)) begin
       v.list = fl_write(v.list, nt[FL_IDX_BITS-1:0], fl_in.free_tag1);
       nt = nt + 1;
       ncc = ncc + 1;
@@ -94,17 +94,23 @@ module fl (
         integer i;
         logic [FL_IDX_BITS-1:0] src_pos;
         logic [FL_CNT_BITS-1:0] start;
-        start = rin.tail - rin.comm_count;
+        logic [FL_CNT_BITS-1:0] eff_count;
+        eff_count = (rin.comm_count > FL_CNT_BITS'(FLIST_DEPTH)) ?
+                     FL_CNT_BITS'(FLIST_DEPTH) : rin.comm_count;
+        start = rin.tail - eff_count;
         for (i = 0; i < FLIST_DEPTH; i++) begin
           src_pos = start[FL_IDX_BITS-1:0] + FL_IDX_BITS'(unsigned'(i));
           r.list[i*PRF_ADDR_BITS+:PRF_ADDR_BITS] <= rin.list[src_pos*PRF_ADDR_BITS+:PRF_ADDR_BITS];
         end
       end
-      r.spec_head  <= '0;
-      r.comm_head  <= '0;
-      r.tail       <= rin.comm_count;
-      r.spec_count <= rin.comm_count;
-      r.comm_count <= rin.comm_count;
+      r.spec_head <= '0;
+      r.comm_head <= '0;
+      r.tail       <= rin.comm_count > FL_CNT_BITS'(FLIST_DEPTH) ?
+                       FL_CNT_BITS'(FLIST_DEPTH) : rin.comm_count;
+      r.spec_count <= rin.comm_count > FL_CNT_BITS'(FLIST_DEPTH) ?
+                       FL_CNT_BITS'(FLIST_DEPTH) : rin.comm_count;
+      r.comm_count <= rin.comm_count > FL_CNT_BITS'(FLIST_DEPTH) ?
+                       FL_CNT_BITS'(FLIST_DEPTH) : rin.comm_count;
     end else begin
       r <= rin;
     end
