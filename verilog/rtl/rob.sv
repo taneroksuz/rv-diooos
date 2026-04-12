@@ -17,36 +17,23 @@ module rob (
   logic          [  ROB_ADDR_BITS:0] count;
   rob_entry_type h0, h1;
   logic h0_done, h1_done;
+  logic h0_flush;
   assign rob_entries = array;
   always_comb begin
     h0                  = array[head];
     h1                  = array[head+1'b1];
     h0_done             = h0.valid && h0.done && (count >= 1);
     h1_done             = h1.valid && h1.done && (count >= 2);
+    h0_flush            = h0.exception || h0.mret || (h0.jump && h0.npc != h0.pnpc);
     rob_out.commit_ctrl = init_commit;
     rob_out.commit0     = 1'b0;
     rob_out.commit1     = 1'b0;
     if (h0_done) begin
       rob_out.commit0 = 1'b1;
-      if (h0.exception) begin
-        rob_out.commit_ctrl.flush    = 1'b1;
-        rob_out.commit_ctrl.flush_pc = h0.pc;
-      end else if (h0.jump && h0.npc != h0.pnpc) begin
-        rob_out.commit_ctrl.flush    = 1'b1;
-        rob_out.commit_ctrl.flush_pc = h0.npc;
-      end else if (h1_done && !h0.exception &&
-                   !h0.jump &&
-                   !h0.store && !h0.fence && !h0.mret &&
-                   !h0.wfi && !h0.ecall && !h0.ebreak && !h0.csreg &&
-                   !h1.jump) begin
+      if (h1_done && !h0_flush &&
+          !h0.store && !h0.fence && !h0.mret &&
+          !h0.wfi && !h0.ecall && !h0.ebreak && !h0.csreg) begin
         rob_out.commit1 = 1'b1;
-        if (h1.exception) begin
-          rob_out.commit_ctrl.flush    = 1'b1;
-          rob_out.commit_ctrl.flush_pc = h1.pc;
-        end else if (h1.jump && h1.npc != h1.pnpc) begin
-          rob_out.commit_ctrl.flush    = 1'b1;
-          rob_out.commit_ctrl.flush_pc = h1.npc;
-        end
       end
     end
     rob_out.head_ptr     = head;

@@ -74,13 +74,13 @@ module cpu (
   commit_in_type   commit_in;
   commit_out_type  commit_out;
   rob_entry_type   rob_entries_snap[0:ROB_DEPTH-1];
-  assign cpu_ctrl.flush = rob_out.commit_ctrl.flush;
+  assign cpu_ctrl.flush = commit_out.flush;
   assign cpu_ctrl.flush_all = cpu_ctrl.flush | csr_out.trap | csr_out.mret;
   assign cpu_ctrl.flush_pc = csr_out.trap ?
  csr_out.mtvec :
                              csr_out.mret ?
  csr_out.mepc  :
-                             rob_out.commit_ctrl.flush_pc;
+                             commit_out.flush_pc;
   assign cpu_ctrl.backend_stall = rename_out.stall | rob_out.full;
   assign ifetch_in.csr_out = csr_out;
   assign ifetch_in.btac_out = btac_out;

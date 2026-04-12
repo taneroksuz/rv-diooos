@@ -73,21 +73,21 @@ module rename (
     e0.psrc2 = rename_in.rat.psrc1;
     e0.src1_ready = !rename_in.instr0.op.rden1 || src_ready(
       rename_in.rat.psrc0,
-      rename_in.rat.psrc0_valid,
+      rename_in.rat.psrc0_valid && rename_in.prf.rvalid0,
       rename_in.cdb0,
       rename_in.cdb1,
       rename_in.cdb_load
     );
     e0.src2_ready = !rename_in.instr0.op.rden2 || src_ready(
       rename_in.rat.psrc1,
-      rename_in.rat.psrc1_valid,
+      rename_in.rat.psrc1_valid && rename_in.prf.rvalid1,
       rename_in.cdb0,
       rename_in.cdb1,
       rename_in.cdb_load
     );
     e0.rdata1 = rename_in.instr0.op.rden1 ? prf_or_cdb(
       rename_in.rat.psrc0,
-      rename_in.rat.psrc0_valid,
+      rename_in.rat.psrc0_valid && rename_in.prf.rvalid0,
       rename_in.prf.rdata0,
       rename_in.cdb0,
       rename_in.cdb1,
@@ -95,7 +95,7 @@ module rename (
     ) : 32'h0;
     e0.rdata2 = rename_in.instr0.op.rden2 ? prf_or_cdb(
       rename_in.rat.psrc1,
-      rename_in.rat.psrc1_valid,
+      rename_in.rat.psrc1_valid && rename_in.prf.rvalid1,
       rename_in.prf.rdata1,
       rename_in.cdb0,
       rename_in.cdb1,
@@ -121,21 +121,21 @@ module rename (
     e1.psrc2 = rename_in.rat.psrc3;
     e1.src1_ready = !rename_in.instr1.op.rden1 || src_ready(
       rename_in.rat.psrc2,
-      rename_in.rat.psrc2_valid,
+      rename_in.rat.psrc2_valid && rename_in.prf.rvalid2,
       rename_in.cdb0,
       rename_in.cdb1,
       rename_in.cdb_load
     );
     e1.src2_ready = !rename_in.instr1.op.rden2 || src_ready(
       rename_in.rat.psrc3,
-      rename_in.rat.psrc3_valid,
+      rename_in.rat.psrc3_valid && rename_in.prf.rvalid3,
       rename_in.cdb0,
       rename_in.cdb1,
       rename_in.cdb_load
     );
     e1.rdata1 = rename_in.instr1.op.rden1 ? prf_or_cdb(
       rename_in.rat.psrc2,
-      rename_in.rat.psrc2_valid,
+      rename_in.rat.psrc2_valid && rename_in.prf.rvalid2,
       rename_in.prf.rdata2,
       rename_in.cdb0,
       rename_in.cdb1,
@@ -143,7 +143,7 @@ module rename (
     ) : 32'h0;
     e1.rdata2 = rename_in.instr1.op.rden2 ? prf_or_cdb(
       rename_in.rat.psrc3,
-      rename_in.rat.psrc3_valid,
+      rename_in.rat.psrc3_valid && rename_in.prf.rvalid3,
       rename_in.prf.rdata3,
       rename_in.cdb0,
       rename_in.cdb1,

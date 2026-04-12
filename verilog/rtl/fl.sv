@@ -29,7 +29,7 @@ module fl (
       free0_slot = nt[FL_IDX_BITS-1:0];
       nt = nt + 1;
       nsc = nsc + 1;
-      ncc = ncc + 1;
+      nch = nch + 1;
     end else begin
       free0_slot = '0;
     end
@@ -38,21 +38,17 @@ module fl (
       free1_slot = nt[FL_IDX_BITS-1:0];
       nt = nt + 1;
       nsc = nsc + 1;
-      ncc = ncc + 1;
+      nch = nch + 1;
     end else begin
       free1_slot = '0;
     end
     if (fl_in.alloc0 && nsc >= 1) begin
       nsh = nsh + 1;
       nsc = nsc - 1;
-      nch = nch + 1;
-      ncc = ncc - 1;
     end
     if (fl_in.alloc1 && nsc >= 1) begin
       nsh = nsh + 1;
       nsc = nsc - 1;
-      nch = nch + 1;
-      ncc = ncc - 1;
     end
     if (flush) begin
       nsh = nch;
