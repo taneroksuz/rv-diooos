@@ -30,8 +30,6 @@ module rat (
     end else if (flush) begin
       for (i = 0; i < ARCH_REGS; i++) spec[i] <= comm[i];
     end else begin
-      if (rat_in.wren0 && rat_in.waddr0_a != 5'h0) spec[rat_in.waddr0_a] <= {1'b0, rat_in.waddr0_p};
-      if (rat_in.wren1 && rat_in.waddr1_a != 5'h0) spec[rat_in.waddr1_a] <= {1'b0, rat_in.waddr1_p};
       if (rat_in.commit_en0 && rat_in.commit_addr0 != 5'h0) begin
         comm[rat_in.commit_addr0] <= {1'b1, rat_in.commit_tag0};
         if (spec_tag(rat_in.commit_addr0) == rat_in.commit_tag0)
@@ -42,13 +40,12 @@ module rat (
         if (spec_tag(rat_in.commit_addr1) == rat_in.commit_tag1)
           spec[rat_in.commit_addr1] <= {1'b1, rat_in.commit_tag1};
       end
+      if (rat_in.wren0 && rat_in.waddr0_a != 5'h0) spec[rat_in.waddr0_a] <= {1'b0, rat_in.waddr0_p};
+      if (rat_in.wren1 && rat_in.waddr1_a != 5'h0) spec[rat_in.waddr1_a] <= {1'b0, rat_in.waddr1_p};
     end
   end
   assign rat_out.old_pdest0 = spec_tag(rat_in.waddr0_a);
-  assign rat_out.old_pdest1 = (rat_in.wren0 && rat_in.waddr0_a == rat_in.waddr1_a)
-                               ?
- rat_in.waddr0_p
-                               : spec_tag(
+  assign rat_out.old_pdest1 = (rat_in.wren0 && rat_in.waddr0_a == rat_in.waddr1_a) ? rat_in.waddr0_p : spec_tag(
       rat_in.waddr1_a
   );
   assign rat_out.psrc0 = spec_tag(rat_in.rsrc0_a);
