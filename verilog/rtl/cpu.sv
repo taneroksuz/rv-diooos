@@ -83,11 +83,8 @@ module cpu (
   assign btac_in = ifetch_out.btac_in;
   assign imem0_in = ifetch_out.imem0_in;
   assign imem1_in = ifetch_out.imem1_in;
-  assign csr_rin.crden  = (rs_int_out.issue0_valid && rs_int_out.issue0.op.csreg) ||
-                          (rs_int_out.issue1_valid && rs_int_out.issue1.op.csreg);
-  assign csr_rin.craddr = rs_int_out.issue0.op.csreg ?
- rs_int_out.issue0.caddr
-                                                      : rs_int_out.issue1.caddr;
+  assign csr_rin.crden  = (rs_int_out.issue0_valid && rs_int_out.issue0.op.csreg) || (rs_int_out.issue1_valid && rs_int_out.issue1.op.csreg);
+  assign csr_rin.craddr = rs_int_out.issue0.op.csreg ? rs_int_out.issue0.caddr : rs_int_out.issue1.caddr;
   assign idecode_in.decoder0_out = decoder0_out;
   assign idecode_in.decoder1_out = decoder1_out;
   assign idecode_in.compress0_out = compress0_out;
