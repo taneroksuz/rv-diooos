@@ -35,6 +35,7 @@ module rob (
         rob_out.commit_ctrl.flush    = 1'b1;
         rob_out.commit_ctrl.flush_pc = h0.npc;
       end else if (h1_done && !h0.exception &&
+                   !h0.jump &&
                    !h0.store && !h0.fence && !h0.mret &&
                    !h0.wfi && !h0.ecall && !h0.ebreak && !h0.csreg &&
                    !h1.jump) begin

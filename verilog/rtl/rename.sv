@@ -2,7 +2,6 @@ import configure::*;
 import constants::*;
 import wires::*;
 import functions::*;
-
 module rename (
     input  logic           reset,
     input  logic           clock,
@@ -11,45 +10,36 @@ module rename (
     output rename_out_type rename_out
 );
   timeunit 1ns; timeprecision 1ps;
-
   logic i0_is_mem, i1_is_mem;
   logic need_fl0, need_fl1;
   logic rs0_ok, rs1_ok;
   logic can_dispatch0, can_dispatch1;
   logic [PRF_ADDR_BITS-1:0] pdest0, pdest1;
   rs_entry_type e0, e1, em0, em1;
-
   assign i0_is_mem = rename_in.instr0.op.load | rename_in.instr0.op.store;
   assign i1_is_mem = rename_in.instr1.op.load | rename_in.instr1.op.store;
-
   assign need_fl0 = rename_in.instr0_valid && rename_in.instr0.op.wren;
   assign need_fl1 = rename_in.instr1_valid && rename_in.instr1.op.wren;
-
   assign rs0_ok = rename_in.instr0_valid ?
                   (i0_is_mem ? !rename_in.rs_mem_full : !rename_in.rs_int_full) : 1'b1;
   assign rs1_ok = rename_in.instr1_valid ?
                   (i1_is_mem ? rename_in.rs_mem_has_two : rename_in.rs_int_has_two) : 1'b1;
-
   assign can_dispatch0 = rename_in.instr0_valid && !rename_in.rob_full
                          && (!need_fl0 || rename_in.fl.alloc_ok0) && rs0_ok && !flush;
   assign can_dispatch1 = rename_in.instr1_valid && can_dispatch0 && rename_in.rob_has_two
                          && (!need_fl1 || (need_fl0 ? rename_in.fl.alloc_ok1 : rename_in.fl.alloc_ok0))
                          && rs1_ok && !flush;
-
   assign pdest0 = need_fl0 ? rename_in.fl.alloc_tag0 : PRF_ADDR_BITS'(0);
   assign pdest1 = need_fl1 ? (need_fl0 ? rename_in.fl.alloc_tag1
                                        : rename_in.fl.alloc_tag0)
                            : PRF_ADDR_BITS'(0);
-
   assign rename_out.stall = rename_in.instr0_valid && !can_dispatch0;
-
-  assign rename_out.fl.alloc0 = need_fl0;
-  assign rename_out.fl.alloc1 = need_fl1;
+  assign rename_out.fl.alloc0 = can_dispatch0 && need_fl0;
+  assign rename_out.fl.alloc1 = can_dispatch1 && need_fl1;
   assign rename_out.fl.free_tag0 = '0;
   assign rename_out.fl.free_en0 = 1'b0;
   assign rename_out.fl.free_tag1 = '0;
   assign rename_out.fl.free_en1 = 1'b0;
-
   assign rename_out.rat.rsrc0_a = rename_in.instr0.op.rden1 ? rename_in.instr0.raddr1 : 5'h0;
   assign rename_out.rat.rsrc1_a = rename_in.instr0.op.rden2 ? rename_in.instr0.raddr2 : 5'h0;
   assign rename_out.rat.rsrc2_a = rename_in.instr1.op.rden1 ? rename_in.instr1.raddr1 : 5'h0;
@@ -66,10 +56,8 @@ module rename (
   assign rename_out.rat.commit_addr1 = '0;
   assign rename_out.rat.commit_tag1 = '0;
   assign rename_out.rat.commit_en1 = 1'b0;
-
   assign rename_out.rob_alloc0 = can_dispatch0;
   assign rename_out.rob_alloc1 = can_dispatch1;
-
   assign rename_out.rs_int_alloc0 = e0.valid;
   assign rename_out.rs_int_entry0 = e0;
   assign rename_out.rs_int_alloc1 = e1.valid;
@@ -78,9 +66,7 @@ module rename (
   assign rename_out.rs_mem_entry0 = em0;
   assign rename_out.rs_mem_alloc1 = em1.valid;
   assign rename_out.rs_mem_entry1 = em1;
-
   always_comb begin
-
     e0 = init_rs_entry;
     e0.valid = can_dispatch0 && !i0_is_mem;
     e0.psrc1 = rename_in.rat.psrc0;
@@ -129,7 +115,6 @@ module rename (
     e0.div_op = rename_in.instr0.div_op;
     e0.mul_op = rename_in.instr0.mul_op;
     e0.bit_op = rename_in.instr0.bit_op;
-
     e1 = init_rs_entry;
     e1.valid = can_dispatch1 && !i1_is_mem;
     e1.psrc1 = rename_in.rat.psrc2;
@@ -178,12 +163,10 @@ module rename (
     e1.div_op = rename_in.instr1.div_op;
     e1.mul_op = rename_in.instr1.mul_op;
     e1.bit_op = rename_in.instr1.bit_op;
-
     em0 = e0;
     em0.valid = can_dispatch0 && i0_is_mem;
     em1 = e1;
     em1.valid = can_dispatch1 && i1_is_mem;
-
     rename_out.rob_entry0 = init_rob_entry;
     rename_out.rob_entry0.valid = 1'b1;
     rename_out.rob_entry0.pc = rename_in.instr0.pc;
@@ -206,7 +189,6 @@ module rename (
     rename_out.rob_entry0.csreg = rename_in.instr0.op.csreg;
     rename_out.rob_entry0.cwren = rename_in.instr0.op.cwren;
     rename_out.rob_entry0.caddr = rename_in.instr0.caddr;
-
     rename_out.rob_entry1 = init_rob_entry;
     rename_out.rob_entry1.valid = 1'b1;
     rename_out.rob_entry1.pc = rename_in.instr1.pc;
@@ -229,7 +211,5 @@ module rename (
     rename_out.rob_entry1.csreg = rename_in.instr1.op.csreg;
     rename_out.rob_entry1.cwren = rename_in.instr1.op.cwren;
     rename_out.rob_entry1.caddr = rename_in.instr1.caddr;
-
   end
-
 endmodule
