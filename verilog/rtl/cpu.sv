@@ -18,7 +18,6 @@ module cpu (
     input  logic        [63:0] mtime
 );
   timeunit 1ns; timeprecision 1ps;
-  cpu_ctrl_type cpu_ctrl;
   cdb_type cdb0, cdb1, cdb_load;
   csr_read_in_type csr_rin;
   alu_in_type alu0_in, alu1_in;
@@ -74,14 +73,7 @@ module cpu (
   commit_in_type   commit_in;
   commit_out_type  commit_out;
   rob_entry_type   rob_entries_snap[0:ROB_DEPTH-1];
-  assign cpu_ctrl.flush = commit_out.flush;
-  assign cpu_ctrl.flush_all = cpu_ctrl.flush | csr_out.trap | csr_out.mret;
-  assign cpu_ctrl.flush_pc = csr_out.trap ?
- csr_out.mtvec :
-                             csr_out.mret ?
- csr_out.mepc  :
-                             commit_out.flush_pc;
-  assign cpu_ctrl.backend_stall = rename_out.stall | rob_out.full;
+
   assign ifetch_in.csr_out = csr_out;
   assign ifetch_in.btac_out = btac_out;
   assign ifetch_in.imem0_out = imem0_out;
@@ -296,14 +288,13 @@ module cpu (
   mul mul_comp (
       .reset  (reset),
       .clock  (clock),
-      .flush  (cpu_ctrl.flush_all),
       .mul_in (mul_in),
       .mul_out(mul_out)
   );
   div div_comp (
       .reset  (reset),
       .clock  (clock),
-      .flush  (cpu_ctrl.flush_all),
+      .flush  (commit_out.flush),
       .div_in (div_in),
       .div_out(div_out)
   );
@@ -318,7 +309,7 @@ module cpu (
   bit_clmul bit_clmul_comp (
       .reset(reset),
       .clock(clock),
-      .flush(cpu_ctrl.flush_all),
+      .flush(commit_out.flush),
       .bit_clmul_in(bit_clmul_in),
       .bit_clmul_out(bit_clmul_out)
   );
@@ -375,44 +366,44 @@ module cpu (
   ifetch ifetch_comp (
       .reset(reset),
       .clock(clock),
-      .flush(cpu_ctrl.flush_all),
-      .stall(cpu_ctrl.backend_stall),
-      .flush_pc(cpu_ctrl.flush_pc),
+      .flush(commit_out.flush),
+      .stall(rename_out.stall | rob_out.full),
+      .flush_pc(commit_out.flush_pc),
       .ifetch_in(ifetch_in),
       .ifetch_out(ifetch_out)
   );
   idecode idecode_comp (
       .reset(reset),
       .clock(clock),
-      .flush(cpu_ctrl.flush_all),
+      .flush(commit_out.flush),
       .idecode_in(idecode_in),
       .idecode_out(idecode_out)
   );
   prf prf_comp (
       .reset  (reset),
       .clock  (clock),
-      .flush  (cpu_ctrl.flush_all),
+      .flush  (commit_out.flush),
       .prf_in (prf_in),
       .prf_out(prf_out)
   );
   rat rat_comp (
       .reset  (reset),
       .clock  (clock),
-      .flush  (cpu_ctrl.flush_all),
+      .flush  (commit_out.flush),
       .rat_in (rat_in),
       .rat_out(rat_out)
   );
   fl fl_comp (
       .reset (reset),
       .clock (clock),
-      .flush (cpu_ctrl.flush_all),
+      .flush (commit_out.flush),
       .fl_in (fl_in),
       .fl_out(fl_out)
   );
   rob rob_comp (
       .reset(reset),
       .clock(clock),
-      .flush(cpu_ctrl.flush_all),
+      .flush(commit_out.flush),
       .rob_in(rob_in),
       .rob_out(rob_out),
       .rob_entries(rob_entries_snap)
@@ -420,14 +411,14 @@ module cpu (
   rs_int rs_int_comp (
       .reset (reset),
       .clock (clock),
-      .flush (cpu_ctrl.flush_all),
+      .flush (commit_out.flush),
       .rs_in (rs_int_in),
       .rs_out(rs_int_out)
   );
   rs_mem rs_mem_comp (
       .reset(reset),
       .clock(clock),
-      .flush(cpu_ctrl.flush_all),
+      .flush(commit_out.flush),
       .rs_in(rs_mem_in),
       .rob_entries(rob_entries_snap),
       .rs_out(rs_mem_out)
@@ -435,21 +426,21 @@ module cpu (
   rename rename_comp (
       .reset(reset),
       .clock(clock),
-      .flush(cpu_ctrl.flush_all),
+      .flush(commit_out.flush),
       .rename_in(rename_in),
       .rename_out(rename_out)
   );
   eu eu_comp (
       .reset (reset),
       .clock (clock),
-      .flush (cpu_ctrl.flush_all),
+      .flush (commit_out.flush),
       .eu_in (eu_in),
       .eu_out(eu_out)
   );
   msu msu_comp (
       .reset  (reset),
       .clock  (clock),
-      .flush  (cpu_ctrl.flush_all),
+      .flush  (commit_out.flush),
       .msu_in (msu_in),
       .msu_out(msu_out)
   );

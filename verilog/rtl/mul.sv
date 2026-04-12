@@ -3,7 +3,6 @@ import wires::*;
 module mul (
     input logic reset,
     input logic clock,
-    input logic flush,
     input mul_in_type mul_in,
     output mul_out_type mul_out
 );
