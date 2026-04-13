@@ -53,7 +53,10 @@ module commit (
     flush_pc0 = '0;
     flush_pc1 = '0;
 
-    if (c0) begin
+    do0 = c0;
+    do1 = c1 && !flush0;
+
+    if (do0) begin
       if (e0.exception) begin
         flush0 = 1'b1;
         flush_pc0 = commit_in.csr.mtvec;
@@ -66,7 +69,7 @@ module commit (
       end
     end
 
-    if (c1 && !flush0) begin
+    if (do1) begin
       if (e1.exception) begin
         flush1 = 1'b1;
         flush_pc1 = commit_in.csr.mtvec;
@@ -78,9 +81,6 @@ module commit (
         flush_pc1 = e1.npc;
       end
     end
-
-    do0 = c0;
-    do1 = c1 && !flush0;
 
     v.flush = flush0 | flush1;
     v.flush_pc = flush0 ? flush_pc0 : flush_pc1;
