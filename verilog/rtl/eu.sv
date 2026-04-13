@@ -86,30 +86,30 @@ module eu (
     //----------------------------------------------------------
     // AGU2: memory load address
     //----------------------------------------------------------
-    eu_out.agu2_in.rdata1 = eu_in.mem_issue0.rdata1;
-    eu_out.agu2_in.imm = eu_in.mem_issue0.imm;
-    eu_out.agu2_in.pc = eu_in.mem_issue0.pc;
+    eu_out.agu2_in.rdata1 = eu_in.mem_load_issue.rdata1;
+    eu_out.agu2_in.imm = eu_in.mem_load_issue.imm;
+    eu_out.agu2_in.pc = eu_in.mem_load_issue.pc;
     eu_out.agu2_in.auipc = 1'b0;
     eu_out.agu2_in.jal = 1'b0;
     eu_out.agu2_in.jalr = 1'b0;
     eu_out.agu2_in.branch = 1'b0;
-    eu_out.agu2_in.load = eu_in.mem_issue0.op.load;
+    eu_out.agu2_in.load = eu_in.mem_load_issue.op.load;
     eu_out.agu2_in.store = 1'b0;
-    eu_out.agu2_in.lsu_op = eu_in.mem_issue0.lsu_op;
+    eu_out.agu2_in.lsu_op = eu_in.mem_load_issue.lsu_op;
 
     //----------------------------------------------------------
     // AGU3: memory store address
     //----------------------------------------------------------
-    eu_out.agu3_in.rdata1 = eu_in.mem_issue0.rdata1;
-    eu_out.agu3_in.imm = eu_in.mem_issue0.imm;
-    eu_out.agu3_in.pc = eu_in.mem_issue0.pc;
+    eu_out.agu3_in.rdata1 = eu_in.mem_store_issue.rdata1;
+    eu_out.agu3_in.imm = eu_in.mem_store_issue.imm;
+    eu_out.agu3_in.pc = eu_in.mem_store_issue.pc;
     eu_out.agu3_in.auipc = 1'b0;
     eu_out.agu3_in.jal = 1'b0;
     eu_out.agu3_in.jalr = 1'b0;
     eu_out.agu3_in.branch = 1'b0;
     eu_out.agu3_in.load = 1'b0;
-    eu_out.agu3_in.store = eu_in.mem_issue0.op.store;
-    eu_out.agu3_in.lsu_op = eu_in.mem_issue0.lsu_op;
+    eu_out.agu3_in.store = eu_in.mem_store_issue.op.store;
+    eu_out.agu3_in.lsu_op = eu_in.mem_store_issue.lsu_op;
 
     //----------------------------------------------------------
     // ALU inputs
@@ -234,10 +234,10 @@ module eu (
         eu_done(eu_in.int_issue1, eu_in.int_issue1_valid, eu_in.div_out, eu_in.bit_clmul_out);
 
     mstore_data = store_data(
-      eu_in.mem_issue0.rdata2,
-      eu_in.mem_issue0.lsu_op.lsu_sb,
-      eu_in.mem_issue0.lsu_op.lsu_sh,
-      eu_in.mem_issue0.lsu_op.lsu_sw
+      eu_in.mem_store_issue.rdata2,
+      eu_in.mem_store_issue.lsu_op.lsu_sb,
+      eu_in.mem_store_issue.lsu_op.lsu_sh,
+      eu_in.mem_store_issue.lsu_op.lsu_sw
     );
 
     //----------------------------------------------------------
@@ -287,20 +287,20 @@ module eu (
         v.rob_wentry1.cwdata = eu_in.csr_alu_out.cdata;
       end
 
-      if (eu_in.mem_issue0_valid && !(eu_in.int_issue0_valid && eu0_done)) begin
-        v.rob_wtag0              = eu_in.mem_issue0.rob_tag;
+      if (eu_in.mem_store_issue_valid && !(eu_in.int_issue0_valid && eu0_done)) begin
+        v.rob_wtag0              = eu_in.mem_store_issue.rob_tag;
         v.rob_wen0               = 1'b1;
-        v.rob_wentry0.done       = eu_in.mem_issue0.op.store;
+        v.rob_wentry0.done       = eu_in.mem_store_issue.op.store;
         v.rob_wentry0.store_addr = eu_in.agu3_out.address;
         v.rob_wentry0.store_data = mstore_data;
         v.rob_wentry0.store_strb = eu_in.agu3_out.byteenable;
         v.rob_wentry0.exception  = eu_in.agu3_out.exception;
         v.rob_wentry0.ecause     = eu_in.agu3_out.ecause;
         v.rob_wentry0.etval      = eu_in.agu3_out.etval;
-      end else if (eu_in.mem_issue0_valid && !(eu_in.int_issue1_valid && eu1_done)) begin
-        v.rob_wtag1              = eu_in.mem_issue0.rob_tag;
+      end else if (eu_in.mem_store_issue_valid && !(eu_in.int_issue1_valid && eu1_done)) begin
+        v.rob_wtag1              = eu_in.mem_store_issue.rob_tag;
         v.rob_wen1               = 1'b1;
-        v.rob_wentry1.done       = eu_in.mem_issue0.op.store;
+        v.rob_wentry1.done       = eu_in.mem_store_issue.op.store;
         v.rob_wentry1.store_addr = eu_in.agu3_out.address;
         v.rob_wentry1.store_data = mstore_data;
         v.rob_wentry1.store_strb = eu_in.agu3_out.byteenable;

@@ -21,6 +21,7 @@ module rs_mem (
   logic [MEM_ADDR_BITS-1:0] free_idx0, free_idx1;
   logic free_found0, free_found1;
   logic store_ahead;
+  logic [ROB_ADDR_BITS-1:0] scan_tag;
   integer ii, jj;
   always_comb begin
     rs_out      = '0;
@@ -31,6 +32,7 @@ module rs_mem (
     free_found0 = 1'b0;
     free_idx1   = '0;
     free_found1 = 1'b0;
+    scan_tag    = '0;
     for (ii = 0; ii < RS_MEM_DEPTH; ii++) begin
       woken[ii] = rs_wakeup(array[ii], rs_in.cdb0);
       woken[ii] = rs_wakeup(woken[ii], rs_in.cdb1);
@@ -41,9 +43,14 @@ module rs_mem (
       if (woken[ii].valid && woken[ii].src1_ready && woken[ii].src2_ready) begin
         if (woken[ii].op.load) begin
           store_ahead = 1'b0;
-          for (jj = 0; jj < ROB_DEPTH; jj++)
-          if (rob_entries[jj].valid && rob_entries[jj].store && !rob_entries[jj].done)
-            store_ahead = 1'b1;
+          scan_tag = rs_in.rob_head;
+          for (jj = 0; jj < ROB_DEPTH; jj++) begin
+            if (scan_tag != woken[ii].rob_tag) begin
+              if (rob_entries[scan_tag].valid && (rob_entries[scan_tag].store || rob_entries[scan_tag].load))
+                store_ahead = 1'b1;
+              scan_tag = scan_tag + ROB_ADDR_BITS'(1);
+            end
+          end
           ready_vec[ii] = !store_ahead;
         end else ready_vec[ii] = 1'b1;
       end

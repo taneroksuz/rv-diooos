@@ -182,8 +182,12 @@ module cpu (
   assign eu_in.int_issue0_valid = rs_int_out.issue0_valid;
   assign eu_in.int_issue1 = rs_int_out.issue1;
   assign eu_in.int_issue1_valid = rs_int_out.issue1_valid;
-  assign eu_in.mem_issue0 = rs_mem_out.issue0;
-  assign eu_in.mem_issue0_valid = rs_mem_out.issue0_valid && rs_mem_out.issue0.op.store;
+  assign eu_in.mem_store_issue = rs_mem_out.issue0.op.store ? rs_mem_out.issue0 : rs_mem_out.issue1;
+  assign eu_in.mem_store_issue_valid = (rs_mem_out.issue0_valid && rs_mem_out.issue0.op.store) ||
+                                       (rs_mem_out.issue1_valid && rs_mem_out.issue1.op.store);
+  assign eu_in.mem_load_issue = rs_mem_out.issue0.op.load ? rs_mem_out.issue0 : rs_mem_out.issue1;
+  assign eu_in.mem_load_issue_valid = (rs_mem_out.issue0_valid && rs_mem_out.issue0.op.load) ||
+                                      (rs_mem_out.issue1_valid && rs_mem_out.issue1.op.load);
   assign eu_in.csr = csr_out;
   assign eu_in.alu0_out = alu0_out;
   assign eu_in.alu1_out = alu1_out;
@@ -215,8 +219,8 @@ module cpu (
   assign agu1_in = eu_out.agu1_in;
   assign agu2_in = eu_out.agu2_in;
   assign agu3_in = eu_out.agu3_in;
-  assign msu_in.issue = rs_mem_out.issue0;
-  assign msu_in.issue_valid = rs_mem_out.issue0_valid && rs_mem_out.issue0.op.load;
+  assign msu_in.issue = eu_in.mem_load_issue;
+  assign msu_in.issue_valid = eu_in.mem_load_issue_valid;
   assign msu_in.agu2_out = agu2_out;
   assign msu_in.lsu1_out = lsu1_out;
   assign msu_in.dmem1_out = dmem1_out;

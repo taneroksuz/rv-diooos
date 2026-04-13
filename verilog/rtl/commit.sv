@@ -85,8 +85,15 @@ module commit (
     v.flush = flush0 | flush1;
     v.flush_pc = flush0 ? flush_pc0 : flush_pc1;
 
-    v.commit_store = do0 && e0.store && !e0.exception && !flush0;
-    v.commit_entry = e0;
+    v.commit_store = 1'b0;
+    v.commit_entry = init_rob_entry;
+    if (do0 && e0.store && !e0.exception && !flush0) begin
+      v.commit_store = 1'b1;
+      v.commit_entry = e0;
+    end else if (do1 && e1.store && !e1.exception && !flush1) begin
+      v.commit_store = 1'b1;
+      v.commit_entry = e1;
+    end
 
     if (do0) begin
       v.register0_win.wren = e0.wren && !e0.exception;
