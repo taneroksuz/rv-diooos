@@ -68,21 +68,24 @@ $XVLOG --sv \
 
 $XELAB -top testbench -snapshot testbench_snapshot
 
-cp $BASEDIR/riscv/$PROGRAM.riscv $BASEDIR/sim/xsim/output/$PROGRAM.riscv
-
-FILE=$BASEDIR/sim/xsim/output/$PROGRAM
-
-${RISCV}/bin/riscv32-unknown-elf-nm -A ${FILE}.riscv | grep -sw 'tohost' | sed -e 's/.*:\(.*\) D.*/\1/' > ${FILE}.host
-${RISCV}/bin/riscv32-unknown-elf-objcopy -O binary ${FILE}.riscv ${FILE}.bin
-$PYTHON $BASEDIR/py/bin2dat.py --input ${FILE}.riscv --address 0x0 --offset 0x100000
-cp ${FILE}.dat ram.dat
-cp ${FILE}.host host.dat
-if [ "$DUMP" = "1" ]
-then
-  $XSIM testbench_snapshot -testplusarg "MAXTIME=$MAXTIME" -testplusarg "REGFILE=${FILE}.reg" -testplusarg "CSRFILE=${FILE}.csr" -testplusarg "MEMFILE=${FILE}.mem" -tclbatch $BASEDIR/sim/xsim/run.tcl --wdb ${FILE}.wdb
-else
-  $XSIM testbench_snapshot -R -testplusarg "MAXTIME=$MAXTIME"
-fi
+for FILE in $BASEDIR/riscv/*.riscv; do
+  BASE="${FILE##*/}"
+  NAME="${BASE%.*}"
+  if [[ "$NAME" == "$PROGRAM"* ]]; then
+    cp $BASEDIR/riscv/$NAME.riscv $BASEDIR/sim/verilator/output/$NAME.riscv
+    $RISCV/bin/riscv32-unknown-elf-nm -A $BASEDIR/sim/verilator/output/$NAME.riscv | grep -sw 'tohost' | sed -e 's/.*:\(.*\) D.*/\1/' > $BASEDIR/sim/verilator/output/$NAME.host
+    $RISCV/bin/riscv32-unknown-elf-objcopy -O binary $BASEDIR/sim/verilator/output/$NAME.riscv $BASEDIR/sim/verilator/output/$NAME.bin
+    $PYTHON $BASEDIR/py/bin2dat.py --input $BASEDIR/sim/verilator/output/$NAME.riscv --address 0x0 --offset 0x100000
+    cp $BASEDIR/sim/verilator/output/$NAME.dat ram.dat
+    cp $BASEDIR/sim/verilator/output/$NAME.host host.dat
+    if [ "$DUMP" = "1" ]
+    then
+      $XSIM testbench_snapshot -testplusarg "MAXTIME=$MAXTIME" -testplusarg "REGFILE=$BASEDIR/sim/verilator/output/$NAME.reg" -testplusarg "CSRFILE=$BASEDIR/sim/verilator/output/$NAME.csr" -testplusarg "MEMFILE=$BASEDIR/sim/verilator/output/$NAME.mem" -tclbatch $BASEDIR/sim/xsim/run.tcl --wdb $BASEDIR/sim/verilator/output/$NAME.wdb
+    else
+      $XSIM testbench_snapshot -R -testplusarg "MAXTIME=$MAXTIME"
+    fi
+  fi
+done
 
 end=`date +%s`
 echo Execution time was `expr $end - $start` seconds.
