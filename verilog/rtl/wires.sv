@@ -955,11 +955,12 @@ package wires;
   } rs_int_in_type;
   typedef struct packed {
     rs_entry_type issue0;
-    logic [0:0]   issue0_valid;
+    logic [0:0] issue0_valid;
     rs_entry_type issue1;
-    logic [0:0]   issue1_valid;
-    logic [0:0]   full;
-    logic [0:0]   has_two_free;
+    logic [0:0] issue1_valid;
+    logic [0:0] full;
+    logic [0:0] has_two_free;
+    csr_read_in_type csr_rin;
   } rs_int_out_type;
   typedef struct packed {
     rs_entry_type issue0;

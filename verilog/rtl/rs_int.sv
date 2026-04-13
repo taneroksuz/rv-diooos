@@ -53,12 +53,15 @@ module rs_int (
       sel1_idx   = RS_ADDR_BITS'(unsigned'(ii));
       sel1_found = 1'b1;
     end
-    rs_out.issue0       = sel0_found ? woken[sel0_idx] : init_rs_entry;
+    rs_out.issue0 = sel0_found ? woken[sel0_idx] : init_rs_entry;
     rs_out.issue0_valid = sel0_found;
-    rs_out.issue1       = sel1_found ? woken[sel1_idx] : init_rs_entry;
+    rs_out.issue1 = sel1_found ? woken[sel1_idx] : init_rs_entry;
     rs_out.issue1_valid = sel1_found;
-    rs_out.full         = (count >= (RS_ADDR_BITS + 1)'(RS_INT_DEPTH - 1));
+    rs_out.full = (count >= (RS_ADDR_BITS + 1)'(RS_INT_DEPTH - 1));
     rs_out.has_two_free = (count <= (RS_ADDR_BITS + 1)'(RS_INT_DEPTH - 2));
+
+    rs_out.csr_rin.crden  = (sel0_found && woken[sel0_idx].op.csreg) || (sel1_found && woken[sel1_idx].op.csreg);
+    rs_out.csr_rin.craddr = woken[sel0_idx].op.csreg ? woken[sel0_idx].caddr : woken[sel1_idx].caddr;
   end
   always_ff @(posedge clock) begin
     integer i;
