@@ -35,6 +35,14 @@ module rat (
       end
     end else if (flush) begin
       for (i = 0; i < ARCH_REGS; i++) spec[i] <= comm[i];
+      if (rat_in.commit_en0 && rat_in.commit_addr0 != 5'h0) begin
+        comm[rat_in.commit_addr0] <= {1'b1, rat_in.commit_tag0};
+        spec[rat_in.commit_addr0] <= {1'b1, rat_in.commit_tag0};
+      end
+      if (rat_in.commit_en1 && rat_in.commit_addr1 != 5'h0) begin
+        comm[rat_in.commit_addr1] <= {1'b1, rat_in.commit_tag1};
+        spec[rat_in.commit_addr1] <= {1'b1, rat_in.commit_tag1};
+      end
     end else begin
       if (rat_in.commit_en0 && rat_in.commit_addr0 != 5'h0) begin
         comm[rat_in.commit_addr0] <= {1'b1, rat_in.commit_tag0};
