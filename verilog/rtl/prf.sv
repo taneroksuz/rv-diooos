@@ -9,12 +9,10 @@ module prf (
     output prf_out_type prf_out
 );
   timeunit 1ns; timeprecision 1ps;
-  logic [32:0] mem[0:PRF_DEPTH-1];
+  logic [32:0] mem[0:PRF_DEPTH-1] = '{default: 33'b1_00000000000000000000000000000000};
+
   always_ff @(posedge clock) begin
-    if (reset == 0) begin
-      integer k;
-      for (k = 0; k < PRF_DEPTH; k++) mem[k] <= 33'b1_00000000000000000000000000000000;
-    end else begin
+    if (reset != 0) begin
       if (prf_in.wren0 && prf_in.waddr0 != '0) mem[prf_in.waddr0] <= {1'b1, prf_in.wdata0};
       if (prf_in.wren1 && prf_in.waddr1 != '0) mem[prf_in.waddr1] <= {1'b1, prf_in.wdata1};
     end

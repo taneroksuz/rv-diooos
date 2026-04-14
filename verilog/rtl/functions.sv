@@ -65,10 +65,9 @@ package functions;
   function automatic [31:0] bit_clz;
     input [31:0] rs1;
     logic [5:0] res;
-    integer i;
     begin
       res = 0;
-      for (i = 31; i >= 0; i = i - 1) begin
+      for (int i = 31; i >= 0; i = i - 1) begin
         if (rs1[i] == 1) break;
         res = res + 1;
       end
@@ -78,10 +77,9 @@ package functions;
   function automatic [31:0] bit_ctz;
     input [31:0] rs1;
     logic [5:0] res;
-    integer i;
     begin
       res = 0;
-      for (i = 0; i < 32; i = i + 1) begin
+      for (int i = 0; i < 32; i = i + 1) begin
         if (rs1[i] == 1) break;
         res = res + 1;
       end
@@ -91,10 +89,9 @@ package functions;
   function automatic [31:0] bit_cpop;
     input [31:0] rs1;
     logic [5:0] res;
-    integer i;
     begin
       res = 0;
-      for (i = 0; i < 32; i = i + 1) if (rs1[i] == 1) res = res + 1;
+      for (int i = 0; i < 32; i = i + 1) if (rs1[i] == 1) res = res + 1;
       bit_cpop = {26'h0, res};
     end
   endfunction
@@ -121,20 +118,18 @@ package functions;
   function automatic [31:0] bit_orcb;
     input [31:0] rs1;
     logic [31:0] res;
-    integer i;
     begin
       res = 0;
-      for (i = 0; i < 32; i = i + 8) if (|(rs1[i+:8]) == 1) res[i+:8] = 8'hFF;
+      for (int i = 0; i < 32; i = i + 8) if (|(rs1[i+:8]) == 1) res[i+:8] = 8'hFF;
       bit_orcb = res;
     end
   endfunction
   function automatic [31:0] bit_rev8;
     input [31:0] rs1;
     logic [31:0] res;
-    integer i;
     begin
       res = 0;
-      for (i = 0; i < 32; i = i + 8) res[i+:8] = rs1[(24-i)+:8];
+      for (int i = 0; i < 32; i = i + 8) res[i+:8] = rs1[(24-i)+:8];
       bit_rev8 = res;
     end
   endfunction
