@@ -22,7 +22,7 @@ module rs_int (
     logic [RS_ADDR_BITS-1:0] free_idx1;
     logic                    free_found0;
     logic                    free_found1;
-    rs_int_out_type          rs_out;
+    rs_int_out_type          rs_o;
   } rs_int_reg_type;
 
   localparam rs_int_out_type init_rs_int_out = '0;
@@ -38,7 +38,7 @@ module rs_int (
       free_idx1: '0,
       free_found0: 1'b0,
       free_found1: 1'b0,
-      rs_out: init_rs_int_out
+      rs_o: init_rs_int_out
   };
 
   rs_entry_type array[0:RS_INT_DEPTH-1];
@@ -57,7 +57,7 @@ module rs_int (
     v.free_idx1 = '0;
     v.free_found0 = 1'b0;
     v.free_found1 = 1'b0;
-    v.rs_out = init_rs_int_out;
+    v.rs_o = init_rs_int_out;
 
     for (int i = 0; i < RS_INT_DEPTH; i++) begin
       view[i] = r.valid_bits[i] ? array[i] : init_rs_entry;
@@ -89,25 +89,25 @@ module rs_int (
     end
 
     if (v.sel0_found) begin
-      v.rs_out.issue0 = woken[v.sel0_idx];
+      v.rs_o.issue0 = woken[v.sel0_idx];
     end else begin
-      v.rs_out.issue0 = init_rs_entry;
+      v.rs_o.issue0 = init_rs_entry;
     end
-    v.rs_out.issue0_valid = v.sel0_found;
+    v.rs_o.issue0_valid = v.sel0_found;
     if (v.sel1_found) begin
-      v.rs_out.issue1 = woken[v.sel1_idx];
+      v.rs_o.issue1 = woken[v.sel1_idx];
     end else begin
-      v.rs_out.issue1 = init_rs_entry;
+      v.rs_o.issue1 = init_rs_entry;
     end
-    v.rs_out.issue1_valid = v.sel1_found;
-    v.rs_out.full = (r.count >= (RS_ADDR_BITS + 1)'(RS_INT_DEPTH - 1));
-    v.rs_out.has_two_free = (r.count <= (RS_ADDR_BITS + 1)'(RS_INT_DEPTH - 2));
-    v.rs_out.csr_rin = '0;
-    v.rs_out.csr_rin.crden = (v.sel0_found && woken[v.sel0_idx].op.csreg) || (v.sel1_found && woken[v.sel1_idx].op.csreg);
+    v.rs_o.issue1_valid = v.sel1_found;
+    v.rs_o.full = (r.count >= (RS_ADDR_BITS + 1)'(RS_INT_DEPTH - 1));
+    v.rs_o.has_two_free = (r.count <= (RS_ADDR_BITS + 1)'(RS_INT_DEPTH - 2));
+    v.rs_o.csr_rin = '0;
+    v.rs_o.csr_rin.crden = (v.sel0_found && woken[v.sel0_idx].op.csreg) || (v.sel1_found && woken[v.sel1_idx].op.csreg);
     if (v.sel0_found && woken[v.sel0_idx].op.csreg) begin
-      v.rs_out.csr_rin.craddr = woken[v.sel0_idx].caddr;
+      v.rs_o.csr_rin.craddr = woken[v.sel0_idx].caddr;
     end else if (v.sel1_found && woken[v.sel1_idx].op.csreg) begin
-      v.rs_out.csr_rin.craddr = woken[v.sel1_idx].caddr;
+      v.rs_o.csr_rin.craddr = woken[v.sel1_idx].caddr;
     end
 
     if (flush) begin
@@ -117,7 +117,7 @@ module rs_int (
       v.sel1_found = 1'b0;
       v.free_found0 = 1'b0;
       v.free_found1 = 1'b0;
-      v.rs_out = init_rs_int_out;
+      v.rs_o = init_rs_int_out;
     end else begin
       if (v.sel0_found) begin
         v.valid_bits[v.sel0_idx] = 1'b0;
@@ -138,7 +138,7 @@ module rs_int (
     end
 
     rin = v;
-    rs_out = rin.rs_out;
+    rs_out = rin.rs_o;
   end
 
   always_ff @(posedge clock) begin

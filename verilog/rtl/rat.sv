@@ -24,7 +24,7 @@ module rat (
     logic [4:0]               waddr1_a;
     logic [PRF_ADDR_BITS-1:0] waddr1_p;
     logic [0:0]               wren1;
-    rat_out_type              rat_out;
+    rat_out_type              rat_o;
   } rat_reg_type;
 
   localparam rat_reg_type init_rat_reg = '{
@@ -41,7 +41,7 @@ module rat (
       waddr1_a    : '0,
       waddr1_p    : '0,
       wren1       : 1'b0,
-      rat_out     : init_rat_out
+      rat_o       : init_rat_out
   };
 
   logic [PRF_ADDR_BITS:0] spec[0:ARCH_REGS-1] = '{
@@ -118,60 +118,60 @@ module rat (
   logic [PRF_ADDR_BITS:0] eff0, eff1, eff2, eff3, old0, old1;
 
   always_comb begin
-    v                    = init_rat_reg;
+    v                  = init_rat_reg;
 
-    v.do_flush           = flush;
-    v.commit_addr0       = rat_in.commit_addr0;
-    v.commit_tag0        = rat_in.commit_tag0;
-    v.commit_en0         = rat_in.commit_en0;
-    v.commit_addr1       = rat_in.commit_addr1;
-    v.commit_tag1        = rat_in.commit_tag1;
-    v.commit_en1         = rat_in.commit_en1;
-    v.waddr0_a           = rat_in.waddr0_a;
-    v.waddr0_p           = rat_in.waddr0_p;
-    v.wren0              = rat_in.wren0;
-    v.waddr1_a           = rat_in.waddr1_a;
-    v.waddr1_p           = rat_in.waddr1_p;
-    v.wren1              = rat_in.wren1;
+    v.do_flush         = flush;
+    v.commit_addr0     = rat_in.commit_addr0;
+    v.commit_tag0      = rat_in.commit_tag0;
+    v.commit_en0       = rat_in.commit_en0;
+    v.commit_addr1     = rat_in.commit_addr1;
+    v.commit_tag1      = rat_in.commit_tag1;
+    v.commit_en1       = rat_in.commit_en1;
+    v.waddr0_a         = rat_in.waddr0_a;
+    v.waddr0_p         = rat_in.waddr0_p;
+    v.wren0            = rat_in.wren0;
+    v.waddr1_a         = rat_in.waddr1_a;
+    v.waddr1_p         = rat_in.waddr1_p;
+    v.wren1            = rat_in.wren1;
 
-    eff0                 = flush ? comm[rat_in.rsrc0_a] : spec[rat_in.rsrc0_a];
-    eff1                 = flush ? comm[rat_in.rsrc1_a] : spec[rat_in.rsrc1_a];
-    eff2                 = flush ? comm[rat_in.rsrc2_a] : spec[rat_in.rsrc2_a];
-    eff3                 = flush ? comm[rat_in.rsrc3_a] : spec[rat_in.rsrc3_a];
-    old0                 = flush ? comm[rat_in.waddr0_a] : spec[rat_in.waddr0_a];
-    old1                 = flush ? comm[rat_in.waddr1_a] : spec[rat_in.waddr1_a];
+    eff0               = flush ? comm[rat_in.rsrc0_a] : spec[rat_in.rsrc0_a];
+    eff1               = flush ? comm[rat_in.rsrc1_a] : spec[rat_in.rsrc1_a];
+    eff2               = flush ? comm[rat_in.rsrc2_a] : spec[rat_in.rsrc2_a];
+    eff3               = flush ? comm[rat_in.rsrc3_a] : spec[rat_in.rsrc3_a];
+    old0               = flush ? comm[rat_in.waddr0_a] : spec[rat_in.waddr0_a];
+    old1               = flush ? comm[rat_in.waddr1_a] : spec[rat_in.waddr1_a];
 
-    v.rat_out            = init_rat_out;
-    v.rat_out.old_pdest0 = old0[PRF_ADDR_BITS-1:0];
+    v.rat_o            = init_rat_out;
+    v.rat_o.old_pdest0 = old0[PRF_ADDR_BITS-1:0];
     if (rat_in.wren0 && (rat_in.waddr0_a == rat_in.waddr1_a)) begin
-      v.rat_out.old_pdest1 = rat_in.waddr0_p;
+      v.rat_o.old_pdest1 = rat_in.waddr0_p;
     end else begin
-      v.rat_out.old_pdest1 = old1[PRF_ADDR_BITS-1:0];
+      v.rat_o.old_pdest1 = old1[PRF_ADDR_BITS-1:0];
     end
 
-    v.rat_out.psrc0 = eff0[PRF_ADDR_BITS-1:0];
-    v.rat_out.psrc0_valid = eff0[PRF_ADDR_BITS];
-    v.rat_out.psrc1 = eff1[PRF_ADDR_BITS-1:0];
-    v.rat_out.psrc1_valid = eff1[PRF_ADDR_BITS];
+    v.rat_o.psrc0 = eff0[PRF_ADDR_BITS-1:0];
+    v.rat_o.psrc0_valid = eff0[PRF_ADDR_BITS];
+    v.rat_o.psrc1 = eff1[PRF_ADDR_BITS-1:0];
+    v.rat_o.psrc1_valid = eff1[PRF_ADDR_BITS];
 
     if (rat_in.wren0 && (rat_in.rsrc2_a == rat_in.waddr0_a) && (rat_in.waddr0_a != 5'h0)) begin
-      v.rat_out.psrc2 = rat_in.waddr0_p;
-      v.rat_out.psrc2_valid = 1'b0;
+      v.rat_o.psrc2 = rat_in.waddr0_p;
+      v.rat_o.psrc2_valid = 1'b0;
     end else begin
-      v.rat_out.psrc2 = eff2[PRF_ADDR_BITS-1:0];
-      v.rat_out.psrc2_valid = eff2[PRF_ADDR_BITS];
+      v.rat_o.psrc2 = eff2[PRF_ADDR_BITS-1:0];
+      v.rat_o.psrc2_valid = eff2[PRF_ADDR_BITS];
     end
 
     if (rat_in.wren0 && (rat_in.rsrc3_a == rat_in.waddr0_a) && (rat_in.waddr0_a != 5'h0)) begin
-      v.rat_out.psrc3 = rat_in.waddr0_p;
-      v.rat_out.psrc3_valid = 1'b0;
+      v.rat_o.psrc3 = rat_in.waddr0_p;
+      v.rat_o.psrc3_valid = 1'b0;
     end else begin
-      v.rat_out.psrc3 = eff3[PRF_ADDR_BITS-1:0];
-      v.rat_out.psrc3_valid = eff3[PRF_ADDR_BITS];
+      v.rat_o.psrc3 = eff3[PRF_ADDR_BITS-1:0];
+      v.rat_o.psrc3_valid = eff3[PRF_ADDR_BITS];
     end
 
     rin = v;
-    rat_out = rin.rat_out;
+    rat_out = rin.rat_o;
   end
 
   always_ff @(posedge clock) begin

@@ -1104,7 +1104,7 @@ package wires;
     commit_type    commit_ctrl;
     rob_entry_type entry0;
     rob_entry_type entry1;
-    csr_out_type   csr;
+    csr_out_type   csr_o;
   } commit_in_type;
   localparam commit_in_type init_commit_in = '{
       commit0: 0,
@@ -1112,16 +1112,16 @@ package wires;
       commit_ctrl: init_commit,
       entry0: init_rob_entry,
       entry1: init_rob_entry,
-      csr: '{trap: 0, mret: 0, mtvec: 0, mepc: 0, cdata: 0, fs: 0}
+      csr_o: '{trap: 0, mret: 0, mtvec: 0, mepc: 0, cdata: 0, fs: 0}
   };
   typedef struct packed {
     register_write_in_type register0_win;
     register_write_in_type register1_win;
     csr_write_in_type      csr_win;
     csr_exception_in_type  csr_ein;
-    rat_in_type            rat;
-    prf_in_type            prf;
-    fl_in_type             fl;
+    rat_in_type            rat_i;
+    prf_in_type            prf_i;
+    fl_in_type             fl_i;
     logic [0:0]            flush;
     logic [31:0]           flush_pc;
     logic [0:0]            commit_store;
@@ -1132,9 +1132,9 @@ package wires;
       register1_win: '{wren: 0, waddr: 0, wdata: 0},
       csr_win: init_csr_write_in,
       csr_ein: init_csr_exception_in,
-      rat: init_rat_in,
-      prf: init_prf_in,
-      fl: init_fl_in,
+      rat_i: init_rat_in,
+      prf_i: init_prf_in,
+      fl_i: init_fl_in,
       flush: 0,
       flush_pc: 0,
       commit_store: 0,

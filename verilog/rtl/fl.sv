@@ -21,7 +21,7 @@ module fl (
     logic                   do_free1;
     logic [FL_IDX_BITS-1:0] free0_slot;
     logic [FL_IDX_BITS-1:0] free1_slot;
-    fl_out_type             fl_out;
+    fl_out_type             fl_o;
   } fl_reg_type;
 
   localparam fl_reg_type init_fl_reg = '{
@@ -35,7 +35,7 @@ module fl (
       do_free1: 1'b0,
       free0_slot: '0,
       free1_slot: '0,
-      fl_out: '{
+      fl_o: '{
           alloc_tag0: PRF_ADDR_BITS'(ARCH_REGS + 0),
           alloc_tag1: PRF_ADDR_BITS'(ARCH_REGS + 1),
           alloc_ok0: 1'b1,
@@ -64,19 +64,19 @@ module fl (
     alloc_slot1 = spec_head_p1[FL_IDX_BITS-1:0];
 
     if (r.list_written[alloc_slot0]) begin
-      v.fl_out.alloc_tag0 = list[alloc_slot0];
+      v.fl_o.alloc_tag0 = list[alloc_slot0];
     end else begin
-      v.fl_out.alloc_tag0 = PRF_ADDR_BITS'(ARCH_REGS) + PRF_ADDR_BITS'(alloc_slot0);
+      v.fl_o.alloc_tag0 = PRF_ADDR_BITS'(ARCH_REGS) + PRF_ADDR_BITS'(alloc_slot0);
     end
     if (r.list_written[alloc_slot1]) begin
-      v.fl_out.alloc_tag1 = list[alloc_slot1];
+      v.fl_o.alloc_tag1 = list[alloc_slot1];
     end else begin
-      v.fl_out.alloc_tag1 = PRF_ADDR_BITS'(ARCH_REGS) + PRF_ADDR_BITS'(alloc_slot1);
+      v.fl_o.alloc_tag1 = PRF_ADDR_BITS'(ARCH_REGS) + PRF_ADDR_BITS'(alloc_slot1);
     end
-    v.fl_out.alloc_ok0 = (r.spec_count >= 1);
-    v.fl_out.alloc_ok1 = (r.spec_count >= 2);
-    v.fl_out.empty     = (r.spec_count == '0);
-    v.fl_out.has_two   = (r.spec_count >= 2);
+    v.fl_o.alloc_ok0 = (r.spec_count >= 1);
+    v.fl_o.alloc_ok1 = (r.spec_count >= 2);
+    v.fl_o.empty     = (r.spec_count == '0);
+    v.fl_o.has_two   = (r.spec_count >= 2);
 
     if (flush) begin
       v.spec_head  = r.comm_head;
@@ -111,7 +111,7 @@ module fl (
     end
 
     rin = v;
-    fl_out = rin.fl_out;
+    fl_out = rin.fl_o;
   end
 
   always_ff @(posedge clock) begin

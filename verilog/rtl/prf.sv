@@ -18,7 +18,7 @@ module prf (
     logic [31:0]              wdata0;
     logic [31:0]              wdata1;
     logic [PRF_DEPTH-1:0]     written_bits;
-    prf_out_type              prf_out;
+    prf_out_type              prf_o;
   } prf_reg_type;
 
   localparam prf_reg_type init_prf_reg = '{
@@ -29,7 +29,7 @@ module prf (
       wdata0: '0,
       wdata1: '0,
       written_bits: '0,
-      prf_out: init_prf_out
+      prf_o: init_prf_out
   };
 
   logic [31:0] mem[0:PRF_DEPTH-1];
@@ -51,37 +51,37 @@ module prf (
       v.written_bits[v.waddr1] = 1'b1;
     end
 
-    v.prf_out = init_prf_out;
+    v.prf_o = init_prf_out;
     if (r.written_bits[prf_in.raddr0]) begin
-      v.prf_out.rdata0 = mem[prf_in.raddr0];
+      v.prf_o.rdata0 = mem[prf_in.raddr0];
     end else begin
-      v.prf_out.rdata0 = 32'h0;
+      v.prf_o.rdata0 = 32'h0;
     end
-    v.prf_out.rvalid0 = 1'b1;
+    v.prf_o.rvalid0 = 1'b1;
 
     if (r.written_bits[prf_in.raddr1]) begin
-      v.prf_out.rdata1 = mem[prf_in.raddr1];
+      v.prf_o.rdata1 = mem[prf_in.raddr1];
     end else begin
-      v.prf_out.rdata1 = 32'h0;
+      v.prf_o.rdata1 = 32'h0;
     end
-    v.prf_out.rvalid1 = 1'b1;
+    v.prf_o.rvalid1 = 1'b1;
 
     if (r.written_bits[prf_in.raddr2]) begin
-      v.prf_out.rdata2 = mem[prf_in.raddr2];
+      v.prf_o.rdata2 = mem[prf_in.raddr2];
     end else begin
-      v.prf_out.rdata2 = 32'h0;
+      v.prf_o.rdata2 = 32'h0;
     end
-    v.prf_out.rvalid2 = 1'b1;
+    v.prf_o.rvalid2 = 1'b1;
 
     if (r.written_bits[prf_in.raddr3]) begin
-      v.prf_out.rdata3 = mem[prf_in.raddr3];
+      v.prf_o.rdata3 = mem[prf_in.raddr3];
     end else begin
-      v.prf_out.rdata3 = 32'h0;
+      v.prf_o.rdata3 = 32'h0;
     end
-    v.prf_out.rvalid3 = 1'b1;
+    v.prf_o.rvalid3 = 1'b1;
 
     rin = v;
-    prf_out = rin.prf_out;
+    prf_out = rin.prf_o;
   end
 
   always_ff @(posedge clock) begin

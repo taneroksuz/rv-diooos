@@ -14,9 +14,9 @@ module commit (
     register_write_in_type register1_win;
     csr_write_in_type      csr_win;
     csr_exception_in_type  csr_ein;
-    rat_in_type            rat;
-    prf_in_type            prf;
-    fl_in_type             fl;
+    rat_in_type            rat_i;
+    prf_in_type            prf_i;
+    fl_in_type             fl_i;
     logic [0:0]            flush;
     logic [31:0]           flush_pc;
     logic [0:0]            commit_store;
@@ -27,9 +27,9 @@ module commit (
       register1_win : '{wren : 0, waddr : 0, wdata : 0},
       csr_win       : init_csr_write_in,
       csr_ein       : init_csr_exception_in,
-      rat           : init_rat_in,
-      prf           : init_prf_in,
-      fl            : init_fl_in,
+      rat_i         : init_rat_in,
+      prf_i         : init_prf_in,
+      fl_i          : init_fl_in,
       flush         : 0,
       flush_pc      : 0,
       commit_store  : 0,
@@ -59,10 +59,10 @@ module commit (
     if (do0) begin
       if (e0.exception) begin
         flush0 = 1'b1;
-        flush_pc0 = commit_in.csr.mtvec;
+        flush_pc0 = commit_in.csr_o.mtvec;
       end else if (e0.mret) begin
         flush0 = 1'b1;
-        flush_pc0 = commit_in.csr.mepc;
+        flush_pc0 = commit_in.csr_o.mepc;
       end else if (e0.jump && e0.npc != e0.pnpc) begin
         flush0 = 1'b1;
         flush_pc0 = e0.npc;
@@ -72,10 +72,10 @@ module commit (
     if (do1) begin
       if (e1.exception) begin
         flush1 = 1'b1;
-        flush_pc1 = commit_in.csr.mtvec;
+        flush_pc1 = commit_in.csr_o.mtvec;
       end else if (e1.mret) begin
         flush1 = 1'b1;
-        flush_pc1 = commit_in.csr.mepc;
+        flush_pc1 = commit_in.csr_o.mepc;
       end else if (e1.jump && e1.npc != e1.pnpc) begin
         flush1 = 1'b1;
         flush_pc1 = e1.npc;
@@ -99,14 +99,14 @@ module commit (
       v.register0_win.wren = e0.wren && !e0.exception;
       v.register0_win.waddr = e0.adest;
       v.register0_win.wdata = e0.result;
-      v.prf.wren0 = e0.wren && !e0.exception;
-      v.prf.waddr0 = e0.pdest;
-      v.prf.wdata0 = e0.result;
-      v.rat.commit_addr0 = e0.adest;
-      v.rat.commit_tag0 = e0.pdest;
-      v.rat.commit_en0 = e0.wren && !e0.exception;
-      v.fl.free_tag0 = e0.old_pdest;
-      v.fl.free_en0 = e0.wren;
+      v.prf_i.wren0 = e0.wren && !e0.exception;
+      v.prf_i.waddr0 = e0.pdest;
+      v.prf_i.wdata0 = e0.result;
+      v.rat_i.commit_addr0 = e0.adest;
+      v.rat_i.commit_tag0 = e0.pdest;
+      v.rat_i.commit_en0 = e0.wren && !e0.exception;
+      v.fl_i.free_tag0 = e0.old_pdest;
+      v.fl_i.free_en0 = e0.wren;
       if (e0.cwren) begin
         v.csr_win.cwren  = 1'b1;
         v.csr_win.cwaddr = e0.caddr;
@@ -131,14 +131,14 @@ module commit (
       v.register1_win.wren = e1.wren && !e1.exception;
       v.register1_win.waddr = e1.adest;
       v.register1_win.wdata = e1.result;
-      v.prf.wren1 = e1.wren && !e1.exception;
-      v.prf.waddr1 = e1.pdest;
-      v.prf.wdata1 = e1.result;
-      v.rat.commit_addr1 = e1.adest;
-      v.rat.commit_tag1 = e1.pdest;
-      v.rat.commit_en1 = e1.wren && !e1.exception;
-      v.fl.free_tag1 = e1.old_pdest;
-      v.fl.free_en1 = e1.wren;
+      v.prf_i.wren1 = e1.wren && !e1.exception;
+      v.prf_i.waddr1 = e1.pdest;
+      v.prf_i.wdata1 = e1.result;
+      v.rat_i.commit_addr1 = e1.adest;
+      v.rat_i.commit_tag1 = e1.pdest;
+      v.rat_i.commit_en1 = e1.wren && !e1.exception;
+      v.fl_i.free_tag1 = e1.old_pdest;
+      v.fl_i.free_en1 = e1.wren;
       if (e1.exception) begin
         v.csr_ein.valid1 = 1'b1;
         v.csr_ein.exception = 1'b1;
@@ -158,9 +158,9 @@ module commit (
     commit_out.register1_win = r.register1_win;
     commit_out.csr_win = r.csr_win;
     commit_out.csr_ein = r.csr_ein;
-    commit_out.rat = r.rat;
-    commit_out.prf = r.prf;
-    commit_out.fl = r.fl;
+    commit_out.rat_i = r.rat_i;
+    commit_out.prf_i = r.prf_i;
+    commit_out.fl_i = r.fl_i;
     commit_out.flush = r.flush;
     commit_out.flush_pc = r.flush_pc;
     commit_out.commit_store = r.commit_store;
