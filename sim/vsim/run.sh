@@ -21,7 +21,7 @@ start=`date +%s`
 
 $VLIB .
 
-$VLOG -sv -svinputport=relaxed \
+$VLOG -quiet -sv -svinputport=relaxed \
             $BASEDIR/verilog/conf/configure.sv \
             $BASEDIR/verilog/rtl/constants.sv \
             $BASEDIR/verilog/rtl/wires.sv \
@@ -66,23 +66,23 @@ $VLOG -sv -svinputport=relaxed \
             $BASEDIR/verilog/rtl/commit.sv \
             $BASEDIR/verilog/rtl/cpu.sv \
             $BASEDIR/verilog/rtl/soc.sv \
-            $BASEDIR/verilog/tb/testbench.sv
+            $BASEDIR/verilog/tb/testbench.sv 2>&1 > /dev/null
 
 for FILE in $BASEDIR/riscv/*.riscv; do
   BASE="${FILE##*/}"
   NAME="${BASE%.*}"
   if [[ "$NAME" == "$PROGRAM"* ]]; then
-    cp $BASEDIR/riscv/$NAME.riscv $BASEDIR/sim/verilator/output/$NAME.riscv
-    $RISCV/bin/riscv32-unknown-elf-nm -A $BASEDIR/sim/verilator/output/$NAME.riscv | grep -sw 'tohost' | sed -e 's/.*:\(.*\) D.*/\1/' > $BASEDIR/sim/verilator/output/$NAME.host
-    $RISCV/bin/riscv32-unknown-elf-objcopy -O binary $BASEDIR/sim/verilator/output/$NAME.riscv $BASEDIR/sim/verilator/output/$NAME.bin
-    $PYTHON $BASEDIR/py/bin2dat.py --input $BASEDIR/sim/verilator/output/$NAME.riscv --address 0x0 --offset 0x100000
-    cp $BASEDIR/sim/verilator/output/$NAME.dat ram.dat
-    cp $BASEDIR/sim/verilator/output/$NAME.host host.dat
+    cp $BASEDIR/riscv/$NAME.riscv $BASEDIR/sim/vsim/output/$NAME.riscv
+    $RISCV/bin/riscv32-unknown-elf-nm -A $BASEDIR/sim/vsim/output/$NAME.riscv | grep -sw 'tohost' | sed -e 's/.*:\(.*\) D.*/\1/' > $BASEDIR/sim/vsim/output/$NAME.host
+    $RISCV/bin/riscv32-unknown-elf-objcopy -O binary $BASEDIR/sim/vsim/output/$NAME.riscv $BASEDIR/sim/vsim/output/$NAME.bin
+    $PYTHON $BASEDIR/py/bin2dat.py --input $BASEDIR/sim/vsim/output/$NAME.riscv --address 0x0 --offset 0x100000
+    cp $BASEDIR/sim/vsim/output/$NAME.dat ram.dat
+    cp $BASEDIR/sim/vsim/output/$NAME.host host.dat
     if [ "$DUMP" = "1" ]
     then
-      $VSIM -c testbench -do "add wave -recursive *; run -all" +MAXTIME=$MAXTIME +REGFILE=$BASEDIR/sim/verilator/output/$NAME.reg +CSRFILE=$BASEDIR/sim/verilator/output/$NAME.csr +MEMFILE=$BASEDIR/sim/verilator/output/$NAME.mem -wlf $BASEDIR/sim/verilator/output/$NAME.wlf
+      $VSIM -quiet -c testbench -do "add wave -recursive *; run -all" +MAXTIME=$MAXTIME +REGFILE=$BASEDIR/sim/vsim/output/$NAME.reg +CSRFILE=$BASEDIR/sim/vsim/output/$NAME.csr +MEMFILE=$BASEDIR/sim/vsim/output/$NAME.mem -wlf $BASEDIR/sim/vsim/output/$NAME.wlf 2>&1
     else
-      $VSIM -c testbench -do "run -all" +MAXTIME=$MAXTIME
+      $VSIM -quiet -c testbench -do "run -all" +MAXTIME=$MAXTIME 2>&1
     fi
   fi
 done

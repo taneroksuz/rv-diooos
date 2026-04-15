@@ -33,11 +33,11 @@ module msu (
       cdb            : init_cdb,
       rob_wtag       : '0,
       rob_wentry     : init_rob_entry,
-      rob_wen        : 0,
+      rob_wen        : 1'b0,
       dmem1_in       : init_mem_in,
-      lsu1_in        : '{ldata : 0, byteenable : 0, lsu_op : init_lsu_op},
+      lsu1_in        : '{ldata : 32'h0, byteenable : 4'h0, lsu_op : init_lsu_op},
       dmem0_in       : init_mem_in,
-      lsu0_in        : '{ldata : 0, byteenable : 0, lsu_op : init_lsu_op},
+      lsu0_in        : '{ldata : 32'h0, byteenable : 4'h0, lsu_op : init_lsu_op},
       load_pending   : 1'b0,
       load_rob_tag   : '0,
       load_pdest     : '0,
@@ -46,28 +46,28 @@ module msu (
       load_exception : 1'b0
   };
 
-  msu_reg_type r, rin;
-  msu_reg_type v;
-
+  msu_reg_type r, rin, v;
   logic load_accept;
   logic load_ready;
   lsu_in_type lsu1_in_cur;
 
-  assign load_accept = msu_in.issue_valid && msu_in.issue.op.load && !flush && !r.load_pending;
-  assign load_ready = r.load_pending && msu_in.dmem1_out.mem_ready;
-
-  assign lsu1_in_cur.ldata = msu_in.dmem1_out.mem_rdata;
-  assign lsu1_in_cur.byteenable = r.lsu1_in.byteenable;
-  assign lsu1_in_cur.lsu_op = r.lsu1_in.lsu_op;
-
   always_comb begin
+    v = init_msu_reg;
+    if (!flush) begin
+      v = r;
+    end
 
-    v                    = r;
+    load_accept = msu_in.issue_valid && msu_in.issue.op.load && !flush && !r.load_pending;
+    load_ready = r.load_pending && msu_in.dmem1_out.mem_ready && !flush;
 
+    lsu1_in_cur = r.lsu1_in;
+    lsu1_in_cur.ldata = msu_in.dmem1_out.mem_rdata;
+
+    v.dmem1_in = init_mem_in;
     v.dmem1_in.mem_valid = load_accept;
     v.dmem1_in.mem_instr = 1'b0;
-    v.dmem1_in.mem_mode  = 2'h0;
-    v.dmem1_in.mem_addr  = msu_in.agu2_out.address;
+    v.dmem1_in.mem_mode = 2'h0;
+    v.dmem1_in.mem_addr = msu_in.agu2_out.address;
     v.dmem1_in.mem_wdata = 32'h0;
     v.dmem1_in.mem_wstrb = 4'h0;
 
@@ -83,7 +83,8 @@ module msu (
       v.load_etval         = msu_in.agu2_out.etval;
     end
 
-    v.dmem0_in.mem_valid = msu_in.commit_store && !msu_in.commit_entry.exception;
+    v.dmem0_in           = init_mem_in;
+    v.dmem0_in.mem_valid = msu_in.commit_store && !msu_in.commit_entry.exception && !flush;
     v.dmem0_in.mem_instr = 1'b0;
     v.dmem0_in.mem_mode  = 2'h0;
     v.dmem0_in.mem_addr  = msu_in.commit_entry.store_addr;
@@ -99,7 +100,7 @@ module msu (
     v.rob_wentry         = init_rob_entry;
     v.rob_wen            = 1'b0;
 
-    if (load_ready && !flush) begin
+    if (load_ready) begin
       v.cdb.valid            = 1'b1;
       v.cdb.tag              = r.load_pdest;
       v.cdb.data             = msu_in.lsu1_out.result;
@@ -115,25 +116,21 @@ module msu (
 
     rin                = v;
 
-    msu_out.cdb        = r.cdb;
-    msu_out.rob_wtag   = r.rob_wtag;
-    msu_out.rob_wentry = r.rob_wentry;
-    msu_out.rob_wen    = r.rob_wen;
-    msu_out.dmem1_in   = r.dmem1_in;
-    msu_out.lsu1_in    = load_ready ? lsu1_in_cur : r.lsu1_in;
-    msu_out.dmem0_in   = r.dmem0_in;
-    msu_out.lsu0_in    = r.lsu0_in;
-
+    msu_out.cdb        = rin.cdb;
+    msu_out.rob_wtag   = rin.rob_wtag;
+    msu_out.rob_wentry = rin.rob_wentry;
+    msu_out.rob_wen    = rin.rob_wen;
+    msu_out.dmem1_in   = rin.dmem1_in;
+    msu_out.lsu1_in    = load_ready ? lsu1_in_cur : rin.lsu1_in;
+    msu_out.dmem0_in   = rin.dmem0_in;
+    msu_out.lsu0_in    = rin.lsu0_in;
   end
 
   always_ff @(posedge clock) begin
     if (reset == 0) begin
       r <= init_msu_reg;
-    end else if (flush) begin
-      r <= init_msu_reg;
     end else begin
       r <= rin;
     end
   end
-
 endmodule
