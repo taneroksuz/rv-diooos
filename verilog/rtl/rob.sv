@@ -19,10 +19,9 @@ module rob (
     logic [ROB_DEPTH-1:0]     valid_bits;
   } rob_reg_type;
 
-  localparam
-      rob_reg_type init_rob_reg = '{head      : '0, tail_ptr  : '0, count     : '0, valid_bits: '0};
+  localparam rob_reg_type init_rob_reg = '{head: '0, tail_ptr: '0, count: '0, valid_bits: '0};
 
-  rob_entry_type array[0:ROB_DEPTH-1];
+  (* ramstyle = "M20K, no_rw_check" *) rob_entry_type array[0:ROB_DEPTH-1];
   rob_reg_type r, rin, v;
   rob_entry_type view[0:ROB_DEPTH-1];
   rob_entry_type h0, h1;

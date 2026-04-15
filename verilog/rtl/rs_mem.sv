@@ -20,7 +20,7 @@ module rs_mem (
 
   localparam rs_mem_reg_type init_rs_mem_reg = '{count: '0, valid_bits: '0};
 
-  rs_entry_type array[0:RS_MEM_DEPTH-1];
+  (* ramstyle = "M20K, no_rw_check" *) rs_entry_type array[0:RS_MEM_DEPTH-1];
   rs_mem_reg_type r, rin, v;
   rs_entry_type woken[0:RS_MEM_DEPTH-1];
   rs_entry_type cur_entry;
@@ -29,20 +29,29 @@ module rs_mem (
   logic sel_found;
   logic [MEM_ADDR_BITS-1:0] free_idx0, free_idx1;
   logic free_found0, free_found1;
-  logic store_ahead;
-  logic [ROB_ADDR_BITS-1:0] scan_tag;
+  logic [ROB_ADDR_BITS-1:0] best_age, cand_age;
+  logic [MEM_ADDR_BITS-1:0] oldest_idx;
+  logic oldest_found;
+
+  function automatic logic [ROB_ADDR_BITS-1:0] rob_age(input logic [ROB_ADDR_BITS-1:0] head,
+                                                       input logic [ROB_ADDR_BITS-1:0] tag);
+    rob_age = tag - head;
+  endfunction
 
   always_comb begin
     rs_out = '0;
     v = r;
+    rin = r;
     sel_idx = '0;
     sel_found = 1'b0;
     free_idx0 = '0;
     free_idx1 = '0;
     free_found0 = 1'b0;
     free_found1 = 1'b0;
-    store_ahead = 1'b0;
-    scan_tag = '0;
+    oldest_idx = '0;
+    oldest_found = 1'b0;
+    best_age = '0;
+    cand_age = '0;
 
     for (int i = 0; i < RS_MEM_DEPTH; i++) begin
       cur_entry = r.valid_bits[i] ? array[i] : init_rs_entry;
@@ -50,23 +59,14 @@ module rs_mem (
       woken[i] = rs_wakeup(cur_entry, rs_in.cdb0);
       woken[i] = rs_wakeup(woken[i], rs_in.cdb1);
       woken[i] = rs_wakeup(woken[i], rs_in.cdb_load);
-      ready_vec[i] = 1'b0;
+      ready_vec[i] = woken[i].valid & woken[i].src1_ready & woken[i].src2_ready;
 
-      if (woken[i].valid && woken[i].src1_ready && woken[i].src2_ready) begin
-        if (woken[i].op.load) begin
-          store_ahead = 1'b0;
-          scan_tag = rs_in.rob_head;
-          for (int j = 0; j < ROB_DEPTH; j++) begin
-            if (scan_tag != woken[i].rob_tag) begin
-              if (rob_entries[scan_tag].valid && (rob_entries[scan_tag].store || rob_entries[scan_tag].load)) begin
-                store_ahead = 1'b1;
-              end
-              scan_tag = scan_tag + ROB_ADDR_BITS'(1);
-            end
-          end
-          ready_vec[i] = !store_ahead;
-        end else begin
-          ready_vec[i] = 1'b1;
+      if (woken[i].valid) begin
+        cand_age = rob_age(rs_in.rob_head, woken[i].rob_tag);
+        if (!oldest_found || (cand_age < best_age)) begin
+          oldest_idx = MEM_ADDR_BITS'(unsigned'(i));
+          oldest_found = 1'b1;
+          best_age = cand_age;
         end
       end
 
@@ -79,11 +79,9 @@ module rs_mem (
       end
     end
 
-    for (int i = RS_MEM_DEPTH - 1; i >= 0; i--) begin
-      if (ready_vec[i]) begin
-        sel_idx   = MEM_ADDR_BITS'(unsigned'(i));
-        sel_found = 1'b1;
-      end
+    if (oldest_found && ready_vec[oldest_idx]) begin
+      sel_idx   = oldest_idx;
+      sel_found = 1'b1;
     end
 
     if (sel_found) begin
