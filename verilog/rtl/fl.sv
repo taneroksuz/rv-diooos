@@ -55,7 +55,26 @@ module fl (
 
     if (flush) begin
       spec_head_n  = comm_head;
+      comm_head_n  = comm_head;
       spec_count_n = comm_count;
+
+      if (fl_in.free_en0) begin
+        do_free0 = 1'b1;
+        free0_slot = tail_n[FL_IDX_BITS-1:0];
+        tail_n = tail_n + 1'b1;
+        spec_head_n = spec_head_n + 1'b1;
+        comm_head_n = comm_head_n + 1'b1;
+        list_written_n[free0_slot] = 1'b1;
+      end
+
+      if (fl_in.free_en1) begin
+        do_free1 = 1'b1;
+        free1_slot = tail_n[FL_IDX_BITS-1:0];
+        tail_n = tail_n + 1'b1;
+        spec_head_n = spec_head_n + 1'b1;
+        comm_head_n = comm_head_n + 1'b1;
+        list_written_n[free1_slot] = 1'b1;
+      end
     end else begin
       if (fl_in.free_en0 && (spec_count_n < FL_CNT_BITS'(FLIST_DEPTH))) begin
         do_free0 = 1'b1;

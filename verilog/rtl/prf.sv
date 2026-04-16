@@ -18,10 +18,10 @@ module prf (
   logic [31:0] wdata0, wdata1;
 
   always_comb begin
-    wen0 = prf_in.wren0 && (prf_in.waddr0 != '0) && !flush;
+    wen0 = prf_in.wren0 && (prf_in.waddr0 != '0);
     waddr0 = prf_in.waddr0;
     wdata0 = prf_in.wdata0;
-    wen1 = prf_in.wren1 && (prf_in.waddr1 != '0) && !flush;
+    wen1 = prf_in.wren1 && (prf_in.waddr1 != '0);
     waddr1 = prf_in.waddr1;
     wdata1 = prf_in.wdata1;
 
