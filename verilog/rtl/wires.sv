@@ -952,6 +952,8 @@ package wires;
     cdb_type      cdb0;
     cdb_type      cdb1;
     cdb_type      cdb_load;
+    logic [0:0]   div_busy;
+    logic [0:0]   clmul_busy;
   } rs_int_in_type;
   typedef struct packed {
     rs_entry_type issue0;
@@ -1055,6 +1057,8 @@ package wires;
     logic [ROB_ADDR_BITS-1:0] rob_wtag1;
     rob_entry_type            rob_wentry1;
     logic [0:0]               rob_wen1;
+    logic [0:0]               div_busy;
+    logic [0:0]               clmul_busy;
   } eu_out_type;
   typedef struct packed {
     rs_entry_type  issue;

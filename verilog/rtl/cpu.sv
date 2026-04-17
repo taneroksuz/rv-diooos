@@ -152,6 +152,8 @@ module cpu (
   assign rs_int_in.cdb0 = cdb0;
   assign rs_int_in.cdb1 = cdb1;
   assign rs_int_in.cdb_load = cdb_load;
+  assign rs_int_in.div_busy = eu_out.div_busy;
+  assign rs_int_in.clmul_busy = eu_out.clmul_busy;
   assign rs_mem_in.entry0 = rename_out.rs_mem_entry0;
   assign rs_mem_in.alloc0 = rename_out.rs_mem_alloc0;
   assign rs_mem_in.entry1 = rename_out.rs_mem_entry1;

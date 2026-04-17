@@ -65,7 +65,8 @@ module rs_int (
       woken[i] = rs_wakeup(view[i], rs_in.cdb0);
       woken[i] = rs_wakeup(woken[i], rs_in.cdb1);
       woken[i] = rs_wakeup(woken[i], rs_in.cdb_load);
-      ready_vec[i] = woken[i].valid & woken[i].src1_ready & woken[i].src2_ready;
+      ready_vec[i] = woken[i].valid & woken[i].src1_ready & woken[i].src2_ready &
+                     ~rs_in.div_busy & ~rs_in.clmul_busy;
       if (!woken[i].valid && !v.free_found0) begin
         v.free_idx0   = RS_ADDR_BITS'(unsigned'(i));
         v.free_found0 = 1'b1;
