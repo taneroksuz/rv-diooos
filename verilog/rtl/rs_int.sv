@@ -41,7 +41,7 @@ module rs_int (
       rs_o: init_rs_int_out
   };
 
-  (* ramstyle = "M20K, no_rw_check" *) rs_entry_type array[0:RS_INT_DEPTH-1];
+  rs_entry_type array[0:RS_INT_DEPTH-1];
   rs_entry_type view[0:RS_INT_DEPTH-1];
   rs_entry_type woken[0:RS_INT_DEPTH-1];
   logic [RS_INT_DEPTH-1:0] ready_vec;

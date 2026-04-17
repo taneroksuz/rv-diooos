@@ -10,7 +10,7 @@ module rat (
 );
   timeunit 1ns; timeprecision 1ps;
 
-  (* ramstyle = "M20K, no_rw_check" *) logic [PRF_ADDR_BITS:0] spec[0:ARCH_REGS-1] = '{
+  logic [PRF_ADDR_BITS:0] spec[0:ARCH_REGS-1] = '{
       0: {1'b1, PRF_ADDR_BITS'(0)},
       1: {1'b1, PRF_ADDR_BITS'(1)},
       2: {1'b1, PRF_ADDR_BITS'(2)},
@@ -45,7 +45,7 @@ module rat (
       31: {1'b1, PRF_ADDR_BITS'(31)}
   };
 
-  (* ramstyle = "M20K, no_rw_check" *) logic [PRF_ADDR_BITS:0] comm[0:ARCH_REGS-1] = '{
+  logic [PRF_ADDR_BITS:0] comm[0:ARCH_REGS-1] = '{
       0: {1'b1, PRF_ADDR_BITS'(0)},
       1: {1'b1, PRF_ADDR_BITS'(1)},
       2: {1'b1, PRF_ADDR_BITS'(2)},
@@ -89,6 +89,29 @@ module rat (
     eff3 = flush ? comm[rat_in.rsrc3_a] : spec[rat_in.rsrc3_a];
     old0 = flush ? comm[rat_in.waddr0_a] : spec[rat_in.waddr0_a];
     old1 = flush ? comm[rat_in.waddr1_a] : spec[rat_in.waddr1_a];
+
+    if (!flush) begin
+      if (rat_in.commit_en0 && (rat_in.commit_addr0 != 5'h0)) begin
+        if (rat_in.rsrc0_a == rat_in.commit_addr0 && eff0[PRF_ADDR_BITS-1:0] == rat_in.commit_tag0)
+          eff0 = {1'b1, rat_in.commit_tag0};
+        if (rat_in.rsrc1_a == rat_in.commit_addr0 && eff1[PRF_ADDR_BITS-1:0] == rat_in.commit_tag0)
+          eff1 = {1'b1, rat_in.commit_tag0};
+        if (rat_in.rsrc2_a == rat_in.commit_addr0 && eff2[PRF_ADDR_BITS-1:0] == rat_in.commit_tag0)
+          eff2 = {1'b1, rat_in.commit_tag0};
+        if (rat_in.rsrc3_a == rat_in.commit_addr0 && eff3[PRF_ADDR_BITS-1:0] == rat_in.commit_tag0)
+          eff3 = {1'b1, rat_in.commit_tag0};
+      end
+      if (rat_in.commit_en1 && (rat_in.commit_addr1 != 5'h0)) begin
+        if (rat_in.rsrc0_a == rat_in.commit_addr1 && eff0[PRF_ADDR_BITS-1:0] == rat_in.commit_tag1)
+          eff0 = {1'b1, rat_in.commit_tag1};
+        if (rat_in.rsrc1_a == rat_in.commit_addr1 && eff1[PRF_ADDR_BITS-1:0] == rat_in.commit_tag1)
+          eff1 = {1'b1, rat_in.commit_tag1};
+        if (rat_in.rsrc2_a == rat_in.commit_addr1 && eff2[PRF_ADDR_BITS-1:0] == rat_in.commit_tag1)
+          eff2 = {1'b1, rat_in.commit_tag1};
+        if (rat_in.rsrc3_a == rat_in.commit_addr1 && eff3[PRF_ADDR_BITS-1:0] == rat_in.commit_tag1)
+          eff3 = {1'b1, rat_in.commit_tag1};
+      end
+    end
 
     rat_out = init_rat_out;
     rat_out.old_pdest0 = old0[PRF_ADDR_BITS-1:0];

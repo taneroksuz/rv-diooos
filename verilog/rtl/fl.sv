@@ -10,7 +10,7 @@ module fl (
 );
   timeunit 1ns; timeprecision 1ps;
 
-  (* ramstyle = "M20K, no_rw_check" *) logic [PRF_ADDR_BITS-1:0] list[0:FLIST_DEPTH-1];
+  logic [PRF_ADDR_BITS-1:0] list[0:FLIST_DEPTH-1];
   logic [FL_CNT_BITS-1:0] spec_head;
   logic [FL_CNT_BITS-1:0] comm_head;
   logic [FL_CNT_BITS-1:0] tail;

@@ -10,7 +10,7 @@ module prf (
 );
   timeunit 1ns; timeprecision 1ps;
 
-  (* ramstyle = "M20K, no_rw_check" *) logic [31:0] mem[0:PRF_DEPTH-1];
+  logic [31:0] mem[0:PRF_DEPTH-1];
   logic [PRF_DEPTH-1:0] written_bits;
 
   logic wen0, wen1;

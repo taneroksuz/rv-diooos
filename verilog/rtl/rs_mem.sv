@@ -20,7 +20,7 @@ module rs_mem (
 
   localparam rs_mem_reg_type init_rs_mem_reg = '{count: '0, valid_bits: '0};
 
-  (* ramstyle = "M20K, no_rw_check" *) rs_entry_type array[0:RS_MEM_DEPTH-1];
+  rs_entry_type array[0:RS_MEM_DEPTH-1];
   rs_mem_reg_type r, rin, v;
   rs_entry_type woken[0:RS_MEM_DEPTH-1];
   rs_entry_type cur_entry;
