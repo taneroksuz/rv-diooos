@@ -158,8 +158,8 @@ module commit (
     commit_out.register1_win = r.register1_win;
     commit_out.csr_win = r.csr_win;
     commit_out.csr_ein = r.csr_ein;
-    commit_out.rat_i = r.rat_i;
-    commit_out.prf_i = r.prf_i;
+    commit_out.rat_i = v.rat_i;
+    commit_out.prf_i = v.prf_i;
     commit_out.fl_i = r.fl_i;
     commit_out.flush = r.flush;
     commit_out.flush_pc = r.flush_pc;
