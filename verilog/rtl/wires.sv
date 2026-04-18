@@ -572,6 +572,10 @@ package wires;
     logic [31:0] mtval;
     csr_mip_reg_type mip;
     csr_mie_reg_type mie;
+    logic [31:0] tselect;
+    logic [31:0] tdata1;
+    logic [31:0] tdata2;
+    logic [31:0] tcontrol;
   } csr_machine_reg_type;
   localparam csr_machine_reg_type init_csr_machine_reg = '{
       mstatus: init_csr_mstatus_reg,
@@ -583,7 +587,11 @@ package wires;
       mcycle: 0,
       minstret: 0,
       mip: init_csr_mip_reg,
-      mie: init_csr_mie_reg
+      mie: init_csr_mie_reg,
+      tselect: 0,
+      tdata1: 0,
+      tdata2: 0,
+      tcontrol: 0
   };
   typedef struct packed {
     logic [0:0]  cwren;
@@ -916,6 +924,9 @@ package wires;
     logic [ROB_ADDR_BITS-1:0] write_tag2;
     rob_entry_type            write_entry2;
     logic [0:0]               write_en2;
+    logic [ROB_ADDR_BITS-1:0] write_tag3;
+    rob_entry_type            write_entry3;
+    logic [0:0]               write_en3;
     cdb_type                  cdb0;
     cdb_type                  cdb1;
   } rob_in_type;
@@ -945,15 +956,17 @@ package wires;
     logic [ROB_ADDR_BITS-1:0] rob_head;
   } rs_mem_in_type;
   typedef struct packed {
-    rs_entry_type entry0;
-    logic [0:0]   alloc0;
-    rs_entry_type entry1;
-    logic [0:0]   alloc1;
-    cdb_type      cdb0;
-    cdb_type      cdb1;
-    cdb_type      cdb_load;
-    logic [0:0]   div_busy;
-    logic [0:0]   clmul_busy;
+    rs_entry_type             entry0;
+    logic [0:0]               alloc0;
+    rs_entry_type             entry1;
+    logic [0:0]               alloc1;
+    cdb_type                  cdb0;
+    cdb_type                  cdb1;
+    cdb_type                  cdb_load;
+    logic [0:0]               div_busy;
+    logic [0:0]               clmul_busy;
+    logic [0:0]               csr_commit;
+    logic [ROB_ADDR_BITS-1:0] rob_head;
   } rs_int_in_type;
   typedef struct packed {
     rs_entry_type issue0;
@@ -1032,7 +1045,8 @@ package wires;
     bit_alu_out_type   bit_alu0_out;
     bit_alu_out_type   bit_alu1_out;
     bit_clmul_out_type bit_clmul_out;
-    csr_alu_out_type   csr_alu_out;
+    csr_alu_out_type   csr_alu0_out;
+    csr_alu_out_type   csr_alu1_out;
   } eu_in_type;
   typedef struct packed {
     alu_in_type               alu0_in;
@@ -1048,7 +1062,8 @@ package wires;
     bit_alu_in_type           bit_alu0_in;
     bit_alu_in_type           bit_alu1_in;
     bit_clmul_in_type         bit_clmul_in;
-    csr_alu_in_type           csr_alu_in;
+    csr_alu_in_type           csr_alu0_in;
+    csr_alu_in_type           csr_alu1_in;
     cdb_type                  cdb0;
     cdb_type                  cdb1;
     logic [ROB_ADDR_BITS-1:0] rob_wtag0;
@@ -1057,6 +1072,9 @@ package wires;
     logic [ROB_ADDR_BITS-1:0] rob_wtag1;
     rob_entry_type            rob_wentry1;
     logic [0:0]               rob_wen1;
+    logic [ROB_ADDR_BITS-1:0] rob_wtag_store;
+    rob_entry_type            rob_wentry_store;
+    logic [0:0]               rob_wen_store;
     logic [0:0]               div_busy;
     logic [0:0]               clmul_busy;
   } eu_out_type;

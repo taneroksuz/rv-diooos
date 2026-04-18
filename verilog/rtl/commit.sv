@@ -54,6 +54,7 @@ module commit (
     flush_pc1 = '0;
 
     do0 = c0;
+    do1 = c1 && !flush0;
 
     if (do0) begin
       if (e0.exception) begin
@@ -62,13 +63,11 @@ module commit (
       end else if (e0.mret) begin
         flush0 = 1'b1;
         flush_pc0 = commit_in.csr_o.mepc;
-      end else if (e0.jump) begin
+      end else if (e0.jump && e0.npc != e0.pnpc) begin
         flush0 = 1'b1;
         flush_pc0 = e0.npc;
       end
     end
-
-    do1 = c1 && !flush0;
 
     if (do1) begin
       if (e1.exception) begin
@@ -77,7 +76,7 @@ module commit (
       end else if (e1.mret) begin
         flush1 = 1'b1;
         flush_pc1 = commit_in.csr_o.mepc;
-      end else if (e1.jump) begin
+      end else if (e1.jump && e1.npc != e1.pnpc) begin
         flush1 = 1'b1;
         flush_pc1 = e1.npc;
       end
@@ -86,75 +85,67 @@ module commit (
     v.flush = flush0 | flush1;
     v.flush_pc = flush0 ? flush_pc0 : flush_pc1;
 
-    if (do0 && e0.store) begin
+    v.commit_store = 1'b0;
+    v.commit_entry = init_rob_entry;
+    if (do0 && e0.store && !e0.exception && !flush0) begin
       v.commit_store = 1'b1;
       v.commit_entry = e0;
-    end
-    if (do1 && e1.store) begin
+    end else if (do1 && e1.store && !e1.exception && !flush1) begin
       v.commit_store = 1'b1;
       v.commit_entry = e1;
     end
 
     if (do0) begin
-      v.register0_win.wren = e0.wren;
+      v.csr_ein.valid0 = 1'b1;
+      v.register0_win.wren = e0.wren && !e0.exception;
       v.register0_win.waddr = e0.adest;
       v.register0_win.wdata = e0.result;
-      v.prf_i.wren0 = e0.wren;
+      v.prf_i.wren0 = e0.wren && !e0.exception;
       v.prf_i.waddr0 = e0.pdest;
       v.prf_i.wdata0 = e0.result;
       v.rat_i.commit_addr0 = e0.adest;
       v.rat_i.commit_tag0 = e0.pdest;
-      v.rat_i.commit_en0 = e0.wren;
+      v.rat_i.commit_en0 = e0.wren && !e0.exception;
       v.fl_i.free_tag0 = e0.old_pdest;
       v.fl_i.free_en0 = e0.wren;
+      if (e0.cwren) begin
+        v.csr_win.cwren  = 1'b1;
+        v.csr_win.cwaddr = e0.caddr;
+        v.csr_win.cdata  = e0.cwdata;
+      end
+      if (e0.mret) begin
+        v.csr_ein.mret = 1'b1;
+        v.csr_ein.epc  = e0.pc;
+      end
+      if (e0.exception) begin
+        v.csr_ein.exception = 1'b1;
+        v.csr_ein.pc = e0.pc;
+        v.csr_ein.epc = e0.pc;
+        v.csr_ein.ecause = e0.ecause;
+        v.csr_ein.etval = e0.etval;
+      end
     end
+
     if (do1) begin
-      v.register1_win.wren = e1.wren;
+      v.csr_ein.valid1 = 1'b1;
+      v.register1_win.wren = e1.wren && !e1.exception;
       v.register1_win.waddr = e1.adest;
       v.register1_win.wdata = e1.result;
-      v.prf_i.wren1 = e1.wren;
+      v.prf_i.wren1 = e1.wren && !e1.exception;
       v.prf_i.waddr1 = e1.pdest;
       v.prf_i.wdata1 = e1.result;
       v.rat_i.commit_addr1 = e1.adest;
       v.rat_i.commit_tag1 = e1.pdest;
-      v.rat_i.commit_en1 = e1.wren;
+      v.rat_i.commit_en1 = e1.wren && !e1.exception;
       v.fl_i.free_tag1 = e1.old_pdest;
       v.fl_i.free_en1 = e1.wren;
-    end
-
-    if (do0 && e0.cwren) begin
-      v.csr_win.cwren  = e0.cwren;
-      v.csr_win.cwaddr = e0.caddr;
-      v.csr_win.cdata  = e0.cwdata;
-    end
-    if (do1 && e1.cwren) begin
-      v.csr_win.cwren  = e1.cwren;
-      v.csr_win.cwaddr = e1.caddr;
-      v.csr_win.cdata  = e1.cwdata;
-    end
-
-    if (do0) begin
-      v.csr_ein.valid0 = 1'b1;
-    end
-    if (do1) begin
-      v.csr_ein.valid1 = 1'b1;
-    end
-
-    if (do0) begin
-      v.csr_ein.mret = e0.mret;
-      v.csr_ein.exception = e0.exception;
-      v.csr_ein.pc = e0.pc;
-      v.csr_ein.epc = e0.pc;
-      v.csr_ein.ecause = e0.ecause;
-      v.csr_ein.etval = e0.etval;
-    end
-    if (do1) begin
-      v.csr_ein.mret = e1.mret;
-      v.csr_ein.exception = e1.exception;
-      v.csr_ein.pc = e1.pc;
-      v.csr_ein.epc = e1.pc;
-      v.csr_ein.ecause = e1.ecause;
-      v.csr_ein.etval = e1.etval;
+      if (e1.exception) begin
+        v.csr_ein.exception = 1'b1;
+        v.csr_ein.pc = e1.pc;
+        v.csr_ein.epc = e1.pc;
+        v.csr_ein.ecause = e1.ecause;
+        v.csr_ein.etval = e1.etval;
+      end
     end
 
     if (r.flush) begin
@@ -162,7 +153,6 @@ module commit (
     end
 
     rin = v;
-
     commit_out.register0_win = r.register0_win;
     commit_out.register1_win = r.register1_win;
     commit_out.csr_win = r.csr_win;

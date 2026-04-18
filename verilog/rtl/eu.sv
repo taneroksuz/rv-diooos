@@ -21,6 +21,9 @@ module eu (
     logic [ROB_ADDR_BITS-1:0] rob_wtag1;
     rob_entry_type            rob_wentry1;
     logic [0:0]               rob_wen1;
+    logic [ROB_ADDR_BITS-1:0] rob_wtag_store;
+    rob_entry_type            rob_wentry_store;
+    logic [0:0]               rob_wen_store;
     rs_entry_type             div_pending;
     logic [0:0]               div_pending_valid;
     rs_entry_type             clmul_pending;
@@ -36,6 +39,9 @@ module eu (
       rob_wtag1          : '0,
       rob_wentry1        : init_rob_entry,
       rob_wen1           : 0,
+      rob_wtag_store     : '0,
+      rob_wentry_store   : init_rob_entry,
+      rob_wen_store      : 0,
       div_pending        : init_rs_entry,
       div_pending_valid  : 0,
       clmul_pending      : init_rs_entry,
@@ -65,6 +71,9 @@ module eu (
     v.rob_wtag1 = eu_in.int_issue1.rob_tag;
     v.rob_wentry1 = init_rob_entry;
     v.rob_wen1 = 1'b0;
+    v.rob_wtag_store = eu_in.mem_store_issue.rob_tag;
+    v.rob_wentry_store = init_rob_entry;
+    v.rob_wen_store = 1'b0;
 
     div_issue0 = eu_in.int_issue0_valid & eu_in.int_issue0.op.division & ~r.div_pending_valid;
     div_issue1   = eu_in.int_issue1_valid & eu_in.int_issue1.op.division & ~r.div_pending_valid & ~div_issue0;
@@ -96,9 +105,6 @@ module eu (
       end
     end
 
-    //----------------------------------------------------------
-    // AGU0
-    //----------------------------------------------------------
     eu_out.agu0_in.rdata1 = eu_in.int_issue0.rdata1;
     eu_out.agu0_in.imm = eu_in.int_issue0.imm;
     eu_out.agu0_in.pc = eu_in.int_issue0.pc;
@@ -110,9 +116,6 @@ module eu (
     eu_out.agu0_in.store = 1'b0;
     eu_out.agu0_in.lsu_op = init_lsu_op;
 
-    //----------------------------------------------------------
-    // AGU1
-    //----------------------------------------------------------
     eu_out.agu1_in.rdata1 = eu_in.int_issue1.rdata1;
     eu_out.agu1_in.imm = eu_in.int_issue1.imm;
     eu_out.agu1_in.pc = eu_in.int_issue1.pc;
@@ -124,9 +127,6 @@ module eu (
     eu_out.agu1_in.store = 1'b0;
     eu_out.agu1_in.lsu_op = init_lsu_op;
 
-    //----------------------------------------------------------
-    // AGU2
-    //----------------------------------------------------------
     eu_out.agu2_in.rdata1 = eu_in.mem_load_issue.rdata1;
     eu_out.agu2_in.imm = eu_in.mem_load_issue.imm;
     eu_out.agu2_in.pc = eu_in.mem_load_issue.pc;
@@ -138,9 +138,6 @@ module eu (
     eu_out.agu2_in.store = 1'b0;
     eu_out.agu2_in.lsu_op = eu_in.mem_load_issue.lsu_op;
 
-    //----------------------------------------------------------
-    // AGU3
-    //----------------------------------------------------------
     eu_out.agu3_in.rdata1 = eu_in.mem_store_issue.rdata1;
     eu_out.agu3_in.imm = eu_in.mem_store_issue.imm;
     eu_out.agu3_in.pc = eu_in.mem_store_issue.pc;
@@ -152,9 +149,6 @@ module eu (
     eu_out.agu3_in.store = eu_in.mem_store_issue.op.store;
     eu_out.agu3_in.lsu_op = eu_in.mem_store_issue.lsu_op;
 
-    //----------------------------------------------------------
-    // ALU inputs
-    //----------------------------------------------------------
     eu_out.alu0_in.rdata1 = eu_in.int_issue0.rdata1;
     eu_out.alu0_in.rdata2 = eu_in.int_issue0.rdata2;
     eu_out.alu0_in.imm = eu_in.int_issue0.imm;
@@ -167,9 +161,6 @@ module eu (
     eu_out.alu1_in.sel = eu_in.int_issue1.op.rden2;
     eu_out.alu1_in.alu_op = eu_in.int_issue1.alu_op;
 
-    //----------------------------------------------------------
-    // BCU inputs
-    //----------------------------------------------------------
     eu_out.bcu0_in.rdata1 = eu_in.int_issue0.rdata1;
     eu_out.bcu0_in.rdata2 = eu_in.int_issue0.rdata2;
     eu_out.bcu0_in.enable = eu_in.int_issue0.op.branch;
@@ -183,9 +174,6 @@ module eu (
     branch0_taken = eu_in.int_issue0.op.branch & eu_in.bcu0_out.branch;
     branch1_taken = eu_in.int_issue1.op.branch & eu_in.bcu1_out.branch;
 
-    //----------------------------------------------------------
-    // Multiplier
-    //----------------------------------------------------------
     eu_out.mul_in.rdata1 = eu_in.int_issue0.op.mult ? eu_in.int_issue0.rdata1
                                                      : eu_in.int_issue1.rdata1;
     eu_out.mul_in.rdata2 = eu_in.int_issue0.op.mult ? eu_in.int_issue0.rdata2
@@ -193,17 +181,11 @@ module eu (
     eu_out.mul_in.mul_op = eu_in.int_issue0.op.mult ? eu_in.int_issue0.mul_op
                                                      : eu_in.int_issue1.mul_op;
 
-    //----------------------------------------------------------
-    // Divider: only start when not pending; use pending-guarded enable
-    //----------------------------------------------------------
     eu_out.div_in.rdata1 = div_issue0 ? eu_in.int_issue0.rdata1 : eu_in.int_issue1.rdata1;
     eu_out.div_in.rdata2 = div_issue0 ? eu_in.int_issue0.rdata2 : eu_in.int_issue1.rdata2;
     eu_out.div_in.div_op = div_issue0 ? eu_in.int_issue0.div_op : eu_in.int_issue1.div_op;
     eu_out.div_in.enable = div_issue0 | div_issue1;
 
-    //----------------------------------------------------------
-    // Bit-manipulation ALUs
-    //----------------------------------------------------------
     eu_out.bit_alu0_in.rdata1 = eu_in.int_issue0.rdata1;
     eu_out.bit_alu0_in.rdata2 = eu_in.int_issue0.rdata2;
     eu_out.bit_alu0_in.imm = eu_in.int_issue0.imm;
@@ -216,35 +198,24 @@ module eu (
     eu_out.bit_alu1_in.sel = eu_in.int_issue1.op.rden2;
     eu_out.bit_alu1_in.bit_op = eu_in.int_issue1.bit_op;
 
-    //----------------------------------------------------------
-    // Carry-less multiplier: only start when not pending
-    //----------------------------------------------------------
     eu_out.bit_clmul_in.rdata1 = clmul_issue0 ? eu_in.int_issue0.rdata1 : eu_in.int_issue1.rdata1;
     eu_out.bit_clmul_in.rdata2 = clmul_issue0 ? eu_in.int_issue0.rdata2 : eu_in.int_issue1.rdata2;
     eu_out.bit_clmul_in.enable = clmul_issue0 | clmul_issue1;
     eu_out.bit_clmul_in.op     = clmul_issue0 ? eu_in.int_issue0.bit_op.bit_zbc
                                                : eu_in.int_issue1.bit_op.bit_zbc;
 
-    //----------------------------------------------------------
-    // CSR ALU
-    //----------------------------------------------------------
-    eu_out.csr_alu_in.cdata = eu_in.csr.cdata;
-    eu_out.csr_alu_in.rdata1 = eu_in.int_issue0.op.csreg ? eu_in.int_issue0.rdata1
-                                                          : eu_in.int_issue1.rdata1;
-    eu_out.csr_alu_in.imm = eu_in.int_issue0.op.csreg ? eu_in.int_issue0.imm : eu_in.int_issue1.imm;
-    eu_out.csr_alu_in.sel    = eu_in.int_issue0.op.csreg ?
-      (eu_in.int_issue0.csr_op.csrrwi | eu_in.int_issue0.csr_op.csrrsi | eu_in.int_issue0.csr_op.csrrci) :
-      (eu_in.int_issue1.csr_op.csrrwi | eu_in.int_issue1.csr_op.csrrsi | eu_in.int_issue1.csr_op.csrrci);
-    eu_out.csr_alu_in.csr_op = eu_in.int_issue0.op.csreg ? eu_in.int_issue0.csr_op
-                                                          : eu_in.int_issue1.csr_op;
+    eu_out.csr_alu0_in.cdata = eu_in.csr.cdata;
+    eu_out.csr_alu0_in.rdata1 = eu_in.int_issue0.rdata1;
+    eu_out.csr_alu0_in.imm = eu_in.int_issue0.imm;
+    eu_out.csr_alu0_in.sel    = eu_in.int_issue0.csr_op.csrrwi | eu_in.int_issue0.csr_op.csrrsi | eu_in.int_issue0.csr_op.csrrci;
+    eu_out.csr_alu0_in.csr_op = eu_in.int_issue0.csr_op;
 
-    //----------------------------------------------------------
-    // EU result / done
-    // Invariant: while div_pending_valid=1 or clmul_pending_valid=1,
-    // RS issues nothing (div_busy suppresses all ready_vec).
-    // So int_issue0/1_valid=0 while pending → normal paths below are inactive.
-    // Pending completion fires when div_out.ready / bit_clmul_out.ready asserts.
-    //----------------------------------------------------------
+    eu_out.csr_alu1_in.cdata = eu_in.csr.cdata;
+    eu_out.csr_alu1_in.rdata1 = eu_in.int_issue1.rdata1;
+    eu_out.csr_alu1_in.imm = eu_in.int_issue1.imm;
+    eu_out.csr_alu1_in.sel    = eu_in.int_issue1.csr_op.csrrwi | eu_in.int_issue1.csr_op.csrrsi | eu_in.int_issue1.csr_op.csrrci;
+    eu_out.csr_alu1_in.csr_op = eu_in.int_issue1.csr_op;
+
     eu0_result = eu_result(
       eu_in.int_issue0,
       eu_in.alu0_out.result,
@@ -252,7 +223,7 @@ module eu (
       eu_in.mul_out.result,
       eu_in.div_out.result,
       eu_in.bit_alu0_out.result,
-      eu_in.csr_alu_out.cdata,
+      eu_in.csr.cdata,
       eu_in.bit_clmul_out.result
     );
     eu0_done =
@@ -265,7 +236,7 @@ module eu (
       eu_in.mul_out.result,
       eu_in.div_out.result,
       eu_in.bit_alu1_out.result,
-      eu_in.csr_alu_out.cdata,
+      eu_in.csr.cdata,
       eu_in.bit_clmul_out.result
     );
     eu1_done =
@@ -278,12 +249,8 @@ module eu (
       eu_in.mem_store_issue.lsu_op.lsu_sw
     );
 
-    //----------------------------------------------------------
-    // ROB write-back
-    //----------------------------------------------------------
     if (!flush) begin
 
-      //-- Div completion via pending entry (port 0) --
       if (r.div_pending_valid && eu_in.div_out.ready) begin
         if (r.div_pending.op.wren) begin
           v.cdb0.valid = 1'b1;
@@ -320,10 +287,9 @@ module eu (
                                   eu_in.int_issue0.op.ebreak ? except_breakpoint    :
                                                                eu_in.agu0_out.ecause;
         v.rob_wentry0.etval = eu_in.agu0_out.etval;
-        v.rob_wentry0.cwdata = eu_in.csr_alu_out.cdata;
+        v.rob_wentry0.cwdata = eu_in.csr_alu0_out.cdata;
       end
 
-      //-- Clmul completion via pending entry (port 1) --
       if (r.clmul_pending_valid && eu_in.bit_clmul_out.ready) begin
         if (r.clmul_pending.op.wren) begin
           v.cdb1.valid = 1'b1;
@@ -360,50 +326,38 @@ module eu (
                                   eu_in.int_issue1.op.ebreak ? except_breakpoint    :
                                                                eu_in.agu1_out.ecause;
         v.rob_wentry1.etval = eu_in.agu1_out.etval;
-        v.rob_wentry1.cwdata = eu_in.csr_alu_out.cdata;
+        v.rob_wentry1.cwdata = eu_in.csr_alu1_out.cdata;
       end
 
-      if (eu_in.mem_store_issue_valid && !(eu_in.int_issue0_valid && eu0_done) &&
-          !(r.div_pending_valid && eu_in.div_out.ready)) begin
-        v.rob_wtag0              = eu_in.mem_store_issue.rob_tag;
-        v.rob_wen0               = 1'b1;
-        v.rob_wentry0.done       = eu_in.mem_store_issue.op.store;
-        v.rob_wentry0.store_addr = eu_in.agu3_out.address;
-        v.rob_wentry0.store_data = mstore_data;
-        v.rob_wentry0.store_strb = eu_in.agu3_out.byteenable;
-        v.rob_wentry0.exception  = eu_in.agu3_out.exception;
-        v.rob_wentry0.ecause     = eu_in.agu3_out.ecause;
-        v.rob_wentry0.etval      = eu_in.agu3_out.etval;
-      end else if (eu_in.mem_store_issue_valid && !(eu_in.int_issue1_valid && eu1_done) &&
-                   !(r.clmul_pending_valid && eu_in.bit_clmul_out.ready)) begin
-        v.rob_wtag1              = eu_in.mem_store_issue.rob_tag;
-        v.rob_wen1               = 1'b1;
-        v.rob_wentry1.done       = eu_in.mem_store_issue.op.store;
-        v.rob_wentry1.store_addr = eu_in.agu3_out.address;
-        v.rob_wentry1.store_data = mstore_data;
-        v.rob_wentry1.store_strb = eu_in.agu3_out.byteenable;
-        v.rob_wentry1.exception  = eu_in.agu3_out.exception;
-        v.rob_wentry1.ecause     = eu_in.agu3_out.ecause;
-        v.rob_wentry1.etval      = eu_in.agu3_out.etval;
+      if (eu_in.mem_store_issue_valid) begin
+        v.rob_wtag_store              = eu_in.mem_store_issue.rob_tag;
+        v.rob_wen_store               = 1'b1;
+        v.rob_wentry_store.done       = eu_in.mem_store_issue.op.store;
+        v.rob_wentry_store.store_addr = eu_in.agu3_out.address;
+        v.rob_wentry_store.store_data = mstore_data;
+        v.rob_wentry_store.store_strb = eu_in.agu3_out.byteenable;
+        v.rob_wentry_store.exception  = eu_in.agu3_out.exception;
+        v.rob_wentry_store.ecause     = eu_in.agu3_out.ecause;
+        v.rob_wentry_store.etval      = eu_in.agu3_out.etval;
       end
 
     end
 
-    rin                = v;
+    rin                     = v;
 
-    //----------------------------------------------------------
-    // Registered outputs
-    //----------------------------------------------------------
-    eu_out.cdb0        = r.cdb0;
-    eu_out.cdb1        = r.cdb1;
-    eu_out.rob_wtag0   = r.rob_wtag0;
-    eu_out.rob_wentry0 = r.rob_wentry0;
-    eu_out.rob_wen0    = r.rob_wen0;
-    eu_out.rob_wtag1   = r.rob_wtag1;
-    eu_out.rob_wentry1 = r.rob_wentry1;
-    eu_out.rob_wen1    = r.rob_wen1;
-    eu_out.div_busy    = r.div_pending_valid;
-    eu_out.clmul_busy  = r.clmul_pending_valid;
+    eu_out.cdb0             = r.cdb0;
+    eu_out.cdb1             = r.cdb1;
+    eu_out.rob_wtag0        = r.rob_wtag0;
+    eu_out.rob_wentry0      = r.rob_wentry0;
+    eu_out.rob_wen0         = r.rob_wen0;
+    eu_out.rob_wtag1        = r.rob_wtag1;
+    eu_out.rob_wentry1      = r.rob_wentry1;
+    eu_out.rob_wen1         = r.rob_wen1;
+    eu_out.rob_wtag_store   = r.rob_wtag_store;
+    eu_out.rob_wentry_store = r.rob_wentry_store;
+    eu_out.rob_wen_store    = r.rob_wen_store;
+    eu_out.div_busy         = r.div_pending_valid;
+    eu_out.clmul_busy       = r.clmul_pending_valid;
 
   end
 

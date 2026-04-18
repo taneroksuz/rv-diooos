@@ -38,7 +38,10 @@ module csr (
   end
 
   always_comb begin
-    if (csr_rin.crden == 1) begin
+    if (csr_win.cwren == 1 && csr_win.cwaddr == csr_rin.craddr && csr_rin.crden == 1 &&
+        csr_win.cwaddr != csr_minstret && csr_win.cwaddr != csr_minstreth) begin
+      csr_out.cdata = csr_win.cdata;
+    end else if (csr_rin.crden == 1) begin
       case (csr_rin.craddr)
         csr_misa: csr_out.cdata = 32'h40001124;
         csr_mvendorid: csr_out.cdata = 32'h00000000;
@@ -110,6 +113,10 @@ module csr (
         csr_mcycleh: csr_out.cdata = csr_machine_reg.mcycle[63:32];
         csr_minstret: csr_out.cdata = csr_machine_reg.minstret[31:0];
         csr_minstreth: csr_out.cdata = csr_machine_reg.minstret[63:32];
+        csr_tselect: csr_out.cdata = 32'h1;
+        csr_tdata1: csr_out.cdata = csr_machine_reg.tdata1;
+        csr_tdata2: csr_out.cdata = csr_machine_reg.tdata2;
+        csr_tcontrol: csr_out.cdata = csr_machine_reg.tcontrol;
         default: csr_out.cdata = 0;
       endcase
     end else begin
@@ -186,14 +193,20 @@ module csr (
           end
           csr_mcycle: csr_machine_reg.mcycle[31:0] <= csr_win.cdata;
           csr_mcycleh: csr_machine_reg.mcycle[63:32] <= csr_win.cdata;
-          csr_minstret: csr_machine_reg.minstret[31:0] <= csr_win.cdata;
-          csr_minstreth: csr_machine_reg.minstret[63:32] <= csr_win.cdata;
+          csr_minstret:
+          csr_machine_reg.minstret <= {csr_machine_reg.minstret[63:32], csr_win.cdata} + incr;
+          csr_minstreth:
+          csr_machine_reg.minstret <= {csr_win.cdata, csr_machine_reg.minstret[31:0]} + incr;
+          csr_tselect: csr_machine_reg.tselect <= csr_win.cdata;
+          csr_tdata1: csr_machine_reg.tdata1 <= csr_win.cdata;
+          csr_tdata2: csr_machine_reg.tdata2 <= csr_win.cdata;
+          csr_tcontrol: csr_machine_reg.tcontrol <= csr_win.cdata;
           default: ;
         endcase
+      end else begin
+        csr_machine_reg.minstret <= csr_machine_reg.minstret + incr;
       end
-
-      csr_machine_reg.minstret <= csr_machine_reg.minstret + incr;
-      csr_machine_reg.mcycle   <= csr_machine_reg.mcycle + 1;
+      csr_machine_reg.mcycle <= csr_machine_reg.mcycle + 1;
 
       if (meip == 1) begin
         csr_machine_reg.mip.meip <= 1;

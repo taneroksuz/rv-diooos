@@ -32,8 +32,10 @@ module cpu (
   bit_alu_out_type bit_alu0_out, bit_alu1_out;
   bit_clmul_in_type  bit_clmul_in;
   bit_clmul_out_type bit_clmul_out;
-  csr_alu_in_type    csr_alu_in;
-  csr_alu_out_type   csr_alu_out;
+  csr_alu_in_type    csr_alu0_in;
+  csr_alu_out_type   csr_alu0_out;
+  csr_alu_in_type    csr_alu1_in;
+  csr_alu_out_type   csr_alu1_out;
   lsu_in_type lsu0_in, lsu1_in;
   lsu_out_type lsu0_out, lsu1_out;
   csr_out_type csr_out;
@@ -143,6 +145,9 @@ module cpu (
   assign rob_in.write_tag2 = msu_out.rob_wtag;
   assign rob_in.write_entry2 = msu_out.rob_wentry;
   assign rob_in.write_en2 = msu_out.rob_wen;
+  assign rob_in.write_tag3 = eu_out.rob_wtag_store;
+  assign rob_in.write_entry3 = eu_out.rob_wentry_store;
+  assign rob_in.write_en3 = eu_out.rob_wen_store;
   assign rob_in.cdb0 = cdb0;
   assign rob_in.cdb1 = cdb1;
   assign rs_int_in.entry0 = rename_out.rs_int_entry0;
@@ -154,6 +159,8 @@ module cpu (
   assign rs_int_in.cdb_load = cdb_load;
   assign rs_int_in.div_busy = eu_out.div_busy;
   assign rs_int_in.clmul_busy = eu_out.clmul_busy;
+  assign rs_int_in.csr_commit = commit_out.csr_win.cwren;
+  assign rs_int_in.rob_head = rob_out.head_ptr;
   assign rs_mem_in.entry0 = rename_out.rs_mem_entry0;
   assign rs_mem_in.alloc0 = rename_out.rs_mem_alloc0;
   assign rs_mem_in.entry1 = rename_out.rs_mem_entry1;
@@ -204,7 +211,8 @@ module cpu (
   assign eu_in.bit_alu0_out = bit_alu0_out;
   assign eu_in.bit_alu1_out = bit_alu1_out;
   assign eu_in.bit_clmul_out = bit_clmul_out;
-  assign eu_in.csr_alu_out = csr_alu_out;
+  assign eu_in.csr_alu0_out = csr_alu0_out;
+  assign eu_in.csr_alu1_out = csr_alu1_out;
   assign alu0_in = eu_out.alu0_in;
   assign alu1_in = eu_out.alu1_in;
   assign bcu0_in = eu_out.bcu0_in;
@@ -214,7 +222,8 @@ module cpu (
   assign bit_alu0_in = eu_out.bit_alu0_in;
   assign bit_alu1_in = eu_out.bit_alu1_in;
   assign bit_clmul_in = eu_out.bit_clmul_in;
-  assign csr_alu_in = eu_out.csr_alu_in;
+  assign csr_alu0_in = eu_out.csr_alu0_in;
+  assign csr_alu1_in = eu_out.csr_alu1_in;
   assign cdb0 = eu_out.cdb0;
   assign cdb1 = eu_out.cdb1;
   assign agu0_in = eu_out.agu0_in;
@@ -283,9 +292,13 @@ module cpu (
       .lsu_in (lsu1_in),
       .lsu_out(lsu1_out)
   );
-  csr_alu csr_alu_comp (
-      .csr_alu_in (csr_alu_in),
-      .csr_alu_out(csr_alu_out)
+  csr_alu csr_alu0_comp (
+      .csr_alu_in (csr_alu0_in),
+      .csr_alu_out(csr_alu0_out)
+  );
+  csr_alu csr_alu1_comp (
+      .csr_alu_in (csr_alu1_in),
+      .csr_alu_out(csr_alu1_out)
   );
   mul mul_comp (
       .reset  (reset),

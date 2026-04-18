@@ -175,6 +175,17 @@ module rob (
         tmp.etval     = rob_in.write_entry2.etval;
         array[rob_in.write_tag2] <= tmp;
       end
+      if (rob_in.write_en3 && rin.valid_bits[rob_in.write_tag3]) begin
+        tmp            = array[rob_in.write_tag3];
+        tmp.done       = 1'b1;
+        tmp.store_addr = rob_in.write_entry3.store_addr;
+        tmp.store_data = rob_in.write_entry3.store_data;
+        tmp.store_strb = rob_in.write_entry3.store_strb;
+        tmp.exception  = rob_in.write_entry3.exception;
+        tmp.ecause     = rob_in.write_entry3.ecause;
+        tmp.etval      = rob_in.write_entry3.etval;
+        array[rob_in.write_tag3] <= tmp;
+      end
     end
   end
 endmodule
