@@ -25,7 +25,7 @@ module msu (
     logic [ROB_ADDR_BITS-1:0] load_rob_tag;
     logic [PRF_ADDR_BITS-1:0] load_pdest;
     logic [31:0]              load_etval;
-    logic [31:0]              load_ecause;
+    logic [7:0]               load_ecause;
     logic [0:0]               load_exception;
   } msu_reg_type;
 
