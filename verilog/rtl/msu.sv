@@ -64,23 +64,23 @@ module msu (
     lsu1_in_cur.ldata = msu_in.dmem1_out.mem_rdata;
 
     v.dmem1_in = init_mem_in;
-    v.dmem1_in.mem_valid = load_accept;
+    v.dmem1_in.mem_valid = load_accept && !msu_in.agu2_out.exception;
     v.dmem1_in.mem_instr = 1'b0;
     v.dmem1_in.mem_mode = 2'h0;
     v.dmem1_in.mem_addr = msu_in.agu2_out.address;
     v.dmem1_in.mem_wdata = 32'h0;
     v.dmem1_in.mem_wstrb = 4'h0;
 
-    if (load_accept) begin
+    if (load_accept && !msu_in.agu2_out.exception) begin
       v.lsu1_in.ldata      = 32'h0;
       v.lsu1_in.byteenable = msu_in.agu2_out.byteenable;
       v.lsu1_in.lsu_op     = msu_in.issue.lsu_op;
       v.load_pending       = 1'b1;
       v.load_rob_tag       = msu_in.issue.rob_tag;
       v.load_pdest         = msu_in.issue.pdest;
-      v.load_exception     = msu_in.agu2_out.exception;
-      v.load_ecause        = msu_in.agu2_out.ecause;
-      v.load_etval         = msu_in.agu2_out.etval;
+      v.load_exception     = 1'b0;
+      v.load_ecause        = '0;
+      v.load_etval         = '0;
     end
 
     v.dmem0_in           = init_mem_in;
@@ -100,7 +100,15 @@ module msu (
     v.rob_wentry         = init_rob_entry;
     v.rob_wen            = 1'b0;
 
-    if (load_ready) begin
+    if (load_accept && msu_in.agu2_out.exception) begin
+      v.rob_wtag             = msu_in.issue.rob_tag;
+      v.rob_wen              = 1'b1;
+      v.rob_wentry.done      = 1'b1;
+      v.rob_wentry.result    = 32'h0;
+      v.rob_wentry.exception = 1'b1;
+      v.rob_wentry.ecause    = msu_in.agu2_out.ecause;
+      v.rob_wentry.etval     = msu_in.agu2_out.etval;
+    end else if (load_ready) begin
       v.cdb.valid            = 1'b1;
       v.cdb.tag              = r.load_pdest;
       v.cdb.data             = msu_in.lsu1_out.result;

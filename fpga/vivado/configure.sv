@@ -8,6 +8,7 @@ package configure;
   localparam ROB_DEPTH = 16;
   localparam RS_INT_DEPTH = 8;
   localparam RS_MEM_DEPTH = 4;
+  localparam FLIST_DEPTH = PRF_DEPTH - ARCH_REGS;
 
   localparam BUFFER_DEPTH = 4;
 

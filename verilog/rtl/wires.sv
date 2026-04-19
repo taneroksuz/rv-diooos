@@ -1,6 +1,11 @@
 package wires;
   timeunit 1ns; timeprecision 1ps;
   import configure::*;
+  localparam PRF_ADDR_BITS = $clog2(PRF_DEPTH);
+  localparam ROB_ADDR_BITS = $clog2(ROB_DEPTH);
+  localparam RS_ADDR_BITS = $clog2(RS_INT_DEPTH);
+  localparam FL_CNT_BITS = $clog2(FLIST_DEPTH) + 1;
+  localparam FL_IDX_BITS = $clog2(FLIST_DEPTH);
   typedef struct packed {
     logic [0:0] bit_sh1add;
     logic [0:0] bit_sh2add;
@@ -658,12 +663,6 @@ package wires;
     logic [31:0] mem_rdata;
   } mem_out_type;
   localparam mem_out_type init_mem_out = 0;
-  localparam PRF_ADDR_BITS = $clog2(PRF_DEPTH);
-  localparam ROB_ADDR_BITS = $clog2(ROB_DEPTH);
-  localparam RS_ADDR_BITS = $clog2(RS_INT_DEPTH);
-  localparam FLIST_DEPTH = PRF_DEPTH - ARCH_REGS;
-  localparam FL_CNT_BITS = $clog2(FLIST_DEPTH) + 1;
-  localparam FL_IDX_BITS = $clog2(FLIST_DEPTH);
   typedef enum bit [1:0] {
     IDLE,
     BUSY,
