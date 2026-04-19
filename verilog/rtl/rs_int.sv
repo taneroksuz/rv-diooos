@@ -182,7 +182,7 @@ module rs_int (
           array[i] <= rs_in.entry1;
         end else if (r.valid_bits[i] && rin.valid_bits[i] &&
                      !((rin.sel0_found && (rin.sel0_idx == RS_ADDR_BITS'(unsigned'(i)))) ||
-                       (rin.sel1_found && (rin.sel1_idx == RS_ADDR_BITS'(unsigned'(i)))))) begin
+                       (rin.sel1_found && !(rin.sel0_found && woken[rin.sel0_idx].op.csreg) && (rin.sel1_idx == RS_ADDR_BITS'(unsigned'(i)))))) begin
           array[i] <= woken[i];
         end
       end
