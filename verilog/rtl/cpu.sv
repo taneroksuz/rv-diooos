@@ -19,6 +19,8 @@ module cpu (
 );
   timeunit 1ns; timeprecision 1ps;
   cdb_type cdb0, cdb1, cdb_load;
+  cdb_type cdb_exec0, cdb_exec1;
+  cdb_type cdb_commit0, cdb_commit1;
   csr_read_in_type csr_rin;
   alu_in_type alu0_in, alu1_in;
   alu_out_type alu0_out, alu1_out;
@@ -224,8 +226,16 @@ module cpu (
   assign bit_clmul_in = eu_out.bit_clmul_in;
   assign csr_alu0_in = eu_out.csr_alu0_in;
   assign csr_alu1_in = eu_out.csr_alu1_in;
-  assign cdb0 = eu_out.cdb0;
-  assign cdb1 = eu_out.cdb1;
+  assign cdb_exec0 = eu_out.cdb0;
+  assign cdb_exec1 = eu_out.cdb1;
+  assign cdb_commit0.valid = commit_out.prf_i.wren0;
+  assign cdb_commit0.tag = commit_out.prf_i.waddr0;
+  assign cdb_commit0.data = commit_out.prf_i.wdata0;
+  assign cdb_commit1.valid = commit_out.prf_i.wren1;
+  assign cdb_commit1.tag = commit_out.prf_i.waddr1;
+  assign cdb_commit1.data = commit_out.prf_i.wdata1;
+  assign cdb0 = cdb_exec0.valid ? cdb_exec0 : cdb_commit0;
+  assign cdb1 = cdb_exec1.valid ? cdb_exec1 : cdb_commit1;
   assign agu0_in = eu_out.agu0_in;
   assign agu1_in = eu_out.agu1_in;
   assign agu2_in = eu_out.agu2_in;
