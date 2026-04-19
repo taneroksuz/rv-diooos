@@ -20,6 +20,9 @@ module ifetch (
 
     v = r;
 
+    v.valid = 0;
+    v.stall = ifetch_in.buffer_out.stall;
+
     if (ifetch_in.imem0_out.mem_ready == 1) begin
       v.irdata0 = ifetch_in.imem0_out.mem_rdata;
       v.iready0 = ifetch_in.imem0_out.mem_ready;
@@ -40,42 +43,6 @@ module ifetch (
       v.ready = 0;
     end
 
-    case (r.state)
-      IDLE: begin
-        v.valid = 1;
-        v.stall = 0;
-        if (v.ready == 0) begin
-          v.state = BUSY;
-          v.stall = 1;
-        end
-      end
-      BUSY: begin
-        v.valid = 0;
-        v.stall = 1;
-        if (flush == 1) begin
-          v.state = INVALID;
-          v.stall = 1;
-        end
-        if (v.ready == 1) begin
-          v.state = IDLE;
-          v.stall = 0;
-        end
-      end
-      INVALID: begin
-        v.valid = 0;
-        v.stall = 1;
-        if (v.ready == 1) begin
-          v.state = IDLE;
-          v.stall = 0;
-          v.ready = 0;
-        end
-      end
-      default: begin
-        v.valid = 0;
-        v.stall = 1;
-      end
-    endcase
-
     v.pc0 = ifetch_in.buffer_out.pc0;
     v.pc1 = ifetch_in.buffer_out.pc1;
     v.instr0 = ifetch_in.buffer_out.instr0;
@@ -83,7 +50,21 @@ module ifetch (
     v.ready0 = ifetch_in.buffer_out.ready0;
     v.ready1 = ifetch_in.buffer_out.ready1;
 
-    v.stall = v.stall | ifetch_in.buffer_out.stall;
+    case (v.state)
+      IDLE: begin
+        v.stall = 1;
+      end
+      BUSY: begin
+        if (v.ready == 0) begin
+          v.stall = 1;
+        end
+      end
+      INVALID: begin
+        v.stall = 1;
+      end
+      default: begin
+      end
+    endcase
 
     if (flush == 1) begin
       v.ipc0 = flush_pc;
@@ -93,11 +74,44 @@ module ifetch (
 
     v.ipc1 = v.ipc0 + 4;
 
+    case (v.state)
+      IDLE: begin
+        if (reset == 1) begin
+          v.state = BUSY;
+          v.valid = 1;
+        end
+      end
+      BUSY: begin
+        if (v.ready == 1) begin
+          v.state = BUSY;
+          v.valid = 1;
+        end else if (flush == 1) begin
+          v.state = INVALID;
+          v.valid = 0;
+        end else begin
+          v.state = BUSY;
+          v.valid = 0;
+        end
+      end
+      INVALID: begin
+        if (v.ready == 1) begin
+          v.state = BUSY;
+          v.valid = 1;
+        end else begin
+          v.state = INVALID;
+          v.valid = 0;
+        end
+        v.ready = 0;
+      end
+      default: begin
+      end
+    endcase
+
     ifetch_out.buffer_in.pc0 = r.ipc0;
     ifetch_out.buffer_in.pc1 = r.ipc1;
     ifetch_out.buffer_in.rdata = v.rdata;
     ifetch_out.buffer_in.ready = v.ready;
-    ifetch_out.buffer_in.flush = flush;
+    ifetch_out.buffer_in.clear = flush;
     ifetch_out.buffer_in.stall = stall;
 
     ifetch_out.imem0_in.mem_valid = v.valid;

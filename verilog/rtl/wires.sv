@@ -1227,7 +1227,7 @@ package wires;
     logic [31:0] pc1;
     logic [63:0] rdata;
     logic [0:0]  ready;
-    logic [0:0]  flush;
+    logic [0:0]  clear;
     logic [0:0]  stall;
   } buffer_in_type;
   typedef struct packed {
