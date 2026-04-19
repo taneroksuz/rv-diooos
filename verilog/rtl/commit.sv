@@ -54,7 +54,6 @@ module commit (
     flush_pc1 = '0;
 
     do0 = c0;
-    do1 = c1 && !flush0;
 
     if (do0) begin
       if (e0.exception) begin
@@ -68,6 +67,8 @@ module commit (
         flush_pc0 = e0.npc;
       end
     end
+
+    do1 = c1 && !flush0;
 
     if (do1) begin
       if (e1.exception) begin
@@ -97,17 +98,17 @@ module commit (
 
     if (do0) begin
       v.csr_ein.valid0 = 1'b1;
-      v.register0_win.wren = e0.wren && !e0.exception;
+      v.register0_win.wren = e0.wren;
       v.register0_win.waddr = e0.adest;
       v.register0_win.wdata = e0.result;
-      v.prf_i.wren0 = e0.wren && !e0.exception;
+      v.prf_i.wren0 = e0.wren;
       v.prf_i.waddr0 = e0.pdest;
       v.prf_i.wdata0 = e0.result;
       v.rat_i.commit_addr0 = e0.adest;
       v.rat_i.commit_tag0 = e0.pdest;
-      v.rat_i.commit_en0 = e0.wren && !e0.exception;
+      v.rat_i.commit_en0 = e0.wren;
       v.fl_i.free_tag0 = e0.old_pdest;
-      v.fl_i.free_en0 = e0.wren && !e0.exception;
+      v.fl_i.free_en0 = e0.wren;
       if (e0.cwren) begin
         v.csr_win.cwren  = 1'b1;
         v.csr_win.cwaddr = e0.caddr;
@@ -128,17 +129,26 @@ module commit (
 
     if (do1) begin
       v.csr_ein.valid1 = 1'b1;
-      v.register1_win.wren = e1.wren && !e1.exception;
+      v.register1_win.wren = e1.wren;
       v.register1_win.waddr = e1.adest;
       v.register1_win.wdata = e1.result;
-      v.prf_i.wren1 = e1.wren && !e1.exception;
+      v.prf_i.wren1 = e1.wren;
       v.prf_i.waddr1 = e1.pdest;
       v.prf_i.wdata1 = e1.result;
       v.rat_i.commit_addr1 = e1.adest;
       v.rat_i.commit_tag1 = e1.pdest;
-      v.rat_i.commit_en1 = e1.wren && !e1.exception;
+      v.rat_i.commit_en1 = e1.wren;
       v.fl_i.free_tag1 = e1.old_pdest;
-      v.fl_i.free_en1 = e1.wren && !e1.exception;
+      v.fl_i.free_en1 = e1.wren;
+      if (e1.cwren) begin
+        v.csr_win.cwren  = 1'b1;
+        v.csr_win.cwaddr = e1.caddr;
+        v.csr_win.cdata  = e1.cwdata;
+      end
+      if (e1.mret) begin
+        v.csr_ein.mret = 1'b1;
+        v.csr_ein.epc  = e1.pc;
+      end
       if (e1.exception) begin
         v.csr_ein.exception = 1'b1;
         v.csr_ein.pc = e1.pc;
