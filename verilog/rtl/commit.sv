@@ -107,7 +107,7 @@ module commit (
       v.rat_i.commit_tag0 = e0.pdest;
       v.rat_i.commit_en0 = e0.wren && !e0.exception;
       v.fl_i.free_tag0 = e0.old_pdest;
-      v.fl_i.free_en0 = e0.wren;
+      v.fl_i.free_en0 = e0.wren && !e0.exception;
       if (e0.cwren) begin
         v.csr_win.cwren  = 1'b1;
         v.csr_win.cwaddr = e0.caddr;
@@ -138,7 +138,7 @@ module commit (
       v.rat_i.commit_tag1 = e1.pdest;
       v.rat_i.commit_en1 = e1.wren && !e1.exception;
       v.fl_i.free_tag1 = e1.old_pdest;
-      v.fl_i.free_en1 = e1.wren;
+      v.fl_i.free_en1 = e1.wren && !e1.exception;
       if (e1.exception) begin
         v.csr_ein.exception = 1'b1;
         v.csr_ein.pc = e1.pc;

@@ -52,6 +52,54 @@ module rob (
     for (int i = 0; i < ROB_DEPTH; i++) begin
       view[i] = r.valid_bits[i] ? array[i] : init_rob_entry;
       view[i].valid = r.valid_bits[i];
+    end
+
+    if (rob_in.write_en0 && r.valid_bits[rob_in.write_tag0]) begin
+      view[rob_in.write_tag0].done       = 1'b1;
+      view[rob_in.write_tag0].result     = rob_in.write_entry0.result;
+      view[rob_in.write_tag0].exception  = rob_in.write_entry0.exception;
+      view[rob_in.write_tag0].ecause     = rob_in.write_entry0.ecause;
+      view[rob_in.write_tag0].etval      = rob_in.write_entry0.etval;
+      view[rob_in.write_tag0].npc        = rob_in.write_entry0.npc;
+      view[rob_in.write_tag0].branch     = rob_in.write_entry0.branch;
+      view[rob_in.write_tag0].jump       = rob_in.write_entry0.jump;
+      view[rob_in.write_tag0].store_addr = rob_in.write_entry0.store_addr;
+      view[rob_in.write_tag0].store_data = rob_in.write_entry0.store_data;
+      view[rob_in.write_tag0].store_strb = rob_in.write_entry0.store_strb;
+      view[rob_in.write_tag0].cwdata     = rob_in.write_entry0.cwdata;
+    end
+    if (rob_in.write_en1 && r.valid_bits[rob_in.write_tag1]) begin
+      view[rob_in.write_tag1].done       = 1'b1;
+      view[rob_in.write_tag1].result     = rob_in.write_entry1.result;
+      view[rob_in.write_tag1].exception  = rob_in.write_entry1.exception;
+      view[rob_in.write_tag1].ecause     = rob_in.write_entry1.ecause;
+      view[rob_in.write_tag1].etval      = rob_in.write_entry1.etval;
+      view[rob_in.write_tag1].npc        = rob_in.write_entry1.npc;
+      view[rob_in.write_tag1].branch     = rob_in.write_entry1.branch;
+      view[rob_in.write_tag1].jump       = rob_in.write_entry1.jump;
+      view[rob_in.write_tag1].store_addr = rob_in.write_entry1.store_addr;
+      view[rob_in.write_tag1].store_data = rob_in.write_entry1.store_data;
+      view[rob_in.write_tag1].store_strb = rob_in.write_entry1.store_strb;
+      view[rob_in.write_tag1].cwdata     = rob_in.write_entry1.cwdata;
+    end
+    if (rob_in.write_en2 && r.valid_bits[rob_in.write_tag2]) begin
+      view[rob_in.write_tag2].done      = 1'b1;
+      view[rob_in.write_tag2].result    = rob_in.write_entry2.result;
+      view[rob_in.write_tag2].exception = rob_in.write_entry2.exception;
+      view[rob_in.write_tag2].ecause    = rob_in.write_entry2.ecause;
+      view[rob_in.write_tag2].etval     = rob_in.write_entry2.etval;
+    end
+    if (rob_in.write_en3 && r.valid_bits[rob_in.write_tag3]) begin
+      view[rob_in.write_tag3].done       = 1'b1;
+      view[rob_in.write_tag3].store_addr = rob_in.write_entry3.store_addr;
+      view[rob_in.write_tag3].store_data = rob_in.write_entry3.store_data;
+      view[rob_in.write_tag3].store_strb = rob_in.write_entry3.store_strb;
+      view[rob_in.write_tag3].exception  = rob_in.write_entry3.exception;
+      view[rob_in.write_tag3].ecause     = rob_in.write_entry3.ecause;
+      view[rob_in.write_tag3].etval      = rob_in.write_entry3.etval;
+    end
+
+    for (int i = 0; i < ROB_DEPTH; i++) begin
       rob_entries[i] = view[i];
     end
 
