@@ -124,10 +124,10 @@ module msu (
 
     rin                = v;
 
-    msu_out.cdb        = rin.cdb;
-    msu_out.rob_wtag   = rin.rob_wtag;
-    msu_out.rob_wentry = rin.rob_wentry;
-    msu_out.rob_wen    = rin.rob_wen;
+    msu_out.cdb        = r.cdb;
+    msu_out.rob_wtag   = r.rob_wtag;
+    msu_out.rob_wentry = r.rob_wentry;
+    msu_out.rob_wen    = r.rob_wen;
     msu_out.dmem1_in   = rin.dmem1_in;
     msu_out.lsu1_in    = load_ready ? lsu1_in_cur : rin.lsu1_in;
     msu_out.dmem0_in   = rin.dmem0_in;

@@ -16,7 +16,6 @@ package configure;
   localparam TIM_DEPTH = 1024;
 
   localparam RAM_DEPTH = 1;
-  localparam RAM_TYPE = 1;
 
   localparam BTAC_ENABLE = 1;
   localparam BTB_DEPTH = 512;
