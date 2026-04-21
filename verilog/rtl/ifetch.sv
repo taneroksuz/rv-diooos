@@ -76,10 +76,8 @@ module ifetch (
 
     case (v.state)
       IDLE: begin
-        if (reset == 1) begin
-          v.state = BUSY;
-          v.valid = 1;
-        end
+        v.state = BUSY;
+        v.valid = 1;
       end
       BUSY: begin
         if (v.ready == 1) begin
