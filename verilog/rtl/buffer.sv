@@ -330,18 +330,16 @@ module buffer_ctrl (
     end
 
     if (buffer_in.stall == 1) begin
-      v.diff   = 0;
-      v.ready0 = 0;
-      v.ready1 = 0;
+      v.diff = 0;
     end
 
     v.count = v.count - v.diff;
     v.rid   = v.rid + v.diff;
 
-    v.stall = 0;
-
     if (v.count > TOTAL) begin
       v.stall = 1;
+    end else begin
+      v.stall = 0;
     end
 
     buffer_out.pc0 = v.ready0 ? v.pc0 : 32'hFFFFFFFF;

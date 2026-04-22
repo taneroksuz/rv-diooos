@@ -401,6 +401,7 @@ module cpu (
       .reset(reset),
       .clock(clock),
       .flush(commit_out.flush),
+      .stall(rename_out.stall | rob_out.full),
       .idecode_in(idecode_in),
       .idecode_out(idecode_out)
   );
