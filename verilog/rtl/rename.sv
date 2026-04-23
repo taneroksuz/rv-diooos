@@ -20,6 +20,7 @@ module rename (
     logic rs1_ok;
     logic can_dispatch0;
     logic can_dispatch1;
+    logic stall;
     logic [PRF_ADDR_BITS-1:0] pdest0;
     logic [PRF_ADDR_BITS-1:0] pdest1;
     rs_entry_type e0;
@@ -40,15 +41,28 @@ module rename (
     v.need_fl0 = rename_in.instr0_valid && rename_in.instr0.op.wren && (rename_in.instr0.waddr != 5'h0);
     v.need_fl1 = rename_in.instr1_valid && rename_in.instr1.op.wren && (rename_in.instr1.waddr != 5'h0);
     v.rs0_ok = rename_in.instr0_valid ? (v.i0_is_mem ? !rename_in.rs_mem_full : !rename_in.rs_int_full) : 1'b1;
-    v.rs1_ok = rename_in.instr1_valid ? (v.i1_is_mem ? rename_in.rs_mem_has_two : rename_in.rs_int_has_two) : 1'b1;
+    if (rename_in.instr1_valid) begin
+      if (v.i1_is_mem) begin
+        v.rs1_ok = (rename_in.instr0_valid && v.i0_is_mem) ? rename_in.rs_mem_has_two : !rename_in.rs_mem_full;
+      end else begin
+        v.rs1_ok = (rename_in.instr0_valid && !v.i0_is_mem) ? rename_in.rs_int_has_two : !rename_in.rs_int_full;
+      end
+    end else begin
+      v.rs1_ok = 1'b1;
+    end
     v.can_dispatch0 = rename_in.instr0_valid && !rename_in.rob_full && (!v.need_fl0 || rename_in.fl.alloc_ok0) && v.rs0_ok && !flush;
     v.can_dispatch1 = rename_in.instr1_valid && v.can_dispatch0 && rename_in.rob_has_two &&
                       (!v.need_fl1 || (v.need_fl0 ? rename_in.fl.alloc_ok1 : rename_in.fl.alloc_ok0)) &&
                       v.rs1_ok && !flush;
+    v.stall = (rename_in.instr0_valid && !v.can_dispatch0) || (rename_in.instr1_valid && !v.can_dispatch1);
+    if (v.stall) begin
+      v.can_dispatch0 = 1'b0;
+      v.can_dispatch1 = 1'b0;
+    end
     v.pdest0 = v.need_fl0 ? rename_in.fl.alloc_tag0 : PRF_ADDR_BITS'(0);
     v.pdest1 = v.need_fl1 ? (v.need_fl0 ? rename_in.fl.alloc_tag1 : rename_in.fl.alloc_tag0) : PRF_ADDR_BITS'(0);
 
-    v.rename_out.stall = rename_in.instr0_valid && !v.can_dispatch0;
+    v.rename_out.stall = v.stall;
     v.rename_out.fl.alloc0 = v.can_dispatch0 && v.need_fl0;
     v.rename_out.fl.alloc1 = v.can_dispatch1 && v.need_fl1;
     v.rename_out.rat.rsrc0_a = rename_in.instr0.op.rden1 ? rename_in.instr0.raddr1 : 5'h0;

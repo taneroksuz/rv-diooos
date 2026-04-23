@@ -24,12 +24,10 @@ module idecode (
     v.instr0.instr = idecode_in.ready0 ? idecode_in.instr0 : 0;
     v.instr1.instr = idecode_in.ready1 ? idecode_in.instr1 : 0;
 
-    if (r.stall == 1) begin
+    if (stall == 1) begin
       v.instr0 = r.instr0;
       v.instr1 = r.instr1;
     end
-
-    v.stall = stall;
 
     v.instr0.npc = v.instr0.pc + ((&v.instr0.instr[1:0]) ? 4 : 2);
     v.instr1.npc = v.instr1.pc + ((&v.instr1.instr[1:0]) ? 4 : 2);

@@ -398,7 +398,7 @@ module cpu (
       .reset(reset),
       .clock(clock),
       .flush(commit_out.flush),
-      .stall(rename_out.stall | rob_out.full),
+      .stall(rename_out.stall),
       .flush_pc(commit_out.flush_pc),
       .ifetch_in(ifetch_in),
       .ifetch_out(ifetch_out)
@@ -407,7 +407,7 @@ module cpu (
       .reset(reset),
       .clock(clock),
       .flush(commit_out.flush),
-      .stall(rename_out.stall | rob_out.full),
+      .stall(rename_out.stall),
       .idecode_in(idecode_in),
       .idecode_out(idecode_out)
   );
