@@ -914,6 +914,7 @@ package wires;
   typedef struct packed {
     logic [0:0]               alloc0;
     logic [0:0]               alloc1;
+    logic [0:0]               store_ready;
     rob_entry_type            alloc_entry0;
     rob_entry_type            alloc_entry1;
     logic [ROB_ADDR_BITS-1:0] write_tag0;
@@ -954,7 +955,10 @@ package wires;
     cdb_type                  cdb0;
     cdb_type                  cdb1;
     cdb_type                  cdb_load;
+    cdb_type                  cdb_commit0;
+    cdb_type                  cdb_commit1;
     logic [ROB_ADDR_BITS-1:0] rob_head;
+    logic [0:0]               load_busy;
   } rs_mem_in_type;
   typedef struct packed {
     rs_entry_type             entry0;
@@ -964,6 +968,8 @@ package wires;
     cdb_type                  cdb0;
     cdb_type                  cdb1;
     cdb_type                  cdb_load;
+    cdb_type                  cdb_commit0;
+    cdb_type                  cdb_commit1;
     logic [0:0]               div_busy;
     logic [0:0]               clmul_busy;
     logic [0:0]               csr_commit;
@@ -1106,6 +1112,8 @@ package wires;
     logic [ROB_ADDR_BITS-1:0] rob_wtag;
     rob_entry_type            rob_wentry;
     logic [0:0]               rob_wen;
+    logic [0:0]               load_busy;
+    logic [0:0]               store_ready;
     mem_in_type               dmem1_in;
     lsu_in_type               lsu1_in;
     mem_in_type               dmem0_in;
@@ -1116,6 +1124,8 @@ package wires;
       rob_wtag: '0,
       rob_wentry: init_rob_entry,
       rob_wen: 0,
+      load_busy: 0,
+      store_ready: 1,
       dmem1_in: init_mem_in,
       lsu1_in: '{ldata: 0, byteenable: 0, lsu_op: init_lsu_op},
       dmem0_in: init_mem_in,

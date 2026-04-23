@@ -98,6 +98,7 @@ module commit (
 
     if (do0) begin
       v.csr_ein.valid0 = 1'b1;
+      v.csr_ein.pc = e0.pc;
       v.register0_win.wren = e0.wren;
       v.register0_win.waddr = e0.adest;
       v.register0_win.wdata = e0.result;
@@ -129,6 +130,9 @@ module commit (
 
     if (do1) begin
       v.csr_ein.valid1 = 1'b1;
+      if (!do0) begin
+        v.csr_ein.pc = e1.pc;
+      end
       v.register1_win.wren = e1.wren;
       v.register1_win.waddr = e1.adest;
       v.register1_win.wdata = e1.result;

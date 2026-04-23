@@ -138,6 +138,7 @@ module cpu (
   assign rob_in.alloc_entry0 = rename_out.rob_entry0;
   assign rob_in.alloc1 = rename_out.rob_alloc1;
   assign rob_in.alloc_entry1 = rename_out.rob_entry1;
+  assign rob_in.store_ready = msu_out.store_ready;
   assign rob_in.write_tag0 = eu_out.rob_wtag0;
   assign rob_in.write_entry0 = eu_out.rob_wentry0;
   assign rob_in.write_en0 = eu_out.rob_wen0;
@@ -159,6 +160,8 @@ module cpu (
   assign rs_int_in.cdb0 = cdb0;
   assign rs_int_in.cdb1 = cdb1;
   assign rs_int_in.cdb_load = cdb_load;
+  assign rs_int_in.cdb_commit0 = cdb_commit0;
+  assign rs_int_in.cdb_commit1 = cdb_commit1;
   assign rs_int_in.div_busy = eu_out.div_busy;
   assign rs_int_in.clmul_busy = eu_out.clmul_busy;
   assign rs_int_in.csr_commit = commit_out.csr_win.cwren;
@@ -170,7 +173,10 @@ module cpu (
   assign rs_mem_in.cdb0 = cdb0;
   assign rs_mem_in.cdb1 = cdb1;
   assign rs_mem_in.cdb_load = cdb_load;
+  assign rs_mem_in.cdb_commit0 = cdb_commit0;
+  assign rs_mem_in.cdb_commit1 = cdb_commit1;
   assign rs_mem_in.rob_head = rob_out.head_ptr;
+  assign rs_mem_in.load_busy = msu_out.load_busy;
   assign rename_in.instr0 = idecode_out.instr0;
   assign rename_in.instr0_valid = idecode_out.instr0.op.valid;
   assign rename_in.instr1 = idecode_out.instr1;

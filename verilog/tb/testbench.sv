@@ -73,12 +73,19 @@ module testbench ();
   wire        commit0_wren = testbench.soc_comp.cpu_comp.rob_out.entry0.wren;
   wire        commit1_wren = testbench.soc_comp.cpu_comp.rob_out.entry1.wren;
   wire        commit0_store = testbench.soc_comp.cpu_comp.rob_out.entry0.store;
+  wire        commit1_store = testbench.soc_comp.cpu_comp.rob_out.entry1.store;
   wire [31:0] commit0_saddr = testbench.soc_comp.cpu_comp.rob_out.entry0.store_addr;
+  wire [31:0] commit1_saddr = testbench.soc_comp.cpu_comp.rob_out.entry1.store_addr;
   wire [31:0] commit0_sdata = testbench.soc_comp.cpu_comp.rob_out.entry0.store_data;
+  wire [31:0] commit1_sdata = testbench.soc_comp.cpu_comp.rob_out.entry1.store_data;
   wire [ 3:0] commit0_sstrb = testbench.soc_comp.cpu_comp.rob_out.entry0.store_strb;
+  wire [ 3:0] commit1_sstrb = testbench.soc_comp.cpu_comp.rob_out.entry1.store_strb;
   wire        commit0_cwren = testbench.soc_comp.cpu_comp.rob_out.entry0.cwren;
+  wire        commit1_cwren = testbench.soc_comp.cpu_comp.rob_out.entry1.cwren;
   wire [11:0] commit0_caddr = testbench.soc_comp.cpu_comp.rob_out.entry0.caddr;
+  wire [11:0] commit1_caddr = testbench.soc_comp.cpu_comp.rob_out.entry1.caddr;
   wire [31:0] commit0_cwdata = testbench.soc_comp.cpu_comp.rob_out.entry0.cwdata;
+  wire [31:0] commit1_cwdata = testbench.soc_comp.cpu_comp.rob_out.entry1.cwdata;
 
   initial begin
     string filename;
@@ -115,6 +122,12 @@ module testbench ();
           $fwrite(csr_file, "WADDR = %x\t", commit0_caddr);
           $fwrite(csr_file, "WDATA = %x\n", commit0_cwdata);
         end
+        if (commit1_valid && commit1_cwren) begin
+          $fwrite(csr_file, "PERIOD = %t\t", $time);
+          $fwrite(csr_file, "PC = %x\t", commit1_pc);
+          $fwrite(csr_file, "WADDR = %x\t", commit1_caddr);
+          $fwrite(csr_file, "WDATA = %x\n", commit1_cwdata);
+        end
       end
       $fclose(csr_file);
     end
@@ -133,6 +146,13 @@ module testbench ();
           $fwrite(mem_file, "WSTRB = %b\t", commit0_sstrb);
           $fwrite(mem_file, "WDATA = %x\n", commit0_sdata);
         end
+        if (commit1_valid && commit1_store && |commit1_sstrb) begin
+          $fwrite(mem_file, "PERIOD = %t\t", $time);
+          $fwrite(mem_file, "PC = %x\t", commit1_pc);
+          $fwrite(mem_file, "WADDR = %x\t", commit1_saddr);
+          $fwrite(mem_file, "WSTRB = %b\t", commit1_sstrb);
+          $fwrite(mem_file, "WDATA = %x\n", commit1_sdata);
+        end
       end
       $fclose(mem_file);
     end
@@ -142,6 +162,12 @@ module testbench ();
     if (commit0_valid && commit0_store && |commit0_sstrb) begin
       if (commit0_saddr[31:3] == host[0][31:3]) begin
         $display("%d", commit0_sdata[31:0]);
+        $finish;
+      end
+    end
+    if (commit1_valid && commit1_store && |commit1_sstrb) begin
+      if (commit1_saddr[31:3] == host[0][31:3]) begin
+        $display("%d", commit1_sdata[31:0]);
         $finish;
       end
     end

@@ -37,8 +37,8 @@ module rename (
 
     v.i0_is_mem = rename_in.instr0.op.load | rename_in.instr0.op.store;
     v.i1_is_mem = rename_in.instr1.op.load | rename_in.instr1.op.store;
-    v.need_fl0 = rename_in.instr0_valid && rename_in.instr0.op.wren;
-    v.need_fl1 = rename_in.instr1_valid && rename_in.instr1.op.wren;
+    v.need_fl0 = rename_in.instr0_valid && rename_in.instr0.op.wren && (rename_in.instr0.waddr != 5'h0);
+    v.need_fl1 = rename_in.instr1_valid && rename_in.instr1.op.wren && (rename_in.instr1.waddr != 5'h0);
     v.rs0_ok = rename_in.instr0_valid ? (v.i0_is_mem ? !rename_in.rs_mem_full : !rename_in.rs_int_full) : 1'b1;
     v.rs1_ok = rename_in.instr1_valid ? (v.i1_is_mem ? rename_in.rs_mem_has_two : rename_in.rs_int_has_two) : 1'b1;
     v.can_dispatch0 = rename_in.instr0_valid && !rename_in.rob_full && (!v.need_fl0 || rename_in.fl.alloc_ok0) && v.rs0_ok && !flush;
@@ -57,10 +57,10 @@ module rename (
     v.rename_out.rat.rsrc3_a = rename_in.instr1.op.rden2 ? rename_in.instr1.raddr2 : 5'h0;
     v.rename_out.rat.waddr0_a = rename_in.instr0.waddr;
     v.rename_out.rat.waddr0_p = v.pdest0;
-    v.rename_out.rat.wren0 = v.can_dispatch0 && rename_in.instr0.op.wren;
+    v.rename_out.rat.wren0 = v.can_dispatch0 && rename_in.instr0.op.wren && (rename_in.instr0.waddr != 5'h0);
     v.rename_out.rat.waddr1_a = rename_in.instr1.waddr;
     v.rename_out.rat.waddr1_p = v.pdest1;
-    v.rename_out.rat.wren1 = v.can_dispatch1 && rename_in.instr1.op.wren;
+    v.rename_out.rat.wren1 = v.can_dispatch1 && rename_in.instr1.op.wren && (rename_in.instr1.waddr != 5'h0);
     v.rename_out.rob_alloc0 = v.can_dispatch0;
     v.rename_out.rob_alloc1 = v.can_dispatch1;
 
@@ -183,7 +183,7 @@ module rename (
     v.rename_out.rob_entry0.pnpc = rename_in.instr0.npc;
     v.rename_out.rob_entry0.pdest = v.pdest0;
     v.rename_out.rob_entry0.adest = rename_in.instr0.waddr;
-    v.rename_out.rob_entry0.wren = rename_in.instr0.op.wren;
+    v.rename_out.rob_entry0.wren = rename_in.instr0.op.wren && (rename_in.instr0.waddr != 5'h0);
     v.rename_out.rob_entry0.old_pdest = rename_in.rat.old_pdest0;
     v.rename_out.rob_entry0.store = rename_in.instr0.op.store;
     v.rename_out.rob_entry0.load = rename_in.instr0.op.load;
@@ -206,7 +206,7 @@ module rename (
     v.rename_out.rob_entry1.pnpc = rename_in.instr1.npc;
     v.rename_out.rob_entry1.pdest = v.pdest1;
     v.rename_out.rob_entry1.adest = rename_in.instr1.waddr;
-    v.rename_out.rob_entry1.wren = rename_in.instr1.op.wren;
+    v.rename_out.rob_entry1.wren = rename_in.instr1.op.wren && (rename_in.instr1.waddr != 5'h0);
     v.rename_out.rob_entry1.old_pdest = rename_in.rat.old_pdest1;
     v.rename_out.rob_entry1.store = rename_in.instr1.op.store;
     v.rename_out.rob_entry1.load = rename_in.instr1.op.load;

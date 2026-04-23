@@ -24,7 +24,6 @@ module rs_mem (
   rs_mem_reg_type r, rin, v;
   rs_entry_type woken[0:RS_MEM_DEPTH-1];
   rs_entry_type cur_entry;
-  logic [RS_MEM_DEPTH-1:0] ready_vec;
   logic [MEM_ADDR_BITS-1:0] sel_idx;
   logic sel_found;
   logic [MEM_ADDR_BITS-1:0] free_idx0, free_idx1;
@@ -59,9 +58,11 @@ module rs_mem (
       woken[i] = rs_wakeup(cur_entry, rs_in.cdb0);
       woken[i] = rs_wakeup(woken[i], rs_in.cdb1);
       woken[i] = rs_wakeup(woken[i], rs_in.cdb_load);
-      ready_vec[i] = woken[i].valid & woken[i].src1_ready & woken[i].src2_ready;
+      woken[i] = rs_wakeup(woken[i], rs_in.cdb_commit0);
+      woken[i] = rs_wakeup(woken[i], rs_in.cdb_commit1);
 
-      if (woken[i].valid) begin
+      if (woken[i].valid && woken[i].src1_ready && woken[i].src2_ready &&
+          (!rs_in.load_busy || !woken[i].op.load)) begin
         cand_age = rob_age(rs_in.rob_head, woken[i].rob_tag);
         if (!oldest_found || (cand_age < best_age)) begin
           oldest_idx = MEM_ADDR_BITS'(unsigned'(i));
@@ -70,18 +71,21 @@ module rs_mem (
         end
       end
 
-      if (!woken[i].valid && !free_found0) begin
+    end
+
+    if (oldest_found) begin
+      sel_idx   = oldest_idx;
+      sel_found = 1'b1;
+    end
+
+    for (int i = 0; i < RS_MEM_DEPTH; i++) begin
+      if ((!woken[i].valid || (sel_found && (sel_idx == MEM_ADDR_BITS'(unsigned'(i))))) && !free_found0) begin
         free_idx0   = MEM_ADDR_BITS'(unsigned'(i));
         free_found0 = 1'b1;
-      end else if (!woken[i].valid && !free_found1) begin
+      end else if ((!woken[i].valid || (sel_found && (sel_idx == MEM_ADDR_BITS'(unsigned'(i))))) && !free_found1) begin
         free_idx1   = MEM_ADDR_BITS'(unsigned'(i));
         free_found1 = 1'b1;
       end
-    end
-
-    if (oldest_found && ready_vec[oldest_idx]) begin
-      sel_idx   = oldest_idx;
-      sel_found = 1'b1;
     end
 
     if (sel_found) begin

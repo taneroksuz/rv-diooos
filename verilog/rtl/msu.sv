@@ -24,9 +24,14 @@ module msu (
     logic [0:0]               load_pending;
     logic [ROB_ADDR_BITS-1:0] load_rob_tag;
     logic [PRF_ADDR_BITS-1:0] load_pdest;
+    logic [31:0]              load_addr;
     logic [31:0]              load_etval;
     logic [7:0]               load_ecause;
     logic [0:0]               load_exception;
+    logic [7:0]               load_wait_ctr;
+    logic [0:0]               store_pending;
+    logic [0:0]               store_sent;
+    rob_entry_type            store_entry;
   } msu_reg_type;
 
   localparam msu_reg_type init_msu_reg = '{
@@ -41,14 +46,20 @@ module msu (
       load_pending   : 1'b0,
       load_rob_tag   : '0,
       load_pdest     : '0,
+      load_addr      : '0,
       load_etval     : '0,
       load_ecause    : '0,
-      load_exception : 1'b0
+      load_exception : 1'b0,
+      load_wait_ctr  : '0,
+      store_pending  : 1'b0,
+      store_sent     : 1'b0,
+      store_entry    : init_rob_entry
   };
 
   msu_reg_type r, rin, v;
   logic load_accept;
   logic load_ready;
+  logic load_retry;
   lsu_in_type lsu1_in_cur;
 
   always_comb begin
@@ -59,15 +70,16 @@ module msu (
 
     load_accept = msu_in.issue_valid && msu_in.issue.op.load && !flush && !r.load_pending;
     load_ready = r.load_pending && msu_in.dmem1_out.mem_ready && !flush;
+    load_retry = r.load_pending && !load_ready && (r.load_wait_ctr == 8'h40) && !flush;
 
     lsu1_in_cur = r.lsu1_in;
     lsu1_in_cur.ldata = msu_in.dmem1_out.mem_rdata;
 
     v.dmem1_in = init_mem_in;
-    v.dmem1_in.mem_valid = load_accept && !msu_in.agu2_out.exception;
+    v.dmem1_in.mem_valid = (load_accept && !msu_in.agu2_out.exception) || load_retry;
     v.dmem1_in.mem_instr = 1'b0;
     v.dmem1_in.mem_mode = 2'h0;
-    v.dmem1_in.mem_addr = msu_in.agu2_out.address;
+    v.dmem1_in.mem_addr = load_accept ? msu_in.agu2_out.address : r.load_addr;
     v.dmem1_in.mem_wdata = 32'h0;
     v.dmem1_in.mem_wstrb = 4'h0;
 
@@ -78,22 +90,41 @@ module msu (
       v.load_pending       = 1'b1;
       v.load_rob_tag       = msu_in.issue.rob_tag;
       v.load_pdest         = msu_in.issue.pdest;
+      v.load_addr          = msu_in.agu2_out.address;
       v.load_exception     = 1'b0;
       v.load_ecause        = '0;
       v.load_etval         = '0;
+      v.load_wait_ctr      = '0;
     end
 
-    v.dmem0_in           = init_mem_in;
-    v.dmem0_in.mem_valid = msu_in.commit_store && !msu_in.commit_entry.exception && !flush;
+    if (r.load_pending && !load_ready) begin
+      if (load_retry) begin
+        v.load_wait_ctr = '0;
+      end else begin
+        v.load_wait_ctr = r.load_wait_ctr + 8'h1;
+      end
+    end
+
+    v.dmem0_in = init_mem_in;
+    if (!r.store_pending && msu_in.commit_store && !msu_in.commit_entry.exception && !flush) begin
+      v.store_pending = 1'b1;
+      v.store_sent = 1'b0;
+      v.store_entry = msu_in.commit_entry;
+    end
+    if (r.store_pending && msu_in.dmem0_out.mem_ready && !flush) begin
+      v.store_pending = 1'b0;
+      v.store_sent = 1'b0;
+    end
+    v.dmem0_in.mem_valid = r.store_pending;
     v.dmem0_in.mem_instr = 1'b0;
     v.dmem0_in.mem_mode  = 2'h0;
-    v.dmem0_in.mem_addr  = msu_in.commit_entry.store_addr;
-    v.dmem0_in.mem_wdata = msu_in.commit_entry.store_data;
-    v.dmem0_in.mem_wstrb = msu_in.commit_entry.store_strb;
+    v.dmem0_in.mem_addr  = r.store_entry.store_addr;
+    v.dmem0_in.mem_wdata = r.store_entry.store_data;
+    v.dmem0_in.mem_wstrb = r.store_entry.store_strb;
 
     v.lsu0_in.ldata      = msu_in.dmem0_out.mem_rdata;
-    v.lsu0_in.byteenable = msu_in.commit_entry.store_strb;
-    v.lsu0_in.lsu_op     = msu_in.commit_entry.lsu_op;
+    v.lsu0_in.byteenable = r.store_entry.store_strb;
+    v.lsu0_in.lsu_op     = r.store_entry.lsu_op;
 
     v.cdb                = init_cdb;
     v.rob_wtag           = r.load_rob_tag;
@@ -120,18 +151,21 @@ module msu (
       v.rob_wentry.ecause    = r.load_ecause;
       v.rob_wentry.etval     = r.load_etval;
       v.load_pending         = 1'b0;
+      v.load_wait_ctr        = '0;
     end
 
-    rin                = v;
+    rin                 = v;
 
-    msu_out.cdb        = r.cdb;
-    msu_out.rob_wtag   = r.rob_wtag;
-    msu_out.rob_wentry = r.rob_wentry;
-    msu_out.rob_wen    = r.rob_wen;
-    msu_out.dmem1_in   = rin.dmem1_in;
-    msu_out.lsu1_in    = load_ready ? lsu1_in_cur : rin.lsu1_in;
-    msu_out.dmem0_in   = rin.dmem0_in;
-    msu_out.lsu0_in    = rin.lsu0_in;
+    msu_out.cdb         = r.cdb;
+    msu_out.rob_wtag    = r.rob_wtag;
+    msu_out.rob_wentry  = r.rob_wentry;
+    msu_out.rob_wen     = r.rob_wen;
+    msu_out.load_busy   = r.load_pending;
+    msu_out.store_ready = !r.store_pending && !msu_in.commit_store;
+    msu_out.dmem1_in    = rin.dmem1_in;
+    msu_out.lsu1_in     = load_ready ? lsu1_in_cur : rin.lsu1_in;
+    msu_out.dmem0_in    = rin.dmem0_in;
+    msu_out.lsu0_in     = rin.lsu0_in;
   end
 
   always_ff @(posedge clock) begin

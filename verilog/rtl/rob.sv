@@ -103,26 +103,27 @@ module rob (
       rob_entries[i] = view[i];
     end
 
-    h0                   = view[r.head];
-    h1                   = view[head1_idx];
-    h0_done              = h0.valid && h0.done && (r.count >= 1);
-    h1_done              = h1.valid && h1.done && (r.count >= 2);
-    h0_flush             = h0.exception || h0.mret || (h0.jump && (h0.npc != h0.pnpc));
+    h0 = view[r.head];
+    h1 = view[head1_idx];
+    h0_done = h0.valid && h0.done && (r.count >= 1) && (!h0.store || rob_in.store_ready);
+    h1_done = h1.valid && h1.done && (r.count >= 2);
+    h0_flush = h0.exception || h0.mret || (h0.jump && (h0.npc != h0.pnpc));
 
-    rob_out              = init_rob_out;
-    rob_out.head_ptr     = r.head;
-    rob_out.tail_ptr     = r.tail_ptr;
-    rob_out.alloc_tag0   = r.tail_ptr;
-    rob_out.alloc_tag1   = r.tail_ptr + ROB_ADDR_BITS'(1);
-    rob_out.full         = (r.count >= ROB_DEPTH - 1);
+    rob_out = init_rob_out;
+    rob_out.head_ptr = r.head;
+    rob_out.tail_ptr = r.tail_ptr;
+    rob_out.alloc_tag0 = r.tail_ptr;
+    rob_out.alloc_tag1 = r.tail_ptr + ROB_ADDR_BITS'(1);
+    rob_out.full = (r.count >= ROB_DEPTH - 1);
     rob_out.has_two_free = (r.count <= ROB_DEPTH - 2);
-    rob_out.stall        = (r.count >= ROB_DEPTH - 1);
-    rob_out.entry0       = h0;
-    rob_out.entry1       = h1;
+    rob_out.stall = (r.count >= ROB_DEPTH - 1);
+    rob_out.entry0 = h0;
+    rob_out.entry1 = h1;
 
     if (h0_done) begin
       commit0 = 1'b1;
       if (h1_done && !h0_flush &&
+          (!h1.store || rob_in.store_ready) &&
           !h0.store && !h0.fence && !h0.mret &&
           !h0.wfi && !h0.ecall && !h0.ebreak && !h0.csreg) begin
         commit1 = 1'b1;

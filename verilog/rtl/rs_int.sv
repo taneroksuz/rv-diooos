@@ -69,18 +69,13 @@ module rs_int (
       woken[i] = rs_wakeup(view[i], rs_in.cdb0);
       woken[i] = rs_wakeup(woken[i], rs_in.cdb1);
       woken[i] = rs_wakeup(woken[i], rs_in.cdb_load);
+      woken[i] = rs_wakeup(woken[i], rs_in.cdb_commit0);
+      woken[i] = rs_wakeup(woken[i], rs_in.cdb_commit1);
       ready_vec[i] = woken[i].valid & woken[i].src1_ready & woken[i].src2_ready &
                      ~rs_in.div_busy & ~rs_in.clmul_busy &
                      ~(woken[i].op.csreg & (r.csr_inflight > 0)) &
                      ~(woken[i].op.csreg & r.csr_drain) &
                      ~(woken[i].op.csreg & (woken[i].rob_tag != rs_in.rob_head));
-      if (!woken[i].valid && !v.free_found0) begin
-        v.free_idx0   = RS_ADDR_BITS'(unsigned'(i));
-        v.free_found0 = 1'b1;
-      end else if (!woken[i].valid && !v.free_found1) begin
-        v.free_idx1   = RS_ADDR_BITS'(unsigned'(i));
-        v.free_found1 = 1'b1;
-      end
     end
 
     for (int i = RS_INT_DEPTH - 1; i >= 0; i--) begin
@@ -93,6 +88,20 @@ module rs_int (
       if (ready_vec[i] && (RS_ADDR_BITS'(unsigned'(i)) != v.sel0_idx)) begin
         v.sel1_idx   = RS_ADDR_BITS'(unsigned'(i));
         v.sel1_found = 1'b1;
+      end
+    end
+
+    for (int i = 0; i < RS_INT_DEPTH; i++) begin
+      logic issue_free;
+      issue_free = (v.sel0_found && (v.sel0_idx == RS_ADDR_BITS'(unsigned'(i)))) ||
+                   (v.sel1_found && !(v.sel0_found && woken[v.sel0_idx].op.csreg) &&
+                    (v.sel1_idx == RS_ADDR_BITS'(unsigned'(i))));
+      if ((!woken[i].valid || issue_free) && !v.free_found0) begin
+        v.free_idx0   = RS_ADDR_BITS'(unsigned'(i));
+        v.free_found0 = 1'b1;
+      end else if ((!woken[i].valid || issue_free) && !v.free_found1) begin
+        v.free_idx1   = RS_ADDR_BITS'(unsigned'(i));
+        v.free_found1 = 1'b1;
       end
     end
 
