@@ -94,16 +94,16 @@ module testbench ();
       for (int i = 0; i < stoptime; i = i + 1) begin
         @(posedge clock);
         if (commit0_valid && commit0_wren) begin
-          $fwrite(reg_file, "PERIOD = %t\t", $time);
-          $fwrite(reg_file, "PC = %x\t", commit0_pc);
-          $fwrite(reg_file, "WADDR = %x\t", commit0_waddr);
-          $fwrite(reg_file, "WDATA = %x\n", commit0_wdata);
+          $fwrite(reg_file, "PERIOD = %t ;\t", $time);
+          $fwrite(reg_file, "PC = %x ;\t", commit0_pc);
+          $fwrite(reg_file, "WADDR = %x ;\t", commit0_waddr);
+          $fwrite(reg_file, "WDATA = %x ;\n", commit0_wdata);
         end
         if (commit1_valid && commit1_wren) begin
-          $fwrite(reg_file, "PERIOD = %t\t", $time);
-          $fwrite(reg_file, "PC = %x\t", commit1_pc);
-          $fwrite(reg_file, "WADDR = %x\t", commit1_waddr);
-          $fwrite(reg_file, "WDATA = %x\n", commit1_wdata);
+          $fwrite(reg_file, "PERIOD = %t ;\t", $time);
+          $fwrite(reg_file, "PC = %x ;\t", commit1_pc);
+          $fwrite(reg_file, "WADDR = %x ;\t", commit1_waddr);
+          $fwrite(reg_file, "WDATA = %x ;\n", commit1_wdata);
         end
       end
       $fclose(reg_file);
@@ -117,16 +117,16 @@ module testbench ();
       for (int i = 0; i < stoptime; i = i + 1) begin
         @(posedge clock);
         if (commit0_valid && commit0_cwren) begin
-          $fwrite(csr_file, "PERIOD = %t\t", $time);
-          $fwrite(csr_file, "PC = %x\t", commit0_pc);
-          $fwrite(csr_file, "WADDR = %x\t", commit0_caddr);
-          $fwrite(csr_file, "WDATA = %x\n", commit0_cwdata);
+          $fwrite(csr_file, "PERIOD = %t ;\t", $time);
+          $fwrite(csr_file, "PC = %x ;\t", commit0_pc);
+          $fwrite(csr_file, "WADDR = %x ;\t", commit0_caddr);
+          $fwrite(csr_file, "WDATA = %x ;\n", commit0_cwdata);
         end
         if (commit1_valid && commit1_cwren) begin
-          $fwrite(csr_file, "PERIOD = %t\t", $time);
-          $fwrite(csr_file, "PC = %x\t", commit1_pc);
-          $fwrite(csr_file, "WADDR = %x\t", commit1_caddr);
-          $fwrite(csr_file, "WDATA = %x\n", commit1_cwdata);
+          $fwrite(csr_file, "PERIOD = %t ;\t", $time);
+          $fwrite(csr_file, "PC = %x ;\t", commit1_pc);
+          $fwrite(csr_file, "WADDR = %x ;\t", commit1_caddr);
+          $fwrite(csr_file, "WDATA = %x ;\n", commit1_cwdata);
         end
       end
       $fclose(csr_file);
@@ -140,18 +140,18 @@ module testbench ();
       for (int i = 0; i < stoptime; i = i + 1) begin
         @(posedge clock);
         if (commit0_valid && commit0_store && |commit0_sstrb) begin
-          $fwrite(mem_file, "PERIOD = %t\t", $time);
-          $fwrite(mem_file, "PC = %x\t", commit0_pc);
-          $fwrite(mem_file, "WADDR = %x\t", commit0_saddr);
-          $fwrite(mem_file, "WSTRB = %b\t", commit0_sstrb);
-          $fwrite(mem_file, "WDATA = %x\n", commit0_sdata);
+          $fwrite(mem_file, "PERIOD = %t ;\t", $time);
+          $fwrite(mem_file, "PC = %x ;\t", commit0_pc);
+          $fwrite(mem_file, "WADDR = %x ;\t", commit0_saddr);
+          $fwrite(mem_file, "WSTRB = %b ;\t", commit0_sstrb);
+          $fwrite(mem_file, "WDATA = %x ;\n", commit0_sdata);
         end
         if (commit1_valid && commit1_store && |commit1_sstrb) begin
-          $fwrite(mem_file, "PERIOD = %t\t", $time);
-          $fwrite(mem_file, "PC = %x\t", commit1_pc);
-          $fwrite(mem_file, "WADDR = %x\t", commit1_saddr);
-          $fwrite(mem_file, "WSTRB = %b\t", commit1_sstrb);
-          $fwrite(mem_file, "WDATA = %x\n", commit1_sdata);
+          $fwrite(mem_file, "PERIOD = %t ;\t", $time);
+          $fwrite(mem_file, "PC = %x ;\t", commit1_pc);
+          $fwrite(mem_file, "WADDR = %x ;\t", commit1_saddr);
+          $fwrite(mem_file, "WSTRB = %b ;\t", commit1_sstrb);
+          $fwrite(mem_file, "WDATA = %x ;\n", commit1_sdata);
         end
       end
       $fclose(mem_file);
