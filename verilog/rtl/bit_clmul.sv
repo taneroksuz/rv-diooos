@@ -2,11 +2,11 @@ import wires::*;
 import functions::*;
 
 module bit_clmul (
-    input  logic              reset,
-    input  logic              clock,
-    input  logic              flush,
-    input  bit_clmul_in_type  bit_clmul_in,
-    output bit_clmul_out_type bit_clmul_out
+  input  logic              reset,
+  input  logic              clock,
+  input  logic              flush,
+  input  bit_clmul_in_type  bit_clmul_in,
+  output bit_clmul_out_type bit_clmul_out
 );
   timeunit 1ns; timeprecision 1ps;
 

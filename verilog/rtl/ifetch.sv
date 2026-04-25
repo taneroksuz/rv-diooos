@@ -3,13 +3,13 @@ import functions::*;
 import wires::*;
 
 module ifetch (
-    input  logic                  reset,
-    input  logic                  clock,
-    input  logic                  flush,
-    input  logic                  stall,
-    input  logic           [31:0] flush_pc,
-    input  ifetch_in_type         ifetch_in,
-    output ifetch_out_type        ifetch_out
+  input  logic                  reset,
+  input  logic                  clock,
+  input  logic                  flush,
+  input  logic                  stall,
+  input  logic           [31:0] flush_pc,
+  input  ifetch_in_type         ifetch_in,
+  output ifetch_out_type        ifetch_out
 );
   timeunit 1ns; timeprecision 1ps;
 

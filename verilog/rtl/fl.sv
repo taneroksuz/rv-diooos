@@ -2,11 +2,11 @@ import configure::*;
 import wires::*;
 import functions::*;
 module fl (
-    input  logic       reset,
-    input  logic       clock,
-    input  logic       flush,
-    input  fl_in_type  fl_in,
-    output fl_out_type fl_out
+  input  logic       reset,
+  input  logic       clock,
+  input  logic       flush,
+  input  fl_in_type  fl_in,
+  output fl_out_type fl_out
 );
   timeunit 1ns; timeprecision 1ps;
 

@@ -2,16 +2,16 @@ import constants::*;
 import wires::*;
 
 module csr (
-    input  logic                        reset,
-    input  logic                        clock,
-    input  csr_read_in_type             csr_rin,
-    input  csr_write_in_type            csr_win,
-    input  csr_exception_in_type        csr_ein,
-    output csr_out_type                 csr_out,
-    input  logic                 [ 0:0] meip,
-    input  logic                 [ 0:0] msip,
-    input  logic                 [ 0:0] mtip,
-    input  logic                 [63:0] mtime
+  input  logic                        reset,
+  input  logic                        clock,
+  input  csr_read_in_type             csr_rin,
+  input  csr_write_in_type            csr_win,
+  input  csr_exception_in_type        csr_ein,
+  output csr_out_type                 csr_out,
+  input  logic                 [ 0:0] meip,
+  input  logic                 [ 0:0] msip,
+  input  logic                 [ 0:0] mtip,
+  input  logic                 [63:0] mtime
 );
   timeunit 1ns; timeprecision 1ps;
 

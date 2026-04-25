@@ -3,12 +3,12 @@ import wires::*;
 import functions::*;
 
 module idecode (
-    input  logic            reset,
-    input  logic            clock,
-    input  logic            flush,
-    input  logic            stall,
-    input  idecode_in_type  idecode_in,
-    output idecode_out_type idecode_out
+  input  logic            reset,
+  input  logic            clock,
+  input  logic            flush,
+  input  logic            stall,
+  input  idecode_in_type  idecode_in,
+  output idecode_out_type idecode_out
 );
   timeunit 1ns; timeprecision 1ps;
 

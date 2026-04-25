@@ -3,10 +3,10 @@ import constants::*;
 import wires::*;
 import functions::*;
 module commit (
-    input  logic           reset,
-    input  logic           clock,
-    input  commit_in_type  commit_in,
-    output commit_out_type commit_out
+  input  logic           reset,
+  input  logic           clock,
+  input  commit_in_type  commit_in,
+  output commit_out_type commit_out
 );
   timeunit 1ns; timeprecision 1ps;
   typedef struct packed {

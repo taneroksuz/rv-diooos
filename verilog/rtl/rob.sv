@@ -3,12 +3,12 @@ import constants::*;
 import wires::*;
 import functions::*;
 module rob (
-    input  logic          reset,
-    input  logic          clock,
-    input  logic          flush,
-    input  rob_in_type    rob_in,
-    output rob_out_type   rob_out,
-    output rob_entry_type rob_entries[0:ROB_DEPTH-1]
+  input  logic          reset,
+  input  logic          clock,
+  input  logic          flush,
+  input  rob_in_type    rob_in,
+  output rob_out_type   rob_out,
+  output rob_entry_type rob_entries[0:ROB_DEPTH-1]
 );
   timeunit 1ns; timeprecision 1ps;
 

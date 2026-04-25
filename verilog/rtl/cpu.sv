@@ -2,20 +2,20 @@ import configure::*;
 import constants::*;
 import wires::*;
 module cpu (
-    input  logic               reset,
-    input  logic               clock,
-    input  mem_out_type        imem0_out,
-    input  mem_out_type        imem1_out,
-    output mem_in_type         imem0_in,
-    output mem_in_type         imem1_in,
-    input  mem_out_type        dmem0_out,
-    input  mem_out_type        dmem1_out,
-    output mem_in_type         dmem0_in,
-    output mem_in_type         dmem1_in,
-    input  logic        [ 0:0] meip,
-    input  logic        [ 0:0] msip,
-    input  logic        [ 0:0] mtip,
-    input  logic        [63:0] mtime
+  input  logic               reset,
+  input  logic               clock,
+  input  mem_out_type        imem0_out,
+  input  mem_out_type        imem1_out,
+  output mem_in_type         imem0_in,
+  output mem_in_type         imem1_in,
+  input  mem_out_type        dmem0_out,
+  input  mem_out_type        dmem1_out,
+  output mem_in_type         dmem0_in,
+  output mem_in_type         dmem1_in,
+  input  logic        [ 0:0] meip,
+  input  logic        [ 0:0] msip,
+  input  logic        [ 0:0] mtip,
+  input  logic        [63:0] mtime
 );
   timeunit 1ns; timeprecision 1ps;
   cdb_type cdb0, cdb1, cdb_load;
@@ -269,217 +269,217 @@ module cpu (
   assign register0_win = commit_out.register0_win;
   assign register1_win = commit_out.register1_win;
   alu alu0_comp (
-      .alu_in (alu0_in),
-      .alu_out(alu0_out)
+    .alu_in (alu0_in),
+    .alu_out(alu0_out)
   );
   alu alu1_comp (
-      .alu_in (alu1_in),
-      .alu_out(alu1_out)
+    .alu_in (alu1_in),
+    .alu_out(alu1_out)
   );
   agu agu0_comp (
-      .agu_in (agu0_in),
-      .agu_out(agu0_out)
+    .agu_in (agu0_in),
+    .agu_out(agu0_out)
   );
   agu agu1_comp (
-      .agu_in (agu1_in),
-      .agu_out(agu1_out)
+    .agu_in (agu1_in),
+    .agu_out(agu1_out)
   );
   agu agu2_comp (
-      .agu_in (agu2_in),
-      .agu_out(agu2_out)
+    .agu_in (agu2_in),
+    .agu_out(agu2_out)
   );
   agu agu3_comp (
-      .agu_in (agu3_in),
-      .agu_out(agu3_out)
+    .agu_in (agu3_in),
+    .agu_out(agu3_out)
   );
   bcu bcu0_comp (
-      .bcu_in (bcu0_in),
-      .bcu_out(bcu0_out)
+    .bcu_in (bcu0_in),
+    .bcu_out(bcu0_out)
   );
   bcu bcu1_comp (
-      .bcu_in (bcu1_in),
-      .bcu_out(bcu1_out)
+    .bcu_in (bcu1_in),
+    .bcu_out(bcu1_out)
   );
   lsu lsu0_comp (
-      .lsu_in (lsu0_in),
-      .lsu_out(lsu0_out)
+    .lsu_in (lsu0_in),
+    .lsu_out(lsu0_out)
   );
   lsu lsu1_comp (
-      .lsu_in (lsu1_in),
-      .lsu_out(lsu1_out)
+    .lsu_in (lsu1_in),
+    .lsu_out(lsu1_out)
   );
   csr_alu csr_alu0_comp (
-      .csr_alu_in (csr_alu0_in),
-      .csr_alu_out(csr_alu0_out)
+    .csr_alu_in (csr_alu0_in),
+    .csr_alu_out(csr_alu0_out)
   );
   csr_alu csr_alu1_comp (
-      .csr_alu_in (csr_alu1_in),
-      .csr_alu_out(csr_alu1_out)
+    .csr_alu_in (csr_alu1_in),
+    .csr_alu_out(csr_alu1_out)
   );
   mul mul_comp (
-      .reset  (reset),
-      .clock  (clock),
-      .mul_in (mul_in),
-      .mul_out(mul_out)
+    .reset  (reset),
+    .clock  (clock),
+    .mul_in (mul_in),
+    .mul_out(mul_out)
   );
   div div_comp (
-      .reset  (reset),
-      .clock  (clock),
-      .flush  (commit_out.flush),
-      .div_in (div_in),
-      .div_out(div_out)
+    .reset  (reset),
+    .clock  (clock),
+    .flush  (commit_out.flush),
+    .div_in (div_in),
+    .div_out(div_out)
   );
   bit_alu bit_alu0_comp (
-      .bit_alu_in (bit_alu0_in),
-      .bit_alu_out(bit_alu0_out)
+    .bit_alu_in (bit_alu0_in),
+    .bit_alu_out(bit_alu0_out)
   );
   bit_alu bit_alu1_comp (
-      .bit_alu_in (bit_alu1_in),
-      .bit_alu_out(bit_alu1_out)
+    .bit_alu_in (bit_alu1_in),
+    .bit_alu_out(bit_alu1_out)
   );
   bit_clmul bit_clmul_comp (
-      .reset        (reset),
-      .clock        (clock),
-      .flush        (commit_out.flush),
-      .bit_clmul_in (bit_clmul_in),
-      .bit_clmul_out(bit_clmul_out)
+    .reset        (reset),
+    .clock        (clock),
+    .flush        (commit_out.flush),
+    .bit_clmul_in (bit_clmul_in),
+    .bit_clmul_out(bit_clmul_out)
   );
   btac btac_comp (
-      .reset   (reset),
-      .clock   (clock),
-      .btac_in (btac_in),
-      .btac_out(btac_out)
+    .reset   (reset),
+    .clock   (clock),
+    .btac_in (btac_in),
+    .btac_out(btac_out)
   );
   buffer buffer_comp (
-      .reset     (reset),
-      .clock     (clock),
-      .buffer_in (buffer_in),
-      .buffer_out(buffer_out)
+    .reset     (reset),
+    .clock     (clock),
+    .buffer_in (buffer_in),
+    .buffer_out(buffer_out)
   );
   decoder decoder0_comp (
-      .decoder_in (decoder0_in),
-      .decoder_out(decoder0_out)
+    .decoder_in (decoder0_in),
+    .decoder_out(decoder0_out)
   );
   decoder decoder1_comp (
-      .decoder_in (decoder1_in),
-      .decoder_out(decoder1_out)
+    .decoder_in (decoder1_in),
+    .decoder_out(decoder1_out)
   );
   compress compress0_comp (
-      .compress_in (compress0_in),
-      .compress_out(compress0_out)
+    .compress_in (compress0_in),
+    .compress_out(compress0_out)
   );
   compress compress1_comp (
-      .compress_in (compress1_in),
-      .compress_out(compress1_out)
+    .compress_in (compress1_in),
+    .compress_out(compress1_out)
   );
   register register_comp (
-      .reset        (reset),
-      .clock        (clock),
-      .register0_rin('0),
-      .register1_rin('0),
-      .register0_win(register0_win),
-      .register1_win(register1_win),
-      .register0_out(),
-      .register1_out()
+    .reset        (reset),
+    .clock        (clock),
+    .register0_rin('0),
+    .register1_rin('0),
+    .register0_win(register0_win),
+    .register1_win(register1_win),
+    .register0_out(),
+    .register1_out()
   );
   csr csr_comp (
-      .reset  (reset),
-      .clock  (clock),
-      .csr_rin(csr_rin),
-      .csr_win(commit_out.csr_win),
-      .csr_ein(commit_out.csr_ein),
-      .csr_out(csr_out),
-      .meip   (meip),
-      .msip   (msip),
-      .mtip   (mtip),
-      .mtime  (mtime)
+    .reset  (reset),
+    .clock  (clock),
+    .csr_rin(csr_rin),
+    .csr_win(commit_out.csr_win),
+    .csr_ein(commit_out.csr_ein),
+    .csr_out(csr_out),
+    .meip   (meip),
+    .msip   (msip),
+    .mtip   (mtip),
+    .mtime  (mtime)
   );
   ifetch ifetch_comp (
-      .reset     (reset),
-      .clock     (clock),
-      .flush     (commit_out.flush),
-      .stall     (rename_out.stall),
-      .flush_pc  (commit_out.flush_pc),
-      .ifetch_in (ifetch_in),
-      .ifetch_out(ifetch_out)
+    .reset     (reset),
+    .clock     (clock),
+    .flush     (commit_out.flush),
+    .stall     (rename_out.stall),
+    .flush_pc  (commit_out.flush_pc),
+    .ifetch_in (ifetch_in),
+    .ifetch_out(ifetch_out)
   );
   idecode idecode_comp (
-      .reset      (reset),
-      .clock      (clock),
-      .flush      (commit_out.flush),
-      .stall      (rename_out.stall),
-      .idecode_in (idecode_in),
-      .idecode_out(idecode_out)
+    .reset      (reset),
+    .clock      (clock),
+    .flush      (commit_out.flush),
+    .stall      (rename_out.stall),
+    .idecode_in (idecode_in),
+    .idecode_out(idecode_out)
   );
   prf prf_comp (
-      .reset  (reset),
-      .clock  (clock),
-      .flush  (commit_out.flush),
-      .prf_in (prf_in),
-      .prf_out(prf_out)
+    .reset  (reset),
+    .clock  (clock),
+    .flush  (commit_out.flush),
+    .prf_in (prf_in),
+    .prf_out(prf_out)
   );
   rat rat_comp (
-      .reset  (reset),
-      .clock  (clock),
-      .flush  (commit_out.flush),
-      .rat_in (rat_in),
-      .rat_out(rat_out)
+    .reset  (reset),
+    .clock  (clock),
+    .flush  (commit_out.flush),
+    .rat_in (rat_in),
+    .rat_out(rat_out)
   );
   fl fl_comp (
-      .reset (reset),
-      .clock (clock),
-      .flush (commit_out.flush),
-      .fl_in (fl_in),
-      .fl_out(fl_out)
+    .reset (reset),
+    .clock (clock),
+    .flush (commit_out.flush),
+    .fl_in (fl_in),
+    .fl_out(fl_out)
   );
   rob rob_comp (
-      .reset      (reset),
-      .clock      (clock),
-      .flush      (commit_out.flush),
-      .rob_in     (rob_in),
-      .rob_out    (rob_out),
-      .rob_entries(rob_entries_snap)
+    .reset      (reset),
+    .clock      (clock),
+    .flush      (commit_out.flush),
+    .rob_in     (rob_in),
+    .rob_out    (rob_out),
+    .rob_entries(rob_entries_snap)
   );
   rs_int rs_int_comp (
-      .reset (reset),
-      .clock (clock),
-      .flush (commit_out.flush),
-      .rs_in (rs_int_in),
-      .rs_out(rs_int_out)
+    .reset (reset),
+    .clock (clock),
+    .flush (commit_out.flush),
+    .rs_in (rs_int_in),
+    .rs_out(rs_int_out)
   );
   rs_mem rs_mem_comp (
-      .reset      (reset),
-      .clock      (clock),
-      .flush      (commit_out.flush),
-      .rs_in      (rs_mem_in),
-      .rob_entries(rob_entries_snap),
-      .rs_out     (rs_mem_out)
+    .reset      (reset),
+    .clock      (clock),
+    .flush      (commit_out.flush),
+    .rs_in      (rs_mem_in),
+    .rob_entries(rob_entries_snap),
+    .rs_out     (rs_mem_out)
   );
   rename rename_comp (
-      .reset     (reset),
-      .clock     (clock),
-      .flush     (commit_out.flush),
-      .rename_in (rename_in),
-      .rename_out(rename_out)
+    .reset     (reset),
+    .clock     (clock),
+    .flush     (commit_out.flush),
+    .rename_in (rename_in),
+    .rename_out(rename_out)
   );
   eu eu_comp (
-      .reset (reset),
-      .clock (clock),
-      .flush (commit_out.flush),
-      .eu_in (eu_in),
-      .eu_out(eu_out)
+    .reset (reset),
+    .clock (clock),
+    .flush (commit_out.flush),
+    .eu_in (eu_in),
+    .eu_out(eu_out)
   );
   msu msu_comp (
-      .reset  (reset),
-      .clock  (clock),
-      .flush  (commit_out.flush),
-      .msu_in (msu_in),
-      .msu_out(msu_out)
+    .reset  (reset),
+    .clock  (clock),
+    .flush  (commit_out.flush),
+    .msu_in (msu_in),
+    .msu_out(msu_out)
   );
   commit commit_comp (
-      .reset     (reset),
-      .clock     (clock),
-      .commit_in (commit_in),
-      .commit_out(commit_out)
+    .reset     (reset),
+    .clock     (clock),
+    .commit_in (commit_in),
+    .commit_out(commit_out)
   );
 endmodule

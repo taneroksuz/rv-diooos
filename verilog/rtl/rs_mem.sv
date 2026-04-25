@@ -3,12 +3,12 @@ import constants::*;
 import wires::*;
 import functions::*;
 module rs_mem (
-    input  logic           reset,
-    input  logic           clock,
-    input  logic           flush,
-    input  rs_mem_in_type  rs_in,
-    input  rob_entry_type  rob_entries[0:ROB_DEPTH-1],
-    output rs_mem_out_type rs_out
+  input  logic           reset,
+  input  logic           clock,
+  input  logic           flush,
+  input  rs_mem_in_type  rs_in,
+  input  rob_entry_type  rob_entries[0:ROB_DEPTH-1],
+  output rs_mem_out_type rs_out
 );
   timeunit 1ns; timeprecision 1ps;
   localparam MEM_ADDR_BITS = $clog2(RS_MEM_DEPTH);

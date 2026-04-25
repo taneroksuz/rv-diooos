@@ -4,11 +4,11 @@ import wires::*;
 import functions::*;
 
 module msu (
-    input  logic        reset,
-    input  logic        clock,
-    input  logic        flush,
-    input  msu_in_type  msu_in,
-    output msu_out_type msu_out
+  input  logic        reset,
+  input  logic        clock,
+  input  logic        flush,
+  input  msu_in_type  msu_in,
+  output msu_out_type msu_out
 );
   timeunit 1ns; timeprecision 1ps;
 
