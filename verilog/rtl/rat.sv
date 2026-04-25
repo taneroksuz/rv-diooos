@@ -87,7 +87,7 @@ module rat (
   logic [PRF_ADDR_BITS:0] eff0, eff1, eff2, eff3, old0, old1;
 
   always_comb begin
-    v = r;
+    v    = r;
     eff0 = flush ? comm[rat_in.rsrc0_a] : spec[rat_in.rsrc0_a];
     eff1 = flush ? comm[rat_in.rsrc1_a] : spec[rat_in.rsrc1_a];
     eff2 = flush ? comm[rat_in.rsrc2_a] : spec[rat_in.rsrc2_a];
@@ -128,18 +128,18 @@ module rat (
     rat_out.psrc1_valid = eff1[PRF_ADDR_BITS];
 
     if (rat_in.wren0 && (rat_in.rsrc2_a == rat_in.waddr0_a) && (rat_in.waddr0_a != 5'h0)) begin
-      rat_out.psrc2 = rat_in.waddr0_p;
+      rat_out.psrc2       = rat_in.waddr0_p;
       rat_out.psrc2_valid = 1'b0;
     end else begin
-      rat_out.psrc2 = eff2[PRF_ADDR_BITS-1:0];
+      rat_out.psrc2       = eff2[PRF_ADDR_BITS-1:0];
       rat_out.psrc2_valid = eff2[PRF_ADDR_BITS];
     end
 
     if (rat_in.wren0 && (rat_in.rsrc3_a == rat_in.waddr0_a) && (rat_in.waddr0_a != 5'h0)) begin
-      rat_out.psrc3 = rat_in.waddr0_p;
+      rat_out.psrc3       = rat_in.waddr0_p;
       rat_out.psrc3_valid = 1'b0;
     end else begin
-      rat_out.psrc3 = eff3[PRF_ADDR_BITS-1:0];
+      rat_out.psrc3       = eff3[PRF_ADDR_BITS-1:0];
       rat_out.psrc3_valid = eff3[PRF_ADDR_BITS];
     end
     rin = v;

@@ -174,15 +174,15 @@ module testbench ();
   end
 
   soc soc_comp (
-      .reset(reset),
-      .clock(clock),
-      .sclk(sclk),
-      .mosi(mosi),
-      .miso(miso),
-      .ss(ss),
-      .rx(rx),
-      .tx(tx),
-      .ram_in(ram_in),
+      .reset  (reset),
+      .clock  (clock),
+      .sclk   (sclk),
+      .mosi   (mosi),
+      .miso   (miso),
+      .ss     (ss),
+      .rx     (rx),
+      .tx     (tx),
+      .ram_in (ram_in),
       .ram_out(ram_out)
   );
 

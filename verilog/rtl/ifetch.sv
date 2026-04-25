@@ -3,13 +3,13 @@ import functions::*;
 import wires::*;
 
 module ifetch (
-    input logic reset,
-    input logic clock,
-    input logic flush,
-    input logic stall,
-    input logic [31:0] flush_pc,
-    input ifetch_in_type ifetch_in,
-    output ifetch_out_type ifetch_out
+    input  logic                  reset,
+    input  logic                  clock,
+    input  logic                  flush,
+    input  logic                  stall,
+    input  logic           [31:0] flush_pc,
+    input  ifetch_in_type         ifetch_in,
+    output ifetch_out_type        ifetch_out
 );
   timeunit 1ns; timeprecision 1ps;
 
@@ -18,7 +18,7 @@ module ifetch (
 
   always_comb begin
 
-    v = r;
+    v       = r;
 
     v.valid = 0;
     v.stall = ifetch_in.buffer_out.stall;
@@ -43,16 +43,16 @@ module ifetch (
       v.ready = 0;
     end
 
-    v.pc0 = ifetch_in.buffer_out.pc0;
-    v.pc1 = ifetch_in.buffer_out.pc1;
+    v.pc0    = ifetch_in.buffer_out.pc0;
+    v.pc1    = ifetch_in.buffer_out.pc1;
     v.instr0 = ifetch_in.buffer_out.instr0;
     v.instr1 = ifetch_in.buffer_out.instr1;
     v.ready0 = ifetch_in.buffer_out.ready0;
     v.ready1 = ifetch_in.buffer_out.ready1;
 
     if (stall == 1) begin
-      v.pc0 = r.pc0;
-      v.pc1 = r.pc1;
+      v.pc0    = r.pc0;
+      v.pc1    = r.pc1;
       v.instr0 = r.instr0;
       v.instr1 = r.instr1;
       v.ready0 = r.ready0;
@@ -114,35 +114,35 @@ module ifetch (
       end
     endcase
 
-    ifetch_out.buffer_in.pc0 = r.ipc0;
-    ifetch_out.buffer_in.pc1 = r.ipc1;
-    ifetch_out.buffer_in.rdata = v.rdata;
-    ifetch_out.buffer_in.ready = v.ready;
-    ifetch_out.buffer_in.clear = flush;
-    ifetch_out.buffer_in.stall = stall;
+    ifetch_out.buffer_in.pc0      = r.ipc0;
+    ifetch_out.buffer_in.pc1      = r.ipc1;
+    ifetch_out.buffer_in.rdata    = v.rdata;
+    ifetch_out.buffer_in.ready    = v.ready;
+    ifetch_out.buffer_in.clear    = flush;
+    ifetch_out.buffer_in.stall    = stall;
 
     ifetch_out.imem0_in.mem_valid = v.valid;
     ifetch_out.imem0_in.mem_instr = 1;
-    ifetch_out.imem0_in.mem_mode = 0;
-    ifetch_out.imem0_in.mem_addr = v.ipc0;
+    ifetch_out.imem0_in.mem_mode  = 0;
+    ifetch_out.imem0_in.mem_addr  = v.ipc0;
     ifetch_out.imem0_in.mem_wdata = 0;
     ifetch_out.imem0_in.mem_wstrb = 0;
 
     ifetch_out.imem1_in.mem_valid = v.valid;
     ifetch_out.imem1_in.mem_instr = 1;
-    ifetch_out.imem1_in.mem_mode = 0;
-    ifetch_out.imem1_in.mem_addr = v.ipc1;
+    ifetch_out.imem1_in.mem_mode  = 0;
+    ifetch_out.imem1_in.mem_addr  = v.ipc1;
     ifetch_out.imem1_in.mem_wdata = 0;
     ifetch_out.imem1_in.mem_wstrb = 0;
 
-    ifetch_out.pc0 = r.pc0;
-    ifetch_out.pc1 = r.pc1;
-    ifetch_out.instr0 = r.instr0;
-    ifetch_out.instr1 = r.instr1;
-    ifetch_out.ready0 = r.ready0;
-    ifetch_out.ready1 = r.ready1;
+    ifetch_out.pc0                = r.pc0;
+    ifetch_out.pc1                = r.pc1;
+    ifetch_out.instr0             = r.instr0;
+    ifetch_out.instr1             = r.instr1;
+    ifetch_out.ready0             = r.ready0;
+    ifetch_out.ready1             = r.ready1;
 
-    rin = v;
+    rin                           = v;
 
   end
 

@@ -3,7 +3,14 @@ set -e
 
 start=`date +%s`
 
-${VERIBLE}-verilog-format --inplace \
+${VERIBLE}-verilog-format \
+            --indentation_spaces 2 \
+            --column_limit 100 \
+            --assignment_statement_alignment align \
+            --formal_parameters_alignment align \
+            --named_port_alignment align \
+            --port_declarations_alignment align \
+            --inplace \
             ${BASEDIR}/verilog/conf/configure.sv \
             ${BASEDIR}/verilog/rtl/constants.sv \
             ${BASEDIR}/verilog/rtl/wires.sv \

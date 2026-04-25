@@ -43,27 +43,27 @@ module commit (
   logic [31:0] flush_pc0, flush_pc1;
   logic do0, do1;
   always_comb begin
-    v = init_commit_reg;
-    e0 = commit_in.entry0;
-    e1 = commit_in.entry1;
-    c0 = commit_in.commit0;
-    c1 = commit_in.commit1;
-    flush0 = 1'b0;
-    flush1 = 1'b0;
+    v         = init_commit_reg;
+    e0        = commit_in.entry0;
+    e1        = commit_in.entry1;
+    c0        = commit_in.commit0;
+    c1        = commit_in.commit1;
+    flush0    = 1'b0;
+    flush1    = 1'b0;
     flush_pc0 = '0;
     flush_pc1 = '0;
 
-    do0 = c0;
+    do0       = c0;
 
     if (do0) begin
       if (e0.exception) begin
-        flush0 = 1'b1;
+        flush0    = 1'b1;
         flush_pc0 = commit_in.csr_o.mtvec;
       end else if (e0.mret) begin
-        flush0 = 1'b1;
+        flush0    = 1'b1;
         flush_pc0 = commit_in.csr_o.mepc;
       end else if (e0.jump && e0.npc != e0.pnpc) begin
-        flush0 = 1'b1;
+        flush0    = 1'b1;
         flush_pc0 = e0.npc;
       end
     end
@@ -72,19 +72,19 @@ module commit (
 
     if (do1) begin
       if (e1.exception) begin
-        flush1 = 1'b1;
+        flush1    = 1'b1;
         flush_pc1 = commit_in.csr_o.mtvec;
       end else if (e1.mret) begin
-        flush1 = 1'b1;
+        flush1    = 1'b1;
         flush_pc1 = commit_in.csr_o.mepc;
       end else if (e1.jump && e1.npc != e1.pnpc) begin
-        flush1 = 1'b1;
+        flush1    = 1'b1;
         flush_pc1 = e1.npc;
       end
     end
 
-    v.flush = flush0 | flush1;
-    v.flush_pc = flush0 ? flush_pc0 : flush_pc1;
+    v.flush        = flush0 | flush1;
+    v.flush_pc     = flush0 ? flush_pc0 : flush_pc1;
 
     v.commit_store = 1'b0;
     v.commit_entry = init_rob_entry;
@@ -97,19 +97,19 @@ module commit (
     end
 
     if (do0) begin
-      v.csr_ein.valid0 = 1'b1;
-      v.csr_ein.pc = e0.pc;
-      v.register0_win.wren = e0.wren;
+      v.csr_ein.valid0      = 1'b1;
+      v.csr_ein.pc          = e0.pc;
+      v.register0_win.wren  = e0.wren;
       v.register0_win.waddr = e0.adest;
       v.register0_win.wdata = e0.result;
-      v.prf_i.wren0 = e0.wren;
-      v.prf_i.waddr0 = e0.pdest;
-      v.prf_i.wdata0 = e0.result;
-      v.rat_i.commit_addr0 = e0.adest;
-      v.rat_i.commit_tag0 = e0.pdest;
-      v.rat_i.commit_en0 = e0.wren;
-      v.fl_i.free_tag0 = e0.old_pdest;
-      v.fl_i.free_en0 = e0.wren;
+      v.prf_i.wren0         = e0.wren;
+      v.prf_i.waddr0        = e0.pdest;
+      v.prf_i.wdata0        = e0.result;
+      v.rat_i.commit_addr0  = e0.adest;
+      v.rat_i.commit_tag0   = e0.pdest;
+      v.rat_i.commit_en0    = e0.wren;
+      v.fl_i.free_tag0      = e0.old_pdest;
+      v.fl_i.free_en0       = e0.wren;
       if (e0.cwren) begin
         v.csr_win.cwren  = 1'b1;
         v.csr_win.cwaddr = e0.caddr;
@@ -121,10 +121,10 @@ module commit (
       end
       if (e0.exception) begin
         v.csr_ein.exception = 1'b1;
-        v.csr_ein.pc = e0.pc;
-        v.csr_ein.epc = e0.pc;
-        v.csr_ein.ecause = e0.ecause;
-        v.csr_ein.etval = e0.etval;
+        v.csr_ein.pc        = e0.pc;
+        v.csr_ein.epc       = e0.pc;
+        v.csr_ein.ecause    = e0.ecause;
+        v.csr_ein.etval     = e0.etval;
       end
     end
 
@@ -133,17 +133,17 @@ module commit (
       if (!do0) begin
         v.csr_ein.pc = e1.pc;
       end
-      v.register1_win.wren = e1.wren;
+      v.register1_win.wren  = e1.wren;
       v.register1_win.waddr = e1.adest;
       v.register1_win.wdata = e1.result;
-      v.prf_i.wren1 = e1.wren;
-      v.prf_i.waddr1 = e1.pdest;
-      v.prf_i.wdata1 = e1.result;
-      v.rat_i.commit_addr1 = e1.adest;
-      v.rat_i.commit_tag1 = e1.pdest;
-      v.rat_i.commit_en1 = e1.wren;
-      v.fl_i.free_tag1 = e1.old_pdest;
-      v.fl_i.free_en1 = e1.wren;
+      v.prf_i.wren1         = e1.wren;
+      v.prf_i.waddr1        = e1.pdest;
+      v.prf_i.wdata1        = e1.result;
+      v.rat_i.commit_addr1  = e1.adest;
+      v.rat_i.commit_tag1   = e1.pdest;
+      v.rat_i.commit_en1    = e1.wren;
+      v.fl_i.free_tag1      = e1.old_pdest;
+      v.fl_i.free_en1       = e1.wren;
       if (e1.cwren) begin
         v.csr_win.cwren  = 1'b1;
         v.csr_win.cwaddr = e1.caddr;
@@ -155,10 +155,10 @@ module commit (
       end
       if (e1.exception) begin
         v.csr_ein.exception = 1'b1;
-        v.csr_ein.pc = e1.pc;
-        v.csr_ein.epc = e1.pc;
-        v.csr_ein.ecause = e1.ecause;
-        v.csr_ein.etval = e1.etval;
+        v.csr_ein.pc        = e1.pc;
+        v.csr_ein.epc       = e1.pc;
+        v.csr_ein.ecause    = e1.ecause;
+        v.csr_ein.etval     = e1.etval;
       end
     end
 
@@ -166,18 +166,18 @@ module commit (
       v = init_commit_reg;
     end
 
-    rin = v;
+    rin                      = v;
     commit_out.register0_win = r.register0_win;
     commit_out.register1_win = r.register1_win;
-    commit_out.csr_win = r.csr_win;
-    commit_out.csr_ein = r.csr_ein;
-    commit_out.rat_i = r.rat_i;
-    commit_out.prf_i = r.prf_i;
-    commit_out.fl_i = r.fl_i;
-    commit_out.flush = r.flush;
-    commit_out.flush_pc = r.flush_pc;
-    commit_out.commit_store = r.commit_store;
-    commit_out.commit_entry = r.commit_entry;
+    commit_out.csr_win       = r.csr_win;
+    commit_out.csr_ein       = r.csr_ein;
+    commit_out.rat_i         = r.rat_i;
+    commit_out.prf_i         = r.prf_i;
+    commit_out.fl_i          = r.fl_i;
+    commit_out.flush         = r.flush;
+    commit_out.flush_pc      = r.flush_pc;
+    commit_out.commit_store  = r.commit_store;
+    commit_out.commit_entry  = r.commit_entry;
   end
   always_ff @(posedge clock) begin
     if (reset == 0) begin

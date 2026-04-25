@@ -138,7 +138,7 @@ package functions;
     input [31:0] rs2;
     logic [31:0] res;
     begin
-      res = rs1 << rs2[4:0];
+      res     = rs1 << rs2[4:0];
       bit_rol = res | (rs1 >> (32 - rs2[4:0]));
     end
   endfunction
@@ -147,7 +147,7 @@ package functions;
     input [31:0] rs2;
     logic [31:0] res;
     begin
-      res = rs1 >> rs2[4:0];
+      res     = rs1 >> rs2[4:0];
       bit_ror = res | (rs1 << (32 - rs2[4:0]));
     end
   endfunction
@@ -156,9 +156,9 @@ package functions;
     input [31:0] rs2;
     logic [31:0] res;
     begin
-      res = rs1;
+      res           = rs1;
       res[rs2[4:0]] = 1'b1;
-      bit_bset = res;
+      bit_bset      = res;
     end
   endfunction
   function automatic [31:0] bit_bclr;
@@ -166,9 +166,9 @@ package functions;
     input [31:0] rs2;
     logic [31:0] res;
     begin
-      res = rs1;
+      res           = rs1;
       res[rs2[4:0]] = 1'b0;
-      bit_bclr = res;
+      bit_bclr      = res;
     end
   endfunction
   function automatic [31:0] bit_binv;
@@ -176,9 +176,9 @@ package functions;
     input [31:0] rs2;
     logic [31:0] res;
     begin
-      res = rs1;
+      res           = rs1;
       res[rs2[4:0]] = ~res[rs2[4:0]];
-      bit_binv = res;
+      bit_binv      = res;
     end
   endfunction
   function automatic [31:0] bit_bext;
@@ -206,11 +206,11 @@ package functions;
       if (c.valid && t.valid) begin
         if (!t.src1_ready && t.psrc1 == c.tag) begin
           t.src1_ready = 1'b1;
-          t.rdata1 = c.data;
+          t.rdata1     = c.data;
         end
         if (!t.src2_ready && t.psrc2 == c.tag) begin
           t.src2_ready = 1'b1;
-          t.rdata2 = c.data;
+          t.rdata2     = c.data;
         end
       end
       rs_wakeup = t;

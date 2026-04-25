@@ -38,36 +38,36 @@ module rs_mem (
   endfunction
 
   always_comb begin
-    rs_out = '0;
-    v = r;
-    rin = r;
-    sel_idx = '0;
-    sel_found = 1'b0;
-    free_idx0 = '0;
-    free_idx1 = '0;
-    free_found0 = 1'b0;
-    free_found1 = 1'b0;
-    oldest_idx = '0;
+    rs_out       = '0;
+    v            = r;
+    rin          = r;
+    sel_idx      = '0;
+    sel_found    = 1'b0;
+    free_idx0    = '0;
+    free_idx1    = '0;
+    free_found0  = 1'b0;
+    free_found1  = 1'b0;
+    oldest_idx   = '0;
     oldest_found = 1'b0;
-    best_age = '0;
-    cand_age = '0;
+    best_age     = '0;
+    cand_age     = '0;
 
     for (int i = 0; i < RS_MEM_DEPTH; i++) begin
-      cur_entry = r.valid_bits[i] ? array[i] : init_rs_entry;
+      cur_entry       = r.valid_bits[i] ? array[i] : init_rs_entry;
       cur_entry.valid = r.valid_bits[i];
-      woken[i] = rs_wakeup(cur_entry, rs_in.cdb0);
-      woken[i] = rs_wakeup(woken[i], rs_in.cdb1);
-      woken[i] = rs_wakeup(woken[i], rs_in.cdb_load);
-      woken[i] = rs_wakeup(woken[i], rs_in.cdb_commit0);
-      woken[i] = rs_wakeup(woken[i], rs_in.cdb_commit1);
+      woken[i]        = rs_wakeup(cur_entry, rs_in.cdb0);
+      woken[i]        = rs_wakeup(woken[i], rs_in.cdb1);
+      woken[i]        = rs_wakeup(woken[i], rs_in.cdb_load);
+      woken[i]        = rs_wakeup(woken[i], rs_in.cdb_commit0);
+      woken[i]        = rs_wakeup(woken[i], rs_in.cdb_commit1);
 
       if (woken[i].valid && woken[i].src1_ready && woken[i].src2_ready &&
           (!rs_in.load_busy || !woken[i].op.load)) begin
         cand_age = rob_age(rs_in.rob_head, woken[i].rob_tag);
         if (!oldest_found || (cand_age < best_age)) begin
-          oldest_idx = MEM_ADDR_BITS'(unsigned'(i));
+          oldest_idx   = MEM_ADDR_BITS'(unsigned'(i));
           oldest_found = 1'b1;
-          best_age = cand_age;
+          best_age     = cand_age;
         end
       end
 
@@ -94,7 +94,7 @@ module rs_mem (
       rs_out.issue0 = init_rs_entry;
     end
     rs_out.issue0_valid = sel_found;
-    rs_out.full = (r.count >= (MEM_ADDR_BITS + 1)'(RS_MEM_DEPTH - 1));
+    rs_out.full         = (r.count >= (MEM_ADDR_BITS + 1)'(RS_MEM_DEPTH - 1));
     rs_out.has_two_free = (r.count <= (MEM_ADDR_BITS + 1)'(RS_MEM_DEPTH - 2));
 
     if (flush) begin
@@ -102,15 +102,15 @@ module rs_mem (
     end else begin
       if (sel_found) begin
         v.valid_bits[sel_idx] = 1'b0;
-        v.count = v.count - 1'b1;
+        v.count               = v.count - 1'b1;
       end
       if (rs_in.alloc0 && free_found0) begin
         v.valid_bits[free_idx0] = 1'b1;
-        v.count = v.count + 1'b1;
+        v.count                 = v.count + 1'b1;
       end
       if (rs_in.alloc1 && free_found1) begin
         v.valid_bits[free_idx1] = 1'b1;
-        v.count = v.count + 1'b1;
+        v.count                 = v.count + 1'b1;
       end
     end
     rin = v;

@@ -21,15 +21,15 @@ module prf (
   logic [31:0] wdata0, wdata1;
 
   always_comb begin
-    v = r;
-    wen0 = prf_in.wren0 && (prf_in.waddr0 != '0);
-    waddr0 = prf_in.waddr0;
-    wdata0 = prf_in.wdata0;
-    wen1 = prf_in.wren1 && (prf_in.waddr1 != '0);
-    waddr1 = prf_in.waddr1;
-    wdata1 = prf_in.wdata1;
+    v              = r;
+    wen0           = prf_in.wren0 && (prf_in.waddr0 != '0);
+    waddr0         = prf_in.waddr0;
+    wdata0         = prf_in.wdata0;
+    wen1           = prf_in.wren1 && (prf_in.waddr1 != '0);
+    waddr1         = prf_in.waddr1;
+    wdata1         = prf_in.wdata1;
 
-    prf_out = init_prf_out;
+    prf_out        = init_prf_out;
 
     prf_out.rdata0 = r.written_bits[prf_in.raddr0] ? mem[prf_in.raddr0] : 32'h0;
     if (wen0 && waddr0 == prf_in.raddr0) prf_out.rdata0 = wdata0;

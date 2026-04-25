@@ -68,18 +68,18 @@ module msu (
       v = r;
     end
 
-    load_accept = msu_in.issue_valid && msu_in.issue.op.load && !flush && !r.load_pending;
-    load_ready = r.load_pending && msu_in.dmem1_out.mem_ready && !flush;
-    load_retry = r.load_pending && !load_ready && (r.load_wait_ctr == 8'h40) && !flush;
+    load_accept          = msu_in.issue_valid && msu_in.issue.op.load && !flush && !r.load_pending;
+    load_ready           = r.load_pending && msu_in.dmem1_out.mem_ready && !flush;
+    load_retry           = r.load_pending && !load_ready && (r.load_wait_ctr == 8'h40) && !flush;
 
-    lsu1_in_cur = r.lsu1_in;
-    lsu1_in_cur.ldata = msu_in.dmem1_out.mem_rdata;
+    lsu1_in_cur          = r.lsu1_in;
+    lsu1_in_cur.ldata    = msu_in.dmem1_out.mem_rdata;
 
-    v.dmem1_in = init_mem_in;
+    v.dmem1_in           = init_mem_in;
     v.dmem1_in.mem_valid = (load_accept && !msu_in.agu2_out.exception) || load_retry;
     v.dmem1_in.mem_instr = 1'b0;
-    v.dmem1_in.mem_mode = 2'h0;
-    v.dmem1_in.mem_addr = load_accept ? msu_in.agu2_out.address : r.load_addr;
+    v.dmem1_in.mem_mode  = 2'h0;
+    v.dmem1_in.mem_addr  = load_accept ? msu_in.agu2_out.address : r.load_addr;
     v.dmem1_in.mem_wdata = 32'h0;
     v.dmem1_in.mem_wstrb = 4'h0;
 
@@ -108,12 +108,12 @@ module msu (
     v.dmem0_in = init_mem_in;
     if (!r.store_pending && msu_in.commit_store && !msu_in.commit_entry.exception && !flush) begin
       v.store_pending = 1'b1;
-      v.store_sent = 1'b0;
-      v.store_entry = msu_in.commit_entry;
+      v.store_sent    = 1'b0;
+      v.store_entry   = msu_in.commit_entry;
     end
     if (r.store_pending && msu_in.dmem0_out.mem_ready && !flush) begin
       v.store_pending = 1'b0;
-      v.store_sent = 1'b0;
+      v.store_sent    = 1'b0;
     end
     v.dmem0_in.mem_valid = r.store_pending;
     v.dmem0_in.mem_instr = 1'b0;

@@ -32,25 +32,25 @@ module rob (
   logic [ROB_ADDR_BITS-1:0] head1_idx, tail1_idx;
 
   always_comb begin
-    v = r;
-    commit0 = 1'b0;
-    commit1 = 1'b0;
-    alloc0_ok = 1'b0;
-    alloc1_ok = 1'b0;
-    head1_idx = r.head + ROB_ADDR_BITS'(1);
-    tail1_idx = r.tail_ptr;
-    h0 = init_rob_entry;
-    h1 = init_rob_entry;
-    h0_done = 1'b0;
-    h1_done = 1'b0;
-    h0_flush = 1'b0;
-    alloc_entry0_w = rob_in.alloc_entry0;
-    alloc_entry1_w = rob_in.alloc_entry1;
+    v                    = r;
+    commit0              = 1'b0;
+    commit1              = 1'b0;
+    alloc0_ok            = 1'b0;
+    alloc1_ok            = 1'b0;
+    head1_idx            = r.head + ROB_ADDR_BITS'(1);
+    tail1_idx            = r.tail_ptr;
+    h0                   = init_rob_entry;
+    h1                   = init_rob_entry;
+    h0_done              = 1'b0;
+    h1_done              = 1'b0;
+    h0_flush             = 1'b0;
+    alloc_entry0_w       = rob_in.alloc_entry0;
+    alloc_entry1_w       = rob_in.alloc_entry1;
     alloc_entry0_w.valid = 1'b1;
     alloc_entry1_w.valid = 1'b1;
 
     for (int i = 0; i < ROB_DEPTH; i++) begin
-      view[i] = r.valid_bits[i] ? array[i] : init_rob_entry;
+      view[i]       = r.valid_bits[i] ? array[i] : init_rob_entry;
       view[i].valid = r.valid_bits[i];
     end
 
@@ -137,28 +137,28 @@ module rob (
     end else begin
       if (commit0) begin
         v.valid_bits[v.head] = 1'b0;
-        v.head = v.head + ROB_ADDR_BITS'(1);
-        v.count = v.count - 1'b1;
+        v.head               = v.head + ROB_ADDR_BITS'(1);
+        v.count              = v.count - 1'b1;
       end
       if (commit1) begin
         v.valid_bits[v.head] = 1'b0;
-        v.head = v.head + ROB_ADDR_BITS'(1);
-        v.count = v.count - 1'b1;
+        v.head               = v.head + ROB_ADDR_BITS'(1);
+        v.count              = v.count - 1'b1;
       end
 
       alloc0_ok = rob_in.alloc0 && (v.count < ROB_DEPTH);
       if (alloc0_ok) begin
         v.valid_bits[v.tail_ptr] = 1'b1;
-        v.tail_ptr = v.tail_ptr + ROB_ADDR_BITS'(1);
-        v.count = v.count + 1'b1;
+        v.tail_ptr               = v.tail_ptr + ROB_ADDR_BITS'(1);
+        v.count                  = v.count + 1'b1;
       end
 
       alloc1_ok = rob_in.alloc1 && (v.count < ROB_DEPTH);
       if (alloc1_ok) begin
-        tail1_idx = v.tail_ptr;
+        tail1_idx                = v.tail_ptr;
         v.valid_bits[v.tail_ptr] = 1'b1;
-        v.tail_ptr = v.tail_ptr + ROB_ADDR_BITS'(1);
-        v.count = v.count + 1'b1;
+        v.tail_ptr               = v.tail_ptr + ROB_ADDR_BITS'(1);
+        v.count                  = v.count + 1'b1;
       end
     end
 

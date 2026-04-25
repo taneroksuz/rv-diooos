@@ -59,38 +59,38 @@ module fl (
       v.spec_count = r.comm_count;
 
       if (fl_in.free_en0) begin
-        do_free0 = 1'b1;
-        free0_slot = v.tail[FL_IDX_BITS-1:0];
-        v.tail = v.tail + 1'b1;
-        v.spec_head = v.spec_head + 1'b1;
-        v.comm_head = v.comm_head + 1'b1;
+        do_free0                   = 1'b1;
+        free0_slot                 = v.tail[FL_IDX_BITS-1:0];
+        v.tail                     = v.tail + 1'b1;
+        v.spec_head                = v.spec_head + 1'b1;
+        v.comm_head                = v.comm_head + 1'b1;
         v.list_written[free0_slot] = 1'b1;
       end
 
       if (fl_in.free_en1) begin
-        do_free1 = 1'b1;
-        free1_slot = v.tail[FL_IDX_BITS-1:0];
-        v.tail = v.tail + 1'b1;
-        v.spec_head = v.spec_head + 1'b1;
-        v.comm_head = v.comm_head + 1'b1;
+        do_free1                   = 1'b1;
+        free1_slot                 = v.tail[FL_IDX_BITS-1:0];
+        v.tail                     = v.tail + 1'b1;
+        v.spec_head                = v.spec_head + 1'b1;
+        v.comm_head                = v.comm_head + 1'b1;
         v.list_written[free1_slot] = 1'b1;
       end
     end else begin
       if (fl_in.free_en0 && (v.spec_count < FL_CNT_BITS'(FLIST_DEPTH))) begin
-        do_free0 = 1'b1;
-        free0_slot = v.tail[FL_IDX_BITS-1:0];
-        v.tail = v.tail + 1'b1;
-        v.spec_count = v.spec_count + 1'b1;
-        v.comm_head = v.comm_head + 1'b1;
+        do_free0                   = 1'b1;
+        free0_slot                 = v.tail[FL_IDX_BITS-1:0];
+        v.tail                     = v.tail + 1'b1;
+        v.spec_count               = v.spec_count + 1'b1;
+        v.comm_head                = v.comm_head + 1'b1;
         v.list_written[free0_slot] = 1'b1;
       end
 
       if (fl_in.free_en1 && (v.spec_count < FL_CNT_BITS'(FLIST_DEPTH))) begin
-        do_free1 = 1'b1;
-        free1_slot = v.tail[FL_IDX_BITS-1:0];
-        v.tail = v.tail + 1'b1;
-        v.spec_count = v.spec_count + 1'b1;
-        v.comm_head = v.comm_head + 1'b1;
+        do_free1                   = 1'b1;
+        free1_slot                 = v.tail[FL_IDX_BITS-1:0];
+        v.tail                     = v.tail + 1'b1;
+        v.spec_count               = v.spec_count + 1'b1;
+        v.comm_head                = v.comm_head + 1'b1;
         v.list_written[free1_slot] = 1'b1;
       end
 

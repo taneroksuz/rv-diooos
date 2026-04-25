@@ -338,22 +338,22 @@ module cpu (
       .bit_alu_out(bit_alu1_out)
   );
   bit_clmul bit_clmul_comp (
-      .reset(reset),
-      .clock(clock),
-      .flush(commit_out.flush),
-      .bit_clmul_in(bit_clmul_in),
+      .reset        (reset),
+      .clock        (clock),
+      .flush        (commit_out.flush),
+      .bit_clmul_in (bit_clmul_in),
       .bit_clmul_out(bit_clmul_out)
   );
   btac btac_comp (
-      .reset(reset),
-      .clock(clock),
-      .btac_in(btac_in),
+      .reset   (reset),
+      .clock   (clock),
+      .btac_in (btac_in),
       .btac_out(btac_out)
   );
   buffer buffer_comp (
-      .reset(reset),
-      .clock(clock),
-      .buffer_in(buffer_in),
+      .reset     (reset),
+      .clock     (clock),
+      .buffer_in (buffer_in),
       .buffer_out(buffer_out)
   );
   decoder decoder0_comp (
@@ -373,8 +373,8 @@ module cpu (
       .compress_out(compress1_out)
   );
   register register_comp (
-      .reset(reset),
-      .clock(clock),
+      .reset        (reset),
+      .clock        (clock),
       .register0_rin('0),
       .register1_rin('0),
       .register0_win(register0_win),
@@ -383,32 +383,32 @@ module cpu (
       .register1_out()
   );
   csr csr_comp (
-      .reset(reset),
-      .clock(clock),
+      .reset  (reset),
+      .clock  (clock),
       .csr_rin(csr_rin),
       .csr_win(commit_out.csr_win),
       .csr_ein(commit_out.csr_ein),
       .csr_out(csr_out),
-      .meip(meip),
-      .msip(msip),
-      .mtip(mtip),
-      .mtime(mtime)
+      .meip   (meip),
+      .msip   (msip),
+      .mtip   (mtip),
+      .mtime  (mtime)
   );
   ifetch ifetch_comp (
-      .reset(reset),
-      .clock(clock),
-      .flush(commit_out.flush),
-      .stall(rename_out.stall),
-      .flush_pc(commit_out.flush_pc),
-      .ifetch_in(ifetch_in),
+      .reset     (reset),
+      .clock     (clock),
+      .flush     (commit_out.flush),
+      .stall     (rename_out.stall),
+      .flush_pc  (commit_out.flush_pc),
+      .ifetch_in (ifetch_in),
       .ifetch_out(ifetch_out)
   );
   idecode idecode_comp (
-      .reset(reset),
-      .clock(clock),
-      .flush(commit_out.flush),
-      .stall(rename_out.stall),
-      .idecode_in(idecode_in),
+      .reset      (reset),
+      .clock      (clock),
+      .flush      (commit_out.flush),
+      .stall      (rename_out.stall),
+      .idecode_in (idecode_in),
       .idecode_out(idecode_out)
   );
   prf prf_comp (
@@ -433,11 +433,11 @@ module cpu (
       .fl_out(fl_out)
   );
   rob rob_comp (
-      .reset(reset),
-      .clock(clock),
-      .flush(commit_out.flush),
-      .rob_in(rob_in),
-      .rob_out(rob_out),
+      .reset      (reset),
+      .clock      (clock),
+      .flush      (commit_out.flush),
+      .rob_in     (rob_in),
+      .rob_out    (rob_out),
       .rob_entries(rob_entries_snap)
   );
   rs_int rs_int_comp (
@@ -448,18 +448,18 @@ module cpu (
       .rs_out(rs_int_out)
   );
   rs_mem rs_mem_comp (
-      .reset(reset),
-      .clock(clock),
-      .flush(commit_out.flush),
-      .rs_in(rs_mem_in),
+      .reset      (reset),
+      .clock      (clock),
+      .flush      (commit_out.flush),
+      .rs_in      (rs_mem_in),
       .rob_entries(rob_entries_snap),
-      .rs_out(rs_mem_out)
+      .rs_out     (rs_mem_out)
   );
   rename rename_comp (
-      .reset(reset),
-      .clock(clock),
-      .flush(commit_out.flush),
-      .rename_in(rename_in),
+      .reset     (reset),
+      .clock     (clock),
+      .flush     (commit_out.flush),
+      .rename_in (rename_in),
       .rename_out(rename_out)
   );
   eu eu_comp (
@@ -477,9 +477,9 @@ module cpu (
       .msu_out(msu_out)
   );
   commit commit_comp (
-      .reset(reset),
-      .clock(clock),
-      .commit_in(commit_in),
+      .reset     (reset),
+      .clock     (clock),
+      .commit_in (commit_in),
       .commit_out(commit_out)
   );
 endmodule
