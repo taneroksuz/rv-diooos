@@ -330,7 +330,9 @@ module buffer_ctrl (
     end
 
     if (buffer_in.stall == 1) begin
-      v.diff = 0;
+      v.diff   = 0;
+      v.ready0 = 0;
+      v.ready1 = 0;
     end
 
     v.count = v.count - v.diff;

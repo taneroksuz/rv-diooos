@@ -50,7 +50,7 @@ module ifetch (
     v.ready0 = ifetch_in.buffer_out.ready0;
     v.ready1 = ifetch_in.buffer_out.ready1;
 
-    if (stall == 1) begin
+    if (stall == 1 && flush == 0) begin
       v.pc0    = r.pc0;
       v.pc1    = r.pc1;
       v.instr0 = r.instr0;
