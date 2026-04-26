@@ -1,4 +1,5 @@
 read_verilog -sv configure.sv
+read_verilog -sv tim.sv
 read_verilog -sv ../../verilog/rtl/constants.sv
 read_verilog -sv ../../verilog/rtl/wires.sv
 read_verilog -sv ../../verilog/rtl/functions.sv
@@ -24,7 +25,6 @@ read_verilog -sv ../../verilog/rtl/bridge.sv
 read_verilog -sv ../../verilog/rtl/bus.sv
 read_verilog -sv ../../verilog/rtl/cdc.sv
 read_verilog -sv ../../verilog/rtl/clint.sv
-read_verilog -sv ../../verilog/rtl/tim.sv
 read_verilog -sv ../../verilog/rtl/rom.sv
 read_verilog -sv ../../verilog/rtl/ram.sv
 read_verilog -sv ../../verilog/rtl/spi.sv
