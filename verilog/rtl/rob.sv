@@ -100,25 +100,27 @@ module rob (
     end
 
     for (int i = 0; i < ROB_DEPTH; i++) begin
-      rob_entries[i] = view[i];
+      rob_entries[i] = flush ? init_rob_entry : view[i];
     end
 
-    h0 = view[r.head];
-    h1 = view[head1_idx];
-    h0_done = h0.valid && h0.done && (r.count >= 1) && (!h0.store || rob_in.store_ready);
-    h1_done = h1.valid && h1.done && (r.count >= 2);
+    h0       = view[r.head];
+    h1       = view[head1_idx];
+    h0_done  = h0.valid && h0.done && (r.count >= 1) && (!h0.store || rob_in.store_ready);
+    h1_done  = h1.valid && h1.done && (r.count >= 2);
     h0_flush = h0.exception || h0.mret || (h0.jump && (h0.npc != h0.pnpc));
 
-    rob_out = init_rob_out;
-    rob_out.head_ptr = r.head;
-    rob_out.tail_ptr = r.tail_ptr;
-    rob_out.alloc_tag0 = r.tail_ptr;
-    rob_out.alloc_tag1 = r.tail_ptr + ROB_ADDR_BITS'(1);
-    rob_out.full = (r.count >= ROB_DEPTH - 1);
-    rob_out.has_two_free = (r.count <= ROB_DEPTH - 2);
-    rob_out.stall = (r.count >= ROB_DEPTH - 1);
-    rob_out.entry0 = h0;
-    rob_out.entry1 = h1;
+    rob_out  = init_rob_out;
+    if (!flush) begin
+      rob_out.head_ptr     = r.head;
+      rob_out.tail_ptr     = r.tail_ptr;
+      rob_out.alloc_tag0   = r.tail_ptr;
+      rob_out.alloc_tag1   = r.tail_ptr + ROB_ADDR_BITS'(1);
+      rob_out.full         = (r.count >= ROB_DEPTH - 1);
+      rob_out.has_two_free = (r.count <= ROB_DEPTH - 2);
+      rob_out.stall        = (r.count >= ROB_DEPTH - 1);
+      rob_out.entry0       = h0;
+      rob_out.entry1       = h1;
+    end
 
     if (h0_done) begin
       commit0 = 1'b1;
@@ -129,8 +131,8 @@ module rob (
         commit1 = 1'b1;
       end
     end
-    rob_out.commit0 = commit0;
-    rob_out.commit1 = commit1;
+    rob_out.commit0 = flush ? 1'b0 : commit0;
+    rob_out.commit1 = flush ? 1'b0 : commit1;
 
     if (flush) begin
       v = init_rob_reg;
@@ -175,56 +177,58 @@ module rob (
 
   always_ff @(posedge clock) begin
     if (reset != 0) begin
-      if (alloc0_ok) begin
-        array[r.tail_ptr] <= alloc_entry0_w;
-      end
-      if (alloc1_ok) begin
-        array[tail1_idx] <= alloc_entry1_w;
-      end
+      if (!flush) begin
+        if (alloc0_ok) begin
+          array[r.tail_ptr] <= alloc_entry0_w;
+        end
+        if (alloc1_ok) begin
+          array[tail1_idx] <= alloc_entry1_w;
+        end
 
-      if (rob_in.write_en0 && rin.valid_bits[rob_in.write_tag0]) begin
-        array[rob_in.write_tag0].done       <= 1'b1;
-        array[rob_in.write_tag0].result     <= rob_in.write_entry0.result;
-        array[rob_in.write_tag0].exception  <= rob_in.write_entry0.exception;
-        array[rob_in.write_tag0].ecause     <= rob_in.write_entry0.ecause;
-        array[rob_in.write_tag0].etval      <= rob_in.write_entry0.etval;
-        array[rob_in.write_tag0].npc        <= rob_in.write_entry0.npc;
-        array[rob_in.write_tag0].branch     <= rob_in.write_entry0.branch;
-        array[rob_in.write_tag0].jump       <= rob_in.write_entry0.jump;
-        array[rob_in.write_tag0].store_addr <= rob_in.write_entry0.store_addr;
-        array[rob_in.write_tag0].store_data <= rob_in.write_entry0.store_data;
-        array[rob_in.write_tag0].store_strb <= rob_in.write_entry0.store_strb;
-        array[rob_in.write_tag0].cwdata     <= rob_in.write_entry0.cwdata;
-      end
-      if (rob_in.write_en1 && rin.valid_bits[rob_in.write_tag1]) begin
-        array[rob_in.write_tag1].done       <= 1'b1;
-        array[rob_in.write_tag1].result     <= rob_in.write_entry1.result;
-        array[rob_in.write_tag1].exception  <= rob_in.write_entry1.exception;
-        array[rob_in.write_tag1].ecause     <= rob_in.write_entry1.ecause;
-        array[rob_in.write_tag1].etval      <= rob_in.write_entry1.etval;
-        array[rob_in.write_tag1].npc        <= rob_in.write_entry1.npc;
-        array[rob_in.write_tag1].branch     <= rob_in.write_entry1.branch;
-        array[rob_in.write_tag1].jump       <= rob_in.write_entry1.jump;
-        array[rob_in.write_tag1].store_addr <= rob_in.write_entry1.store_addr;
-        array[rob_in.write_tag1].store_data <= rob_in.write_entry1.store_data;
-        array[rob_in.write_tag1].store_strb <= rob_in.write_entry1.store_strb;
-        array[rob_in.write_tag1].cwdata     <= rob_in.write_entry1.cwdata;
-      end
-      if (rob_in.write_en2 && rin.valid_bits[rob_in.write_tag2]) begin
-        array[rob_in.write_tag2].done      <= 1'b1;
-        array[rob_in.write_tag2].result    <= rob_in.write_entry2.result;
-        array[rob_in.write_tag2].exception <= rob_in.write_entry2.exception;
-        array[rob_in.write_tag2].ecause    <= rob_in.write_entry2.ecause;
-        array[rob_in.write_tag2].etval     <= rob_in.write_entry2.etval;
-      end
-      if (rob_in.write_en3 && rin.valid_bits[rob_in.write_tag3]) begin
-        array[rob_in.write_tag3].done       <= 1'b1;
-        array[rob_in.write_tag3].store_addr <= rob_in.write_entry3.store_addr;
-        array[rob_in.write_tag3].store_data <= rob_in.write_entry3.store_data;
-        array[rob_in.write_tag3].store_strb <= rob_in.write_entry3.store_strb;
-        array[rob_in.write_tag3].exception  <= rob_in.write_entry3.exception;
-        array[rob_in.write_tag3].ecause     <= rob_in.write_entry3.ecause;
-        array[rob_in.write_tag3].etval      <= rob_in.write_entry3.etval;
+        if (rob_in.write_en0 && rin.valid_bits[rob_in.write_tag0]) begin
+          array[rob_in.write_tag0].done       <= 1'b1;
+          array[rob_in.write_tag0].result     <= rob_in.write_entry0.result;
+          array[rob_in.write_tag0].exception  <= rob_in.write_entry0.exception;
+          array[rob_in.write_tag0].ecause     <= rob_in.write_entry0.ecause;
+          array[rob_in.write_tag0].etval      <= rob_in.write_entry0.etval;
+          array[rob_in.write_tag0].npc        <= rob_in.write_entry0.npc;
+          array[rob_in.write_tag0].branch     <= rob_in.write_entry0.branch;
+          array[rob_in.write_tag0].jump       <= rob_in.write_entry0.jump;
+          array[rob_in.write_tag0].store_addr <= rob_in.write_entry0.store_addr;
+          array[rob_in.write_tag0].store_data <= rob_in.write_entry0.store_data;
+          array[rob_in.write_tag0].store_strb <= rob_in.write_entry0.store_strb;
+          array[rob_in.write_tag0].cwdata     <= rob_in.write_entry0.cwdata;
+        end
+        if (rob_in.write_en1 && rin.valid_bits[rob_in.write_tag1]) begin
+          array[rob_in.write_tag1].done       <= 1'b1;
+          array[rob_in.write_tag1].result     <= rob_in.write_entry1.result;
+          array[rob_in.write_tag1].exception  <= rob_in.write_entry1.exception;
+          array[rob_in.write_tag1].ecause     <= rob_in.write_entry1.ecause;
+          array[rob_in.write_tag1].etval      <= rob_in.write_entry1.etval;
+          array[rob_in.write_tag1].npc        <= rob_in.write_entry1.npc;
+          array[rob_in.write_tag1].branch     <= rob_in.write_entry1.branch;
+          array[rob_in.write_tag1].jump       <= rob_in.write_entry1.jump;
+          array[rob_in.write_tag1].store_addr <= rob_in.write_entry1.store_addr;
+          array[rob_in.write_tag1].store_data <= rob_in.write_entry1.store_data;
+          array[rob_in.write_tag1].store_strb <= rob_in.write_entry1.store_strb;
+          array[rob_in.write_tag1].cwdata     <= rob_in.write_entry1.cwdata;
+        end
+        if (rob_in.write_en2 && rin.valid_bits[rob_in.write_tag2]) begin
+          array[rob_in.write_tag2].done      <= 1'b1;
+          array[rob_in.write_tag2].result    <= rob_in.write_entry2.result;
+          array[rob_in.write_tag2].exception <= rob_in.write_entry2.exception;
+          array[rob_in.write_tag2].ecause    <= rob_in.write_entry2.ecause;
+          array[rob_in.write_tag2].etval     <= rob_in.write_entry2.etval;
+        end
+        if (rob_in.write_en3 && rin.valid_bits[rob_in.write_tag3]) begin
+          array[rob_in.write_tag3].done       <= 1'b1;
+          array[rob_in.write_tag3].store_addr <= rob_in.write_entry3.store_addr;
+          array[rob_in.write_tag3].store_data <= rob_in.write_entry3.store_data;
+          array[rob_in.write_tag3].store_strb <= rob_in.write_entry3.store_strb;
+          array[rob_in.write_tag3].exception  <= rob_in.write_entry3.exception;
+          array[rob_in.write_tag3].ecause     <= rob_in.write_entry3.ecause;
+          array[rob_in.write_tag3].etval      <= rob_in.write_entry3.etval;
+        end
       end
     end
   end

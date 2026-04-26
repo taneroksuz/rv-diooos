@@ -85,7 +85,12 @@ module rs_int (
       end
     end
     for (int i = RS_INT_DEPTH - 1; i >= 0; i--) begin
-      if (ready_vec[i] && (RS_ADDR_BITS'(unsigned'(i)) != v.sel0_idx)) begin
+      if (ready_vec[i] &&
+          (RS_ADDR_BITS'(unsigned'(i)) != v.sel0_idx) &&
+          !(v.sel0_found && (
+            (woken[v.sel0_idx].op.division && woken[i].op.division) ||
+            (woken[v.sel0_idx].op.bitc && woken[i].op.bitc)
+          ))) begin
         v.sel1_idx   = RS_ADDR_BITS'(unsigned'(i));
         v.sel1_found = 1'b1;
       end
