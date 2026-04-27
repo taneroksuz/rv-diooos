@@ -21,9 +21,12 @@ module eu (
     logic [ROB_ADDR_BITS-1:0] rob_wtag1;
     rob_entry_type            rob_wentry1;
     logic [0:0]               rob_wen1;
-    logic [ROB_ADDR_BITS-1:0] rob_wtag_store;
-    rob_entry_type            rob_wentry_store;
-    logic [0:0]               rob_wen_store;
+    logic [ROB_ADDR_BITS-1:0] rob_wtag_store0;
+    rob_entry_type            rob_wentry_store0;
+    logic [0:0]               rob_wen_store0;
+    logic [ROB_ADDR_BITS-1:0] rob_wtag_store1;
+    rob_entry_type            rob_wentry_store1;
+    logic [0:0]               rob_wen_store1;
     rs_entry_type             div_pending;
     logic [0:0]               div_pending_valid;
     rs_entry_type             clmul_pending;
@@ -39,9 +42,12 @@ module eu (
       rob_wtag1          : '0,
       rob_wentry1        : init_rob_entry,
       rob_wen1           : 0,
-      rob_wtag_store     : '0,
-      rob_wentry_store   : init_rob_entry,
-      rob_wen_store      : 0,
+      rob_wtag_store0    : '0,
+      rob_wentry_store0  : init_rob_entry,
+      rob_wen_store0     : 0,
+      rob_wtag_store1    : '0,
+      rob_wentry_store1  : init_rob_entry,
+      rob_wen_store1     : 0,
       div_pending        : init_rs_entry,
       div_pending_valid  : 0,
       clmul_pending      : init_rs_entry,
@@ -54,7 +60,7 @@ module eu (
   logic branch0_taken, branch1_taken;
   logic [31:0] eu0_result, eu1_result;
   logic eu0_done, eu1_done;
-  logic [31:0] mstore_data;
+  logic [31:0] mstore_data0, mstore_data1;
 
   logic div_issue0, div_issue1;
   logic clmul_issue0, clmul_issue1;
@@ -71,9 +77,12 @@ module eu (
     v.rob_wtag1 = eu_in.int_issue1.rob_tag;
     v.rob_wentry1 = init_rob_entry;
     v.rob_wen1 = 1'b0;
-    v.rob_wtag_store = eu_in.mem_store_issue.rob_tag;
-    v.rob_wentry_store = init_rob_entry;
-    v.rob_wen_store = 1'b0;
+    v.rob_wtag_store0 = eu_in.mem_issue0.rob_tag;
+    v.rob_wentry_store0 = init_rob_entry;
+    v.rob_wen_store0 = 1'b0;
+    v.rob_wtag_store1 = eu_in.mem_issue1.rob_tag;
+    v.rob_wentry_store1 = init_rob_entry;
+    v.rob_wen_store1 = 1'b0;
 
     div_issue0 = eu_in.int_issue0_valid & eu_in.int_issue0.op.division & ~r.div_pending_valid;
     div_issue1   = eu_in.int_issue1_valid & eu_in.int_issue1.op.division & ~r.div_pending_valid & ~div_issue0;
@@ -127,27 +136,27 @@ module eu (
     eu_out.agu1_in.store = 1'b0;
     eu_out.agu1_in.lsu_op = init_lsu_op;
 
-    eu_out.agu2_in.rdata1 = eu_in.mem_load_issue.rdata1;
-    eu_out.agu2_in.imm = eu_in.mem_load_issue.imm;
-    eu_out.agu2_in.pc = eu_in.mem_load_issue.pc;
+    eu_out.agu2_in.rdata1 = eu_in.mem_issue0.rdata1;
+    eu_out.agu2_in.imm = eu_in.mem_issue0.imm;
+    eu_out.agu2_in.pc = eu_in.mem_issue0.pc;
     eu_out.agu2_in.auipc = 1'b0;
     eu_out.agu2_in.jal = 1'b0;
     eu_out.agu2_in.jalr = 1'b0;
     eu_out.agu2_in.branch = 1'b0;
-    eu_out.agu2_in.load = eu_in.mem_load_issue.op.load;
-    eu_out.agu2_in.store = 1'b0;
-    eu_out.agu2_in.lsu_op = eu_in.mem_load_issue.lsu_op;
+    eu_out.agu2_in.load = eu_in.mem_issue0.op.load;
+    eu_out.agu2_in.store = eu_in.mem_issue0.op.store;
+    eu_out.agu2_in.lsu_op = eu_in.mem_issue0.lsu_op;
 
-    eu_out.agu3_in.rdata1 = eu_in.mem_store_issue.rdata1;
-    eu_out.agu3_in.imm = eu_in.mem_store_issue.imm;
-    eu_out.agu3_in.pc = eu_in.mem_store_issue.pc;
+    eu_out.agu3_in.rdata1 = eu_in.mem_issue1.rdata1;
+    eu_out.agu3_in.imm = eu_in.mem_issue1.imm;
+    eu_out.agu3_in.pc = eu_in.mem_issue1.pc;
     eu_out.agu3_in.auipc = 1'b0;
     eu_out.agu3_in.jal = 1'b0;
     eu_out.agu3_in.jalr = 1'b0;
     eu_out.agu3_in.branch = 1'b0;
-    eu_out.agu3_in.load = 1'b0;
-    eu_out.agu3_in.store = eu_in.mem_store_issue.op.store;
-    eu_out.agu3_in.lsu_op = eu_in.mem_store_issue.lsu_op;
+    eu_out.agu3_in.load = eu_in.mem_issue1.op.load;
+    eu_out.agu3_in.store = eu_in.mem_issue1.op.store;
+    eu_out.agu3_in.lsu_op = eu_in.mem_issue1.lsu_op;
 
     eu_out.alu0_in.rdata1 = eu_in.int_issue0.rdata1;
     eu_out.alu0_in.rdata2 = eu_in.int_issue0.rdata2;
@@ -242,11 +251,17 @@ module eu (
     eu1_done =
         eu_done(eu_in.int_issue1, eu_in.int_issue1_valid, eu_in.div_out, eu_in.bit_clmul_out);
 
-    mstore_data = store_data(
-      eu_in.mem_store_issue.rdata2,
-      eu_in.mem_store_issue.lsu_op.lsu_sb,
-      eu_in.mem_store_issue.lsu_op.lsu_sh,
-      eu_in.mem_store_issue.lsu_op.lsu_sw
+    mstore_data0 = store_data(
+      eu_in.mem_issue0.rdata2,
+      eu_in.mem_issue0.lsu_op.lsu_sb,
+      eu_in.mem_issue0.lsu_op.lsu_sh,
+      eu_in.mem_issue0.lsu_op.lsu_sw
+    );
+    mstore_data1 = store_data(
+      eu_in.mem_issue1.rdata2,
+      eu_in.mem_issue1.lsu_op.lsu_sb,
+      eu_in.mem_issue1.lsu_op.lsu_sh,
+      eu_in.mem_issue1.lsu_op.lsu_sw
     );
 
     if (!flush) begin
@@ -329,35 +344,49 @@ module eu (
         v.rob_wentry1.cwdata = eu_in.csr_alu1_out.cdata;
       end
 
-      if (eu_in.mem_store_issue_valid) begin
-        v.rob_wtag_store              = eu_in.mem_store_issue.rob_tag;
-        v.rob_wen_store               = 1'b1;
-        v.rob_wentry_store.done       = eu_in.mem_store_issue.op.store;
-        v.rob_wentry_store.store_addr = eu_in.agu3_out.address;
-        v.rob_wentry_store.store_data = mstore_data;
-        v.rob_wentry_store.store_strb = eu_in.agu3_out.byteenable;
-        v.rob_wentry_store.exception  = eu_in.agu3_out.exception;
-        v.rob_wentry_store.ecause     = eu_in.agu3_out.ecause;
-        v.rob_wentry_store.etval      = eu_in.agu3_out.etval;
+      if (eu_in.mem_issue0_valid && eu_in.mem_issue0.op.store) begin
+        v.rob_wtag_store0              = eu_in.mem_issue0.rob_tag;
+        v.rob_wen_store0               = 1'b1;
+        v.rob_wentry_store0.done       = 1'b1;
+        v.rob_wentry_store0.store_addr = eu_in.agu2_out.address;
+        v.rob_wentry_store0.store_data = mstore_data0;
+        v.rob_wentry_store0.store_strb = eu_in.agu2_out.byteenable;
+        v.rob_wentry_store0.exception  = eu_in.agu2_out.exception;
+        v.rob_wentry_store0.ecause     = eu_in.agu2_out.ecause;
+        v.rob_wentry_store0.etval      = eu_in.agu2_out.etval;
+      end
+      if (eu_in.mem_issue1_valid && eu_in.mem_issue1.op.store) begin
+        v.rob_wtag_store1              = eu_in.mem_issue1.rob_tag;
+        v.rob_wen_store1               = 1'b1;
+        v.rob_wentry_store1.done       = 1'b1;
+        v.rob_wentry_store1.store_addr = eu_in.agu3_out.address;
+        v.rob_wentry_store1.store_data = mstore_data1;
+        v.rob_wentry_store1.store_strb = eu_in.agu3_out.byteenable;
+        v.rob_wentry_store1.exception  = eu_in.agu3_out.exception;
+        v.rob_wentry_store1.ecause     = eu_in.agu3_out.ecause;
+        v.rob_wentry_store1.etval      = eu_in.agu3_out.etval;
       end
 
     end
 
-    rin                     = v;
+    rin                      = v;
 
-    eu_out.cdb0             = r.cdb0;
-    eu_out.cdb1             = r.cdb1;
-    eu_out.rob_wtag0        = r.rob_wtag0;
-    eu_out.rob_wentry0      = r.rob_wentry0;
-    eu_out.rob_wen0         = r.rob_wen0;
-    eu_out.rob_wtag1        = r.rob_wtag1;
-    eu_out.rob_wentry1      = r.rob_wentry1;
-    eu_out.rob_wen1         = r.rob_wen1;
-    eu_out.rob_wtag_store   = r.rob_wtag_store;
-    eu_out.rob_wentry_store = r.rob_wentry_store;
-    eu_out.rob_wen_store    = r.rob_wen_store;
-    eu_out.div_busy         = r.div_pending_valid;
-    eu_out.clmul_busy       = r.clmul_pending_valid;
+    eu_out.cdb0              = r.cdb0;
+    eu_out.cdb1              = r.cdb1;
+    eu_out.rob_wtag0         = r.rob_wtag0;
+    eu_out.rob_wentry0       = r.rob_wentry0;
+    eu_out.rob_wen0          = r.rob_wen0;
+    eu_out.rob_wtag1         = r.rob_wtag1;
+    eu_out.rob_wentry1       = r.rob_wentry1;
+    eu_out.rob_wen1          = r.rob_wen1;
+    eu_out.rob_wtag_store0   = r.rob_wtag_store0;
+    eu_out.rob_wentry_store0 = r.rob_wentry_store0;
+    eu_out.rob_wen_store0    = r.rob_wen_store0;
+    eu_out.rob_wtag_store1   = r.rob_wtag_store1;
+    eu_out.rob_wentry_store1 = r.rob_wentry_store1;
+    eu_out.rob_wen_store1    = r.rob_wen_store1;
+    eu_out.div_busy          = r.div_pending_valid;
+    eu_out.clmul_busy        = r.clmul_pending_valid;
 
   end
 

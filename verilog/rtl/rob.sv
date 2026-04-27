@@ -90,13 +90,29 @@ module rob (
       view[rob_in.write_tag2].etval     = rob_in.write_entry2.etval;
     end
     if (rob_in.write_en3 && r.valid_bits[rob_in.write_tag3]) begin
-      view[rob_in.write_tag3].done       = 1'b1;
-      view[rob_in.write_tag3].store_addr = rob_in.write_entry3.store_addr;
-      view[rob_in.write_tag3].store_data = rob_in.write_entry3.store_data;
-      view[rob_in.write_tag3].store_strb = rob_in.write_entry3.store_strb;
-      view[rob_in.write_tag3].exception  = rob_in.write_entry3.exception;
-      view[rob_in.write_tag3].ecause     = rob_in.write_entry3.ecause;
-      view[rob_in.write_tag3].etval      = rob_in.write_entry3.etval;
+      view[rob_in.write_tag3].done      = 1'b1;
+      view[rob_in.write_tag3].result    = rob_in.write_entry3.result;
+      view[rob_in.write_tag3].exception = rob_in.write_entry3.exception;
+      view[rob_in.write_tag3].ecause    = rob_in.write_entry3.ecause;
+      view[rob_in.write_tag3].etval     = rob_in.write_entry3.etval;
+    end
+    if (rob_in.write_en4 && r.valid_bits[rob_in.write_tag4]) begin
+      view[rob_in.write_tag4].done       = 1'b1;
+      view[rob_in.write_tag4].store_addr = rob_in.write_entry4.store_addr;
+      view[rob_in.write_tag4].store_data = rob_in.write_entry4.store_data;
+      view[rob_in.write_tag4].store_strb = rob_in.write_entry4.store_strb;
+      view[rob_in.write_tag4].exception  = rob_in.write_entry4.exception;
+      view[rob_in.write_tag4].ecause     = rob_in.write_entry4.ecause;
+      view[rob_in.write_tag4].etval      = rob_in.write_entry4.etval;
+    end
+    if (rob_in.write_en5 && r.valid_bits[rob_in.write_tag5]) begin
+      view[rob_in.write_tag5].done       = 1'b1;
+      view[rob_in.write_tag5].store_addr = rob_in.write_entry5.store_addr;
+      view[rob_in.write_tag5].store_data = rob_in.write_entry5.store_data;
+      view[rob_in.write_tag5].store_strb = rob_in.write_entry5.store_strb;
+      view[rob_in.write_tag5].exception  = rob_in.write_entry5.exception;
+      view[rob_in.write_tag5].ecause     = rob_in.write_entry5.ecause;
+      view[rob_in.write_tag5].etval      = rob_in.write_entry5.etval;
     end
 
     for (int i = 0; i < ROB_DEPTH; i++) begin
@@ -221,13 +237,29 @@ module rob (
           array[rob_in.write_tag2].etval     <= rob_in.write_entry2.etval;
         end
         if (rob_in.write_en3 && rin.valid_bits[rob_in.write_tag3]) begin
-          array[rob_in.write_tag3].done       <= 1'b1;
-          array[rob_in.write_tag3].store_addr <= rob_in.write_entry3.store_addr;
-          array[rob_in.write_tag3].store_data <= rob_in.write_entry3.store_data;
-          array[rob_in.write_tag3].store_strb <= rob_in.write_entry3.store_strb;
-          array[rob_in.write_tag3].exception  <= rob_in.write_entry3.exception;
-          array[rob_in.write_tag3].ecause     <= rob_in.write_entry3.ecause;
-          array[rob_in.write_tag3].etval      <= rob_in.write_entry3.etval;
+          array[rob_in.write_tag3].done      <= 1'b1;
+          array[rob_in.write_tag3].result    <= rob_in.write_entry3.result;
+          array[rob_in.write_tag3].exception <= rob_in.write_entry3.exception;
+          array[rob_in.write_tag3].ecause    <= rob_in.write_entry3.ecause;
+          array[rob_in.write_tag3].etval     <= rob_in.write_entry3.etval;
+        end
+        if (rob_in.write_en4 && rin.valid_bits[rob_in.write_tag4]) begin
+          array[rob_in.write_tag4].done       <= 1'b1;
+          array[rob_in.write_tag4].store_addr <= rob_in.write_entry4.store_addr;
+          array[rob_in.write_tag4].store_data <= rob_in.write_entry4.store_data;
+          array[rob_in.write_tag4].store_strb <= rob_in.write_entry4.store_strb;
+          array[rob_in.write_tag4].exception  <= rob_in.write_entry4.exception;
+          array[rob_in.write_tag4].ecause     <= rob_in.write_entry4.ecause;
+          array[rob_in.write_tag4].etval      <= rob_in.write_entry4.etval;
+        end
+        if (rob_in.write_en5 && rin.valid_bits[rob_in.write_tag5]) begin
+          array[rob_in.write_tag5].done       <= 1'b1;
+          array[rob_in.write_tag5].store_addr <= rob_in.write_entry5.store_addr;
+          array[rob_in.write_tag5].store_data <= rob_in.write_entry5.store_data;
+          array[rob_in.write_tag5].store_strb <= rob_in.write_entry5.store_strb;
+          array[rob_in.write_tag5].exception  <= rob_in.write_entry5.exception;
+          array[rob_in.write_tag5].ecause     <= rob_in.write_entry5.ecause;
+          array[rob_in.write_tag5].etval      <= rob_in.write_entry5.etval;
         end
       end
     end

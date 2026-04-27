@@ -31,10 +31,12 @@ module rename (
   } rename_reg_type;
 
   rename_reg_type v;
+  cdb_type cdb_load_any;
 
   always_comb begin
     v = '0;
     v.rename_out = '0;
+    cdb_load_any = rename_in.cdb_load0.valid ? rename_in.cdb_load0 : rename_in.cdb_load1;
 
     v.i0_is_mem = rename_in.instr0.op.load | rename_in.instr0.op.store;
     v.i1_is_mem = rename_in.instr1.op.load | rename_in.instr1.op.store;
@@ -87,14 +89,14 @@ module rename (
       rename_in.rat.psrc0_valid && rename_in.prf.rvalid0,
       rename_in.cdb0,
       rename_in.cdb1,
-      rename_in.cdb_load
+      cdb_load_any
     );
     v.e0.src2_ready = !rename_in.instr0.op.rden2 || src_ready(
       rename_in.rat.psrc1,
       rename_in.rat.psrc1_valid && rename_in.prf.rvalid1,
       rename_in.cdb0,
       rename_in.cdb1,
-      rename_in.cdb_load
+      cdb_load_any
     );
     v.e0.rdata1 = rename_in.instr0.op.rden1 ? prf_or_cdb(
       rename_in.rat.psrc0,
@@ -102,7 +104,7 @@ module rename (
       rename_in.prf.rdata0,
       rename_in.cdb0,
       rename_in.cdb1,
-      rename_in.cdb_load
+      cdb_load_any
     ) : 32'h0;
     v.e0.rdata2 = rename_in.instr0.op.rden2 ? prf_or_cdb(
       rename_in.rat.psrc1,
@@ -110,7 +112,7 @@ module rename (
       rename_in.prf.rdata1,
       rename_in.cdb0,
       rename_in.cdb1,
-      rename_in.cdb_load
+      cdb_load_any
     ) : 32'h0;
     v.e0.pdest = v.pdest0;
     v.e0.rob_tag = rename_in.rob_tag0;
@@ -136,14 +138,14 @@ module rename (
       rename_in.rat.psrc2_valid && rename_in.prf.rvalid2,
       rename_in.cdb0,
       rename_in.cdb1,
-      rename_in.cdb_load
+      cdb_load_any
     );
     v.e1.src2_ready = !rename_in.instr1.op.rden2 || src_ready(
       rename_in.rat.psrc3,
       rename_in.rat.psrc3_valid && rename_in.prf.rvalid3,
       rename_in.cdb0,
       rename_in.cdb1,
-      rename_in.cdb_load
+      cdb_load_any
     );
     v.e1.rdata1 = rename_in.instr1.op.rden1 ? prf_or_cdb(
       rename_in.rat.psrc2,
@@ -151,7 +153,7 @@ module rename (
       rename_in.prf.rdata2,
       rename_in.cdb0,
       rename_in.cdb1,
-      rename_in.cdb_load
+      cdb_load_any
     ) : 32'h0;
     v.e1.rdata2 = rename_in.instr1.op.rden2 ? prf_or_cdb(
       rename_in.rat.psrc3,
@@ -159,7 +161,7 @@ module rename (
       rename_in.prf.rdata3,
       rename_in.cdb0,
       rename_in.cdb1,
-      rename_in.cdb_load
+      cdb_load_any
     ) : 32'h0;
     v.e1.pdest = v.pdest1;
     v.e1.rob_tag = rename_in.rob_tag1;

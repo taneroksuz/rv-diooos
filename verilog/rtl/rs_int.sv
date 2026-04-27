@@ -68,7 +68,8 @@ module rs_int (
       view[i].valid = r.valid_bits[i];
       woken[i] = rs_wakeup(view[i], rs_in.cdb0);
       woken[i] = rs_wakeup(woken[i], rs_in.cdb1);
-      woken[i] = rs_wakeup(woken[i], rs_in.cdb_load);
+      woken[i] = rs_wakeup(woken[i], rs_in.cdb_load0);
+      woken[i] = rs_wakeup(woken[i], rs_in.cdb_load1);
       woken[i] = rs_wakeup(woken[i], rs_in.cdb_commit0);
       woken[i] = rs_wakeup(woken[i], rs_in.cdb_commit1);
       ready_vec[i] = woken[i].valid & woken[i].src1_ready & woken[i].src2_ready &

@@ -19,8 +19,10 @@ module commit (
     fl_in_type             fl_i;
     logic [0:0]            flush;
     logic [31:0]           flush_pc;
-    logic [0:0]            commit_store;
-    rob_entry_type         commit_entry;
+    logic [0:0]            commit_store0;
+    rob_entry_type         commit_entry0;
+    logic [0:0]            commit_store1;
+    rob_entry_type         commit_entry1;
   } commit_reg_type;
   localparam commit_reg_type init_commit_reg = '{
       register0_win : '{wren : 0, waddr : 0, wdata : 0},
@@ -32,8 +34,10 @@ module commit (
       fl_i          : init_fl_in,
       flush         : 0,
       flush_pc      : 0,
-      commit_store  : 0,
-      commit_entry  : init_rob_entry
+      commit_store0 : 0,
+      commit_entry0 : init_rob_entry,
+      commit_store1 : 0,
+      commit_entry1 : init_rob_entry
   };
   commit_reg_type r, rin;
   commit_reg_type v;
@@ -83,17 +87,20 @@ module commit (
       end
     end
 
-    v.flush        = flush0 | flush1;
-    v.flush_pc     = flush0 ? flush_pc0 : flush_pc1;
+    v.flush         = flush0 | flush1;
+    v.flush_pc      = flush0 ? flush_pc0 : flush_pc1;
 
-    v.commit_store = 1'b0;
-    v.commit_entry = init_rob_entry;
+    v.commit_store0 = 1'b0;
+    v.commit_entry0 = init_rob_entry;
+    v.commit_store1 = 1'b0;
+    v.commit_entry1 = init_rob_entry;
     if (do0 && e0.store && !e0.exception && !flush0) begin
-      v.commit_store = 1'b1;
-      v.commit_entry = e0;
-    end else if (do1 && e1.store && !e1.exception && !flush1) begin
-      v.commit_store = 1'b1;
-      v.commit_entry = e1;
+      v.commit_store0 = 1'b1;
+      v.commit_entry0 = e0;
+    end
+    if (do1 && e1.store && !e1.exception && !flush1) begin
+      v.commit_store1 = 1'b1;
+      v.commit_entry1 = e1;
     end
 
     if (do0) begin
@@ -176,8 +183,10 @@ module commit (
     commit_out.fl_i          = r.fl_i;
     commit_out.flush         = r.flush;
     commit_out.flush_pc      = r.flush_pc;
-    commit_out.commit_store  = r.commit_store;
-    commit_out.commit_entry  = r.commit_entry;
+    commit_out.commit_store0 = r.commit_store0;
+    commit_out.commit_entry0 = r.commit_entry0;
+    commit_out.commit_store1 = r.commit_store1;
+    commit_out.commit_entry1 = r.commit_entry1;
   end
   always_ff @(posedge clock) begin
     if (reset == 0) begin
