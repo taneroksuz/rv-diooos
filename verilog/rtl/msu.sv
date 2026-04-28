@@ -151,40 +151,46 @@ module msu (
       v.store1_pending = 1'b0;
       v.store1_sent    = 1'b0;
     end
+    if (load0_ready) begin
+      v.load0_pending = (load0_accept && !msu_in.agu2_out.exception) ? 1'b1 : 1'b0;
+      v.load0_sent    = 1'b0;
+    end
+    if (load1_ready) begin
+      v.load1_pending = (load1_accept && !msu_in.agu3_out.exception) ? 1'b1 : 1'b0;
+      v.load1_sent    = 1'b0;
+    end
     v.dmem0_in = init_mem_in;
     v.dmem1_in = init_mem_in;
-    if (r.store0_pending && !r.store0_sent && !msu_in.dmem0_out.mem_ready) begin
+    if (v.store0_pending && !v.store0_sent) begin
       v.dmem0_in.mem_valid = 1'b1;
       v.dmem0_in.mem_instr = 1'b0;
       v.dmem0_in.mem_mode  = 2'h0;
-      v.dmem0_in.mem_addr  = r.store0_entry.store_addr;
-      v.dmem0_in.mem_wdata = r.store0_entry.store_data;
-      v.dmem0_in.mem_wstrb = r.store0_entry.store_strb;
+      v.dmem0_in.mem_addr  = v.store0_entry.store_addr;
+      v.dmem0_in.mem_wdata = v.store0_entry.store_data;
+      v.dmem0_in.mem_wstrb = v.store0_entry.store_strb;
       v.store0_sent        = 1'b1;
-    end else if ((r.load0_pending || (load0_accept && !msu_in.agu2_out.exception)) &&
-                 !r.load0_sent && !load0_ready) begin
+    end else if (v.load0_pending && !v.load0_sent) begin
       v.dmem0_in.mem_valid = 1'b1;
       v.dmem0_in.mem_instr = 1'b0;
       v.dmem0_in.mem_mode  = 2'h0;
-      v.dmem0_in.mem_addr  = load0_accept ? msu_in.agu2_out.address : r.load0_addr;
+      v.dmem0_in.mem_addr  = v.load0_addr;
       v.dmem0_in.mem_wdata = 32'h0;
       v.dmem0_in.mem_wstrb = 4'h0;
       v.load0_sent         = 1'b1;
     end
-    if (r.store1_pending && !r.store1_sent && !msu_in.dmem1_out.mem_ready) begin
+    if (v.store1_pending && !v.store1_sent) begin
       v.dmem1_in.mem_valid = 1'b1;
       v.dmem1_in.mem_instr = 1'b0;
       v.dmem1_in.mem_mode  = 2'h0;
-      v.dmem1_in.mem_addr  = r.store1_entry.store_addr;
-      v.dmem1_in.mem_wdata = r.store1_entry.store_data;
-      v.dmem1_in.mem_wstrb = r.store1_entry.store_strb;
+      v.dmem1_in.mem_addr  = v.store1_entry.store_addr;
+      v.dmem1_in.mem_wdata = v.store1_entry.store_data;
+      v.dmem1_in.mem_wstrb = v.store1_entry.store_strb;
       v.store1_sent        = 1'b1;
-    end else if ((r.load1_pending || (load1_accept && !msu_in.agu3_out.exception)) &&
-                 !r.load1_sent && !load1_ready) begin
+    end else if (v.load1_pending && !v.load1_sent) begin
       v.dmem1_in.mem_valid = 1'b1;
       v.dmem1_in.mem_instr = 1'b0;
       v.dmem1_in.mem_mode  = 2'h0;
-      v.dmem1_in.mem_addr  = load1_accept ? msu_in.agu3_out.address : r.load1_addr;
+      v.dmem1_in.mem_addr  = v.load1_addr;
       v.dmem1_in.mem_wdata = 32'h0;
       v.dmem1_in.mem_wstrb = 4'h0;
       v.load1_sent         = 1'b1;
@@ -213,7 +219,7 @@ module msu (
       v.rob_wen0           = 1'b1;
       v.rob_wentry0.done   = 1'b1;
       v.rob_wentry0.result = msu_in.lsu0_out.result;
-      v.load0_pending      = 1'b0;
+      v.load0_pending      = (load0_accept && !msu_in.agu2_out.exception) ? 1'b1 : 1'b0;
       v.load0_sent         = 1'b0;
     end
     if (load1_accept && msu_in.agu3_out.exception) begin
@@ -230,7 +236,7 @@ module msu (
       v.rob_wen1           = 1'b1;
       v.rob_wentry1.done   = 1'b1;
       v.rob_wentry1.result = msu_in.lsu1_out.result;
-      v.load1_pending      = 1'b0;
+      v.load1_pending      = (load1_accept && !msu_in.agu3_out.exception) ? 1'b1 : 1'b0;
       v.load1_sent         = 1'b0;
     end
 
@@ -250,6 +256,14 @@ module msu (
     msu_out.lsu1_in = rin.lsu1_in;
     msu_out.dmem0_in = rin.dmem0_in;
     msu_out.lsu0_in = rin.lsu0_in;
+    if (load0_ready) begin
+      msu_out.lsu0_in.byteenable = r.lsu0_in.byteenable;
+      msu_out.lsu0_in.lsu_op     = r.lsu0_in.lsu_op;
+    end
+    if (load1_ready) begin
+      msu_out.lsu1_in.byteenable = r.lsu1_in.byteenable;
+      msu_out.lsu1_in.lsu_op     = r.lsu1_in.lsu_op;
+    end
   end
 
   always_ff @(posedge clock) begin
