@@ -20,12 +20,12 @@ set_global_assignment -name SYSTEMVERILOG_FILE ../../verilog/rtl/csr_alu.sv
 set_global_assignment -name SYSTEMVERILOG_FILE ../../verilog/rtl/mul.sv
 set_global_assignment -name SYSTEMVERILOG_FILE ../../verilog/rtl/div.sv
 set_global_assignment -name SYSTEMVERILOG_FILE ../../verilog/rtl/compress.sv
-set_global_assignment -name SYSTEMVERILOG_FILE ../../verilog/rtl/decoder.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../../verilog/rtl/base.sv
 set_global_assignment -name SYSTEMVERILOG_FILE ../../verilog/rtl/register.sv
 set_global_assignment -name SYSTEMVERILOG_FILE ../../verilog/rtl/csr.sv
 set_global_assignment -name SYSTEMVERILOG_FILE ../../verilog/rtl/buffer.sv
-set_global_assignment -name SYSTEMVERILOG_FILE ../../verilog/rtl/ifetch.sv
-set_global_assignment -name SYSTEMVERILOG_FILE ../../verilog/rtl/idecode.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../../verilog/rtl/fetch.sv
+set_global_assignment -name SYSTEMVERILOG_FILE ../../verilog/rtl/decode.sv
 set_global_assignment -name SYSTEMVERILOG_FILE ../../verilog/rtl/arbiter.sv
 set_global_assignment -name SYSTEMVERILOG_FILE ../../verilog/rtl/bridge.sv
 set_global_assignment -name SYSTEMVERILOG_FILE ../../verilog/rtl/bus.sv

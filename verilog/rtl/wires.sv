@@ -667,9 +667,9 @@ package wires;
     IDLE,
     BUSY,
     INVALID
-  } ifetch_state;
+  } fetch_state;
   typedef struct packed {
-    ifetch_state state;
+    fetch_state  state;
     logic [31:0] ipc0;
     logic [31:0] ipc1;
     logic [31:0] irdata0;
@@ -686,8 +686,8 @@ package wires;
     logic [0:0]  ready1;
     logic [0:0]  valid;
     logic [0:0]  stall;
-  } ifetch_reg_type;
-  localparam ifetch_reg_type init_ifetch_reg = '{
+  } fetch_reg_type;
+  localparam fetch_reg_type init_fetch_reg = '{
       state: IDLE,
       ipc0: 0,
       ipc1: 0,
@@ -709,8 +709,8 @@ package wires;
   typedef struct packed {
     instruction_type instr0;
     instruction_type instr1;
-  } idecode_reg_type;
-  localparam idecode_reg_type init_idecode_reg = '{
+  } decode_reg_type;
+  localparam decode_reg_type init_decode_reg = '{
       instr0: init_instruction,
       instr1: init_instruction
   };
@@ -1205,7 +1205,7 @@ package wires;
       commit_store1: 0,
       commit_entry1: init_rob_entry
   };
-  typedef struct packed {logic [31:0] instr;} decoder_in_type;
+  typedef struct packed {logic [31:0] instr;} base_in_type;
   typedef struct packed {
     logic [79:0] instr_str;
     logic [31:0] imm;
@@ -1241,7 +1241,7 @@ package wires;
     div_op_type  div_op;
     mul_op_type  mul_op;
     bit_op_type  bit_op;
-  } decoder_out_type;
+  } base_out_type;
   typedef struct packed {logic [31:0] instr;} compress_in_type;
   typedef struct packed {
     logic [79:0] instr_str;
@@ -1289,7 +1289,7 @@ package wires;
     mem_out_type    imem0_out;
     mem_out_type    imem1_out;
     buffer_out_type buffer_out;
-  } ifetch_in_type;
+  } fetch_in_type;
   typedef struct packed {
     buffer_in_type buffer_in;
     btac_in_type btac_in;
@@ -1301,10 +1301,10 @@ package wires;
     logic [31:0] instr1;
     logic [0:0]    ready0;
     logic [0:0]  ready1;
-  } ifetch_out_type;
+  } fetch_out_type;
   typedef struct packed {
-    decoder_out_type decoder0_out;
-    decoder_out_type decoder1_out;
+    base_out_type base0_out;
+    base_out_type base1_out;
     compress_out_type compress0_out;
     compress_out_type compress1_out;
     logic [31:0] pc0;
@@ -1313,13 +1313,13 @@ package wires;
     logic [31:0] instr1;
     logic [0:0] ready0;
     logic [0:0] ready1;
-  } idecode_in_type;
+  } decode_in_type;
   typedef struct packed {
-    decoder_in_type  decoder0_in;
-    decoder_in_type  decoder1_in;
+    base_in_type base0_in;
+    base_in_type base1_in;
     compress_in_type compress0_in;
     compress_in_type compress1_in;
     instruction_type instr0;
     instruction_type instr1;
-  } idecode_out_type;
+  } decode_out_type;
 endpackage

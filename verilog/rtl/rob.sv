@@ -121,7 +121,7 @@ module rob (
 
     h0       = view[r.head];
     h1       = view[head1_idx];
-    h0_done  = h0.valid && h0.done && (r.count >= 1) && (!h0.store || rob_in.store_ready);
+    h0_done  = h0.valid && h0.done && (r.count >= 1);
     h1_done  = h1.valid && h1.done && (r.count >= 2);
     h0_flush = h0.exception || h0.mret || (h0.jump && (h0.npc != h0.pnpc));
 
@@ -140,9 +140,7 @@ module rob (
 
     if (h0_done) begin
       commit0 = 1'b1;
-      if (h1_done && !h0_flush &&
-          (!h1.store || rob_in.store_ready) &&
-          !h0.store && !h0.fence && !h0.mret &&
+      if (h1_done && !h0_flush && !h0.fence && !h0.mret &&
           !h0.wfi && !h0.ecall && !h0.ebreak && !h0.csreg) begin
         commit1 = 1'b1;
       end

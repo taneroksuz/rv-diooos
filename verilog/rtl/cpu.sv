@@ -50,58 +50,58 @@ module cpu (
   buffer_out_type buffer_out;
   compress_in_type compress0_in, compress1_in;
   compress_out_type compress0_out, compress1_out;
-  decoder_in_type decoder0_in, decoder1_in;
-  decoder_out_type decoder0_out, decoder1_out;
-  ifetch_in_type   ifetch_in;
-  ifetch_out_type  ifetch_out;
-  idecode_in_type  idecode_in;
-  idecode_out_type idecode_out;
-  prf_in_type      prf_in;
-  prf_out_type     prf_out;
-  fl_in_type       fl_in;
-  fl_out_type      fl_out;
-  rat_in_type      rat_in;
-  rat_out_type     rat_out;
-  rob_in_type      rob_in;
-  rob_out_type     rob_out;
-  rs_int_in_type   rs_int_in;
-  rs_int_out_type  rs_int_out;
-  rs_mem_in_type   rs_mem_in;
-  rs_mem_out_type  rs_mem_out;
-  rename_in_type   rename_in;
-  rename_out_type  rename_out;
-  eu_in_type       eu_in;
-  eu_out_type      eu_out;
-  msu_in_type      msu_in;
-  msu_out_type     msu_out;
-  commit_in_type   commit_in;
-  commit_out_type  commit_out;
-  rob_entry_type   rob_entries_snap[0:ROB_DEPTH-1];
+  base_in_type base0_in, base1_in;
+  base_out_type base0_out, base1_out;
+  fetch_in_type   fetch_in;
+  fetch_out_type  fetch_out;
+  decode_in_type  decode_in;
+  decode_out_type decode_out;
+  prf_in_type     prf_in;
+  prf_out_type    prf_out;
+  fl_in_type      fl_in;
+  fl_out_type     fl_out;
+  rat_in_type     rat_in;
+  rat_out_type    rat_out;
+  rob_in_type     rob_in;
+  rob_out_type    rob_out;
+  rs_int_in_type  rs_int_in;
+  rs_int_out_type rs_int_out;
+  rs_mem_in_type  rs_mem_in;
+  rs_mem_out_type rs_mem_out;
+  rename_in_type  rename_in;
+  rename_out_type rename_out;
+  eu_in_type      eu_in;
+  eu_out_type     eu_out;
+  msu_in_type     msu_in;
+  msu_out_type    msu_out;
+  commit_in_type  commit_in;
+  commit_out_type commit_out;
+  rob_entry_type  rob_entries_snap[0:ROB_DEPTH-1];
 
-  assign ifetch_in.csr_out        = csr_out;
-  assign ifetch_in.btac_out       = btac_out;
-  assign ifetch_in.imem0_out      = imem0_out;
-  assign ifetch_in.imem1_out      = imem1_out;
-  assign ifetch_in.buffer_out     = buffer_out;
-  assign buffer_in                = ifetch_out.buffer_in;
-  assign btac_in                  = ifetch_out.btac_in;
-  assign imem0_in                 = ifetch_out.imem0_in;
-  assign imem1_in                 = ifetch_out.imem1_in;
+  assign fetch_in.csr_out         = csr_out;
+  assign fetch_in.btac_out        = btac_out;
+  assign fetch_in.imem0_out       = imem0_out;
+  assign fetch_in.imem1_out       = imem1_out;
+  assign fetch_in.buffer_out      = buffer_out;
+  assign buffer_in                = fetch_out.buffer_in;
+  assign btac_in                  = fetch_out.btac_in;
+  assign imem0_in                 = fetch_out.imem0_in;
+  assign imem1_in                 = fetch_out.imem1_in;
   assign csr_rin                  = rs_int_out.csr_rin;
-  assign idecode_in.decoder0_out  = decoder0_out;
-  assign idecode_in.decoder1_out  = decoder1_out;
-  assign idecode_in.compress0_out = compress0_out;
-  assign idecode_in.compress1_out = compress1_out;
-  assign idecode_in.pc0           = ifetch_out.pc0;
-  assign idecode_in.pc1           = ifetch_out.pc1;
-  assign idecode_in.instr0        = ifetch_out.instr0;
-  assign idecode_in.instr1        = ifetch_out.instr1;
-  assign idecode_in.ready0        = ifetch_out.ready0;
-  assign idecode_in.ready1        = ifetch_out.ready1;
-  assign decoder0_in              = idecode_out.decoder0_in;
-  assign decoder1_in              = idecode_out.decoder1_in;
-  assign compress0_in             = idecode_out.compress0_in;
-  assign compress1_in             = idecode_out.compress1_in;
+  assign decode_in.base0_out      = base0_out;
+  assign decode_in.base1_out      = base1_out;
+  assign decode_in.compress0_out  = compress0_out;
+  assign decode_in.compress1_out  = compress1_out;
+  assign decode_in.pc0            = fetch_out.pc0;
+  assign decode_in.pc1            = fetch_out.pc1;
+  assign decode_in.instr0         = fetch_out.instr0;
+  assign decode_in.instr1         = fetch_out.instr1;
+  assign decode_in.ready0         = fetch_out.ready0;
+  assign decode_in.ready1         = fetch_out.ready1;
+  assign base0_in                 = decode_out.base0_in;
+  assign base1_in                 = decode_out.base1_in;
+  assign compress0_in             = decode_out.compress0_in;
+  assign compress1_in             = decode_out.compress1_in;
   assign prf_in.raddr0            = rat_out.psrc0;
   assign prf_in.raddr1            = rat_out.psrc1;
   assign prf_in.raddr2            = rat_out.psrc2;
@@ -185,10 +185,10 @@ module cpu (
   assign rs_mem_in.cdb_commit1    = cdb_commit1;
   assign rs_mem_in.rob_head       = rob_out.head_ptr;
   assign rs_mem_in.load_busy      = msu_out.load_busy;
-  assign rename_in.instr0         = idecode_out.instr0;
-  assign rename_in.instr0_valid   = idecode_out.instr0.op.valid;
-  assign rename_in.instr1         = idecode_out.instr1;
-  assign rename_in.instr1_valid   = idecode_out.instr1.op.valid;
+  assign rename_in.instr0         = decode_out.instr0;
+  assign rename_in.instr0_valid   = decode_out.instr0.op.valid;
+  assign rename_in.instr1         = decode_out.instr1;
+  assign rename_in.instr1_valid   = decode_out.instr1.op.valid;
   assign rename_in.rob_tag0       = rob_out.alloc_tag0;
   assign rename_in.rob_tag1       = rob_out.alloc_tag1;
   assign rename_in.rob_full       = rob_out.full;
@@ -369,13 +369,13 @@ module cpu (
     .buffer_in (buffer_in),
     .buffer_out(buffer_out)
   );
-  decoder decoder0_comp (
-    .decoder_in (decoder0_in),
-    .decoder_out(decoder0_out)
+  base base0_comp (
+    .base_in (base0_in),
+    .base_out(base0_out)
   );
-  decoder decoder1_comp (
-    .decoder_in (decoder1_in),
-    .decoder_out(decoder1_out)
+  base base1_comp (
+    .base_in (base1_in),
+    .base_out(base1_out)
   );
   compress compress0_comp (
     .compress_in (compress0_in),
@@ -407,22 +407,22 @@ module cpu (
     .mtip   (mtip),
     .mtime  (mtime)
   );
-  ifetch ifetch_comp (
+  fetch fetch_comp (
+    .reset    (reset),
+    .clock    (clock),
+    .flush    (commit_out.flush),
+    .stall    (rename_out.stall),
+    .flush_pc (commit_out.flush_pc),
+    .fetch_in (fetch_in),
+    .fetch_out(fetch_out)
+  );
+  decode decode_comp (
     .reset     (reset),
     .clock     (clock),
     .flush     (commit_out.flush),
     .stall     (rename_out.stall),
-    .flush_pc  (commit_out.flush_pc),
-    .ifetch_in (ifetch_in),
-    .ifetch_out(ifetch_out)
-  );
-  idecode idecode_comp (
-    .reset      (reset),
-    .clock      (clock),
-    .flush      (commit_out.flush),
-    .stall      (rename_out.stall),
-    .idecode_in (idecode_in),
-    .idecode_out(idecode_out)
+    .decode_in (decode_in),
+    .decode_out(decode_out)
   );
   prf prf_comp (
     .reset  (reset),

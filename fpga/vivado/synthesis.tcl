@@ -14,12 +14,12 @@ read_verilog -sv ../../verilog/rtl/csr_alu.sv
 read_verilog -sv ../../verilog/rtl/mul.sv
 read_verilog -sv ../../verilog/rtl/div.sv
 read_verilog -sv ../../verilog/rtl/compress.sv
-read_verilog -sv ../../verilog/rtl/decoder.sv
+read_verilog -sv ../../verilog/rtl/base.sv
 read_verilog -sv ../../verilog/rtl/register.sv
 read_verilog -sv ../../verilog/rtl/csr.sv
 read_verilog -sv ../../verilog/rtl/buffer.sv
-read_verilog -sv ../../verilog/rtl/ifetch.sv
-read_verilog -sv ../../verilog/rtl/idecode.sv
+read_verilog -sv ../../verilog/rtl/fetch.sv
+read_verilog -sv ../../verilog/rtl/decode.sv
 read_verilog -sv ../../verilog/rtl/arbiter.sv
 read_verilog -sv ../../verilog/rtl/bridge.sv
 read_verilog -sv ../../verilog/rtl/bus.sv

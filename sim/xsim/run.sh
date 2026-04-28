@@ -35,12 +35,12 @@ $XVLOG -nolog --sv \
             $BASEDIR/verilog/rtl/mul.sv \
             $BASEDIR/verilog/rtl/div.sv \
             $BASEDIR/verilog/rtl/compress.sv \
-            $BASEDIR/verilog/rtl/decoder.sv \
+            $BASEDIR/verilog/rtl/base.sv \
             $BASEDIR/verilog/rtl/register.sv \
             $BASEDIR/verilog/rtl/csr.sv \
             $BASEDIR/verilog/rtl/buffer.sv \
-            $BASEDIR/verilog/rtl/ifetch.sv \
-            $BASEDIR/verilog/rtl/idecode.sv \
+            $BASEDIR/verilog/rtl/fetch.sv \
+            $BASEDIR/verilog/rtl/decode.sv \
             $BASEDIR/verilog/rtl/arbiter.sv \
             $BASEDIR/verilog/rtl/bridge.sv \
             $BASEDIR/verilog/rtl/bus.sv \
