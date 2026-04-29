@@ -345,26 +345,27 @@ package wires;
     logic [31:0] upd_npc1;
     logic [31:0] upd_addr0;
     logic [31:0] upd_addr1;
-    logic [0:0] upd_jal0;
-    logic [0:0] upd_jal1;
-    logic [0:0] upd_jalr0;
-    logic [0:0] upd_jalr1;
-    logic [0:0] upd_branch0;
-    logic [0:0] upd_branch1;
     logic [0:0] upd_jump0;
     logic [0:0] upd_jump1;
     prediction_type upd_pred0;
     prediction_type upd_pred1;
-    logic [0:0] stall;
-    logic [0:0] flush;
   } btac_in_type;
   typedef struct packed {
     prediction_type pred0;
     prediction_type pred1;
-    logic [31:0] pred_maddr;
-    logic [0:0] pred_miss;
-    logic [0:0] pred_hazard;
+    logic [31:0] pred_maddr0;
+    logic [31:0] pred_maddr1;
+    logic [0:0] pred_miss0;
+    logic [0:0] pred_miss1;
   } btac_out_type;
+  localparam btac_out_type init_btac_out = '{
+      pred0: init_prediction,
+      pred1: init_prediction,
+      pred_maddr0: 0,
+      pred_maddr1: 0,
+      pred_miss0: 0,
+      pred_miss1: 0
+  };
   typedef struct packed {
     logic [0:0] wren;
     logic [0:0] rden1;
@@ -723,6 +724,7 @@ package wires;
     logic [31:0]              pc;
     logic [31:0]              npc;
     logic [31:0]              pnpc;
+    prediction_type           pred;
     logic [31:0]              result;
     logic [PRF_ADDR_BITS-1:0] pdest;
     logic [PRF_ADDR_BITS-1:0] old_pdest;
@@ -755,6 +757,7 @@ package wires;
       pc: 32'hFFFFFFFF,
       npc: 32'hFFFFFFFF,
       pnpc: 32'hFFFFFFFF,
+      pred: init_prediction,
       result: 0,
       pdest: 0,
       old_pdest: 0,
@@ -1166,6 +1169,7 @@ package wires;
     rob_entry_type entry0;
     rob_entry_type entry1;
     csr_out_type   csr_o;
+    btac_out_type  btac_out;
   } commit_in_type;
   localparam commit_in_type init_commit_in = '{
       commit0: 0,
@@ -1173,7 +1177,8 @@ package wires;
       commit_ctrl: init_commit,
       entry0: init_rob_entry,
       entry1: init_rob_entry,
-      csr_o: '{trap: 0, mret: 0, mtvec: 0, mepc: 0, cdata: 0, fs: 0}
+      csr_o: '{trap: 0, mret: 0, mtvec: 0, mepc: 0, cdata: 0, fs: 0},
+      btac_out: init_btac_out
   };
   typedef struct packed {
     register_write_in_type register0_win;
@@ -1289,6 +1294,8 @@ package wires;
     mem_out_type    imem0_out;
     mem_out_type    imem1_out;
     buffer_out_type buffer_out;
+    rob_entry_type  entry0;
+    rob_entry_type  entry1;
   } fetch_in_type;
   typedef struct packed {
     buffer_in_type buffer_in;
@@ -1307,6 +1314,7 @@ package wires;
     base_out_type base1_out;
     compress_out_type compress0_out;
     compress_out_type compress1_out;
+    btac_out_type btac_out;
     logic [31:0] pc0;
     logic [31:0] pc1;
     logic [31:0] instr0;

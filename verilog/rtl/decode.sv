@@ -17,12 +17,19 @@ module decode (
 
   always_comb begin
 
-    v              = r;
+    v                   = r;
 
-    v.instr0.pc    = decode_in.ready0 ? decode_in.pc0 : 32'hFFFFFFFF;
-    v.instr1.pc    = decode_in.ready1 ? decode_in.pc1 : 32'hFFFFFFFF;
-    v.instr0.instr = decode_in.ready0 ? decode_in.instr0 : 0;
-    v.instr1.instr = decode_in.ready1 ? decode_in.instr1 : 0;
+    v.instr0.pc         = decode_in.ready0 ? decode_in.pc0 : 32'hFFFFFFFF;
+    v.instr1.pc         = decode_in.ready1 ? decode_in.pc1 : 32'hFFFFFFFF;
+    v.instr0.instr      = decode_in.ready0 ? decode_in.instr0 : 0;
+    v.instr1.instr      = decode_in.ready1 ? decode_in.instr1 : 0;
+
+    v.instr0.pred.taken = decode_in.btac_out.pred0.taken;
+    v.instr1.pred.taken = decode_in.btac_out.pred1.taken;
+    v.instr0.pred.taddr = decode_in.btac_out.pred0.taddr;
+    v.instr1.pred.taddr = decode_in.btac_out.pred1.taddr;
+    v.instr0.pred.tsat  = decode_in.btac_out.pred0.tsat;
+    v.instr1.pred.tsat  = decode_in.btac_out.pred1.tsat;
 
     if (stall == 1) begin
       v.instr0 = r.instr0;

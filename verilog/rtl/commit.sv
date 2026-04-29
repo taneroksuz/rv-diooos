@@ -66,9 +66,9 @@ module commit (
       end else if (e0.mret) begin
         flush0    = 1'b1;
         flush_pc0 = commit_in.csr_o.mepc;
-      end else if (e0.jump && e0.npc != e0.pnpc) begin
+      end else if (commit_in.btac_out.pred_miss0) begin
         flush0    = 1'b1;
-        flush_pc0 = e0.npc;
+        flush_pc0 = commit_in.btac_out.pred_maddr0;
       end
     end
 
@@ -81,9 +81,9 @@ module commit (
       end else if (e1.mret) begin
         flush1    = 1'b1;
         flush_pc1 = commit_in.csr_o.mepc;
-      end else if (e1.jump && e1.npc != e1.pnpc) begin
+      end else if (commit_in.btac_out.pred_miss1) begin
         flush1    = 1'b1;
-        flush_pc1 = e1.npc;
+        flush_pc1 = commit_in.btac_out.pred_maddr1;
       end
     end
 

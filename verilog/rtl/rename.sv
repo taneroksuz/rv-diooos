@@ -197,6 +197,7 @@ module rename (
     v.rename_out.rob_entry0.pc = rename_in.instr0.pc;
     v.rename_out.rob_entry0.npc = rename_in.instr0.npc;
     v.rename_out.rob_entry0.pnpc = rename_in.instr0.npc;
+    v.rename_out.rob_entry0.pred = rename_in.instr0.pred;
     v.rename_out.rob_entry0.pdest = v.pdest0;
     v.rename_out.rob_entry0.adest = rename_in.instr0.waddr;
     v.rename_out.rob_entry0.wren = rename_in.instr0.op.wren && (rename_in.instr0.waddr != 5'h0);
@@ -220,6 +221,7 @@ module rename (
     v.rename_out.rob_entry1.pc = rename_in.instr1.pc;
     v.rename_out.rob_entry1.npc = rename_in.instr1.npc;
     v.rename_out.rob_entry1.pnpc = rename_in.instr1.npc;
+    v.rename_out.rob_entry1.pred = rename_in.instr1.pred;
     v.rename_out.rob_entry1.pdest = v.pdest1;
     v.rename_out.rob_entry1.adest = rename_in.instr1.waddr;
     v.rename_out.rob_entry1.wren = rename_in.instr1.op.wren && (rename_in.instr1.waddr != 5'h0);

@@ -83,6 +83,8 @@ module cpu (
   assign fetch_in.imem0_out       = imem0_out;
   assign fetch_in.imem1_out       = imem1_out;
   assign fetch_in.buffer_out      = buffer_out;
+  assign fetch_in.entry0          = rob_out.entry0;
+  assign fetch_in.entry1          = rob_out.entry1;
   assign buffer_in                = fetch_out.buffer_in;
   assign btac_in                  = fetch_out.btac_in;
   assign imem0_in                 = fetch_out.imem0_in;
@@ -92,6 +94,7 @@ module cpu (
   assign decode_in.base1_out      = base1_out;
   assign decode_in.compress0_out  = compress0_out;
   assign decode_in.compress1_out  = compress1_out;
+  assign decode_in.btac_out       = btac_out;
   assign decode_in.pc0            = fetch_out.pc0;
   assign decode_in.pc1            = fetch_out.pc1;
   assign decode_in.instr0         = fetch_out.instr0;
@@ -279,6 +282,7 @@ module cpu (
   assign commit_in.entry0         = rob_out.entry0;
   assign commit_in.entry1         = rob_out.entry1;
   assign commit_in.csr_o          = csr_out;
+  assign commit_in.btac_out       = btac_out;
   assign register0_win            = commit_out.register0_win;
   assign register1_win            = commit_out.register1_win;
   alu alu0_comp (

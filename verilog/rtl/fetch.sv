@@ -77,6 +77,10 @@ module fetch (
 
     if (flush == 1) begin
       v.ipc0 = flush_pc;
+    end else if (fetch_in.btac_out.pred0.taken) begin
+      v.ipc0 = fetch_in.btac_out.pred0.taddr;
+    end else if (fetch_in.btac_out.pred1.taken) begin
+      v.ipc0 = fetch_in.btac_out.pred1.taddr;
     end else if (v.stall == 0) begin
       v.ipc0 = v.ipc0 + 8;
     end
@@ -134,6 +138,19 @@ module fetch (
     fetch_out.imem1_in.mem_addr  = v.ipc1;
     fetch_out.imem1_in.mem_wdata = 0;
     fetch_out.imem1_in.mem_wstrb = 0;
+
+    fetch_out.btac_in.get_pc0    = v.pc0;
+    fetch_out.btac_in.get_pc1    = v.pc1;
+    fetch_out.btac_in.upd_pc0    = fetch_in.entry0.pc;
+    fetch_out.btac_in.upd_pc1    = fetch_in.entry1.pc;
+    fetch_out.btac_in.upd_npc0   = fetch_in.entry0.pnpc;
+    fetch_out.btac_in.upd_npc1   = fetch_in.entry1.pnpc;
+    fetch_out.btac_in.upd_addr0  = fetch_in.entry0.npc;
+    fetch_out.btac_in.upd_addr1  = fetch_in.entry1.npc;
+    fetch_out.btac_in.upd_jump0  = fetch_in.entry0.jump;
+    fetch_out.btac_in.upd_jump1  = fetch_in.entry1.jump;
+    fetch_out.btac_in.upd_pred0  = fetch_in.entry0.pred;
+    fetch_out.btac_in.upd_pred1  = fetch_in.entry1.pred;
 
     fetch_out.pc0                = r.pc0;
     fetch_out.pc1                = r.pc1;
