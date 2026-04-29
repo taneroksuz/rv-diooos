@@ -85,23 +85,26 @@ module msu (
   logic store_slot0_free, store_slot1_free;
 
   always_comb begin
-    v = init_msu_reg;
-    if (!flush) begin
-      v = r;
+    v = r;
+    if (flush) begin
+      v.load0_pending = 1'b0;
+      v.load1_pending = 1'b0;
+      v.load0_sent    = 1'b0;
+      v.load1_sent    = 1'b0;
     end
 
     v.lsu0_in.ldata = msu_in.dmem0_out.mem_rdata;
     v.lsu1_in.ldata = msu_in.dmem1_out.mem_rdata;
 
-    commit_store0_valid = msu_in.commit_store0 && !msu_in.commit_entry0.exception && !flush;
-    commit_store1_valid = msu_in.commit_store1 && !msu_in.commit_entry1.exception && !flush;
+    commit_store0_valid = msu_in.commit_store0 && !msu_in.commit_entry0.exception;
+    commit_store1_valid = msu_in.commit_store1 && !msu_in.commit_entry1.exception;
 
     load0_busy = r.load0_pending && !msu_in.dmem0_out.mem_ready;
     load1_busy = r.load1_pending && !msu_in.dmem1_out.mem_ready;
     store0_busy = r.store0_pending && !msu_in.dmem0_out.mem_ready;
     store1_busy = r.store1_pending && !msu_in.dmem1_out.mem_ready;
-    store0_done = r.store0_pending && msu_in.dmem0_out.mem_ready && !flush;
-    store1_done = r.store1_pending && msu_in.dmem1_out.mem_ready && !flush;
+    store0_done = r.store0_pending && r.store0_sent && msu_in.dmem0_out.mem_ready;
+    store1_done = r.store1_pending && r.store1_sent && msu_in.dmem1_out.mem_ready;
     mem_pending_any = load0_busy || load1_busy || store0_busy || store1_busy;
     mem_block_new_issue = mem_pending_any || commit_store0_valid || commit_store1_valid;
 
@@ -175,13 +178,14 @@ module msu (
     end
     v.dmem0_in = init_mem_in;
     v.dmem1_in = init_mem_in;
-    if (v.store0_pending) begin
+    if (v.store0_pending && !v.store0_sent) begin
       v.dmem0_in.mem_valid = 1'b1;
       v.dmem0_in.mem_instr = 1'b0;
       v.dmem0_in.mem_mode  = 2'h0;
       v.dmem0_in.mem_addr  = v.store0_entry.store_addr;
       v.dmem0_in.mem_wdata = v.store0_entry.store_data;
       v.dmem0_in.mem_wstrb = v.store0_entry.store_strb;
+      v.store0_sent        = 1'b1;
     end else if (v.load0_pending && !v.load0_sent) begin
       v.dmem0_in.mem_valid = 1'b1;
       v.dmem0_in.mem_instr = 1'b0;
@@ -191,13 +195,14 @@ module msu (
       v.dmem0_in.mem_wstrb = 4'h0;
       v.load0_sent         = 1'b1;
     end
-    if (v.store1_pending) begin
+    if (v.store1_pending && !v.store1_sent) begin
       v.dmem1_in.mem_valid = 1'b1;
       v.dmem1_in.mem_instr = 1'b0;
       v.dmem1_in.mem_mode  = 2'h0;
       v.dmem1_in.mem_addr  = v.store1_entry.store_addr;
       v.dmem1_in.mem_wdata = v.store1_entry.store_data;
       v.dmem1_in.mem_wstrb = v.store1_entry.store_strb;
+      v.store1_sent        = 1'b1;
     end else if (v.load1_pending && !v.load1_sent) begin
       v.dmem1_in.mem_valid = 1'b1;
       v.dmem1_in.mem_instr = 1'b0;
@@ -265,10 +270,10 @@ module msu (
     msu_out.load_busy = {mem_block_new_issue, mem_block_new_issue};
     msu_out.store_ready = !(r.store0_pending || r.store1_pending) &&
                           !(msu_in.commit_store0 || msu_in.commit_store1);
-    msu_out.dmem1_in = rin.dmem1_in;
-    msu_out.lsu1_in = rin.lsu1_in;
-    msu_out.dmem0_in = rin.dmem0_in;
-    msu_out.lsu0_in = rin.lsu0_in;
+    msu_out.dmem1_in = v.dmem1_in;
+    msu_out.lsu1_in = v.lsu1_in;
+    msu_out.dmem0_in = v.dmem0_in;
+    msu_out.lsu0_in = v.lsu0_in;
     if (load0_ready) begin
       msu_out.lsu0_in.byteenable = r.lsu0_in.byteenable;
       msu_out.lsu0_in.lsu_op     = r.lsu0_in.lsu_op;
