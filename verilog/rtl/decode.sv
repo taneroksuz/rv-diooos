@@ -36,6 +36,10 @@ module decode (
       v.instr1 = r.instr1;
     end
 
+    if (v.instr0.pred.taken == 1) begin
+      v.instr1 = init_instruction;
+    end
+
     v.instr0.npc                  = v.instr0.pc + ((&v.instr0.instr[1:0]) ? 4 : 2);
     v.instr1.npc                  = v.instr1.pc + ((&v.instr1.instr[1:0]) ? 4 : 2);
 

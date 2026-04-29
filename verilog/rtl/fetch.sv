@@ -99,6 +99,12 @@ module fetch (
         end else if (flush == 1) begin
           v.state = INVALID;
           v.valid = 0;
+        end else if (fetch_in.btac_out.pred0.taken == 1) begin
+          v.state = INVALID;
+          v.valid = 0;
+        end else if (fetch_in.btac_out.pred1.taken == 1) begin
+          v.state = INVALID;
+          v.valid = 0;
         end else begin
           v.state = BUSY;
           v.valid = 0;
@@ -118,48 +124,48 @@ module fetch (
       end
     endcase
 
-    fetch_out.buffer_in.pc0      = r.ipc0;
-    fetch_out.buffer_in.pc1      = r.ipc1;
-    fetch_out.buffer_in.rdata    = v.rdata;
-    fetch_out.buffer_in.ready    = v.ready;
-    fetch_out.buffer_in.clear    = flush;
-    fetch_out.buffer_in.stall    = stall;
+    fetch_out.buffer_in.pc0 = r.ipc0;
+    fetch_out.buffer_in.pc1 = r.ipc1;
+    fetch_out.buffer_in.rdata = v.rdata;
+    fetch_out.buffer_in.ready = v.ready;
+    fetch_out.buffer_in.clear    = flush | fetch_in.btac_out.pred0.taken | fetch_in.btac_out.pred1.taken;
+    fetch_out.buffer_in.stall = stall;
 
     fetch_out.imem0_in.mem_valid = v.valid;
     fetch_out.imem0_in.mem_instr = 1;
-    fetch_out.imem0_in.mem_mode  = 0;
-    fetch_out.imem0_in.mem_addr  = v.ipc0;
+    fetch_out.imem0_in.mem_mode = 0;
+    fetch_out.imem0_in.mem_addr = v.ipc0;
     fetch_out.imem0_in.mem_wdata = 0;
     fetch_out.imem0_in.mem_wstrb = 0;
 
     fetch_out.imem1_in.mem_valid = v.valid;
     fetch_out.imem1_in.mem_instr = 1;
-    fetch_out.imem1_in.mem_mode  = 0;
-    fetch_out.imem1_in.mem_addr  = v.ipc1;
+    fetch_out.imem1_in.mem_mode = 0;
+    fetch_out.imem1_in.mem_addr = v.ipc1;
     fetch_out.imem1_in.mem_wdata = 0;
     fetch_out.imem1_in.mem_wstrb = 0;
 
-    fetch_out.btac_in.get_pc0    = v.pc0;
-    fetch_out.btac_in.get_pc1    = v.pc1;
-    fetch_out.btac_in.upd_pc0    = fetch_in.entry0.pc;
-    fetch_out.btac_in.upd_pc1    = fetch_in.entry1.pc;
-    fetch_out.btac_in.upd_npc0   = fetch_in.entry0.pnpc;
-    fetch_out.btac_in.upd_npc1   = fetch_in.entry1.pnpc;
-    fetch_out.btac_in.upd_addr0  = fetch_in.entry0.npc;
-    fetch_out.btac_in.upd_addr1  = fetch_in.entry1.npc;
-    fetch_out.btac_in.upd_jump0  = fetch_in.entry0.jump;
-    fetch_out.btac_in.upd_jump1  = fetch_in.entry1.jump;
-    fetch_out.btac_in.upd_pred0  = fetch_in.entry0.pred;
-    fetch_out.btac_in.upd_pred1  = fetch_in.entry1.pred;
+    fetch_out.btac_in.get_pc0 = v.pc0;
+    fetch_out.btac_in.get_pc1 = v.pc1;
+    fetch_out.btac_in.upd_pc0 = fetch_in.entry0.pc;
+    fetch_out.btac_in.upd_pc1 = fetch_in.entry1.pc;
+    fetch_out.btac_in.upd_npc0 = fetch_in.entry0.pnpc;
+    fetch_out.btac_in.upd_npc1 = fetch_in.entry1.pnpc;
+    fetch_out.btac_in.upd_addr0 = fetch_in.entry0.npc;
+    fetch_out.btac_in.upd_addr1 = fetch_in.entry1.npc;
+    fetch_out.btac_in.upd_jump0 = fetch_in.entry0.jump;
+    fetch_out.btac_in.upd_jump1 = fetch_in.entry1.jump;
+    fetch_out.btac_in.upd_pred0 = fetch_in.entry0.pred;
+    fetch_out.btac_in.upd_pred1 = fetch_in.entry1.pred;
 
-    fetch_out.pc0                = r.pc0;
-    fetch_out.pc1                = r.pc1;
-    fetch_out.instr0             = r.instr0;
-    fetch_out.instr1             = r.instr1;
-    fetch_out.ready0             = r.ready0;
-    fetch_out.ready1             = r.ready1;
+    fetch_out.pc0 = r.pc0;
+    fetch_out.pc1 = r.pc1;
+    fetch_out.instr0 = r.instr0;
+    fetch_out.instr1 = r.instr1;
+    fetch_out.ready0 = r.ready0;
+    fetch_out.ready1 = r.ready1;
 
-    rin                          = v;
+    rin = v;
 
   end
 
