@@ -158,12 +158,12 @@ module fetch (
     fetch_out.btac_in.upd_pred0 = fetch_in.entry0.pred;
     fetch_out.btac_in.upd_pred1 = fetch_in.entry1.pred;
 
-    fetch_out.pc0 = r.pc0;
-    fetch_out.pc1 = r.pc1;
-    fetch_out.instr0 = r.instr0;
-    fetch_out.instr1 = r.instr1;
-    fetch_out.ready0 = r.ready0;
-    fetch_out.ready1 = r.ready1;
+    fetch_out.pc0 = v.pc0;
+    fetch_out.pc1 = v.pc1;
+    fetch_out.instr0 = v.instr0;
+    fetch_out.instr1 = v.instr1;
+    fetch_out.ready0 = v.ready0;
+    fetch_out.ready1 = v.ready1;
 
     rin = v;
 

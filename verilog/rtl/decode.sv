@@ -17,27 +17,16 @@ module decode (
 
   always_comb begin
 
-    v                   = r;
+    v              = r;
 
-    v.instr0.pc         = decode_in.ready0 ? decode_in.pc0 : 32'hFFFFFFFF;
-    v.instr1.pc         = decode_in.ready1 ? decode_in.pc1 : 32'hFFFFFFFF;
-    v.instr0.instr      = decode_in.ready0 ? decode_in.instr0 : 0;
-    v.instr1.instr      = decode_in.ready1 ? decode_in.instr1 : 0;
-
-    v.instr0.pred.taken = decode_in.btac_out.pred0.taken;
-    v.instr1.pred.taken = decode_in.btac_out.pred1.taken;
-    v.instr0.pred.taddr = decode_in.btac_out.pred0.taddr;
-    v.instr1.pred.taddr = decode_in.btac_out.pred1.taddr;
-    v.instr0.pred.tsat  = decode_in.btac_out.pred0.tsat;
-    v.instr1.pred.tsat  = decode_in.btac_out.pred1.tsat;
+    v.instr0.pc    = decode_in.ready0 ? decode_in.pc0 : 32'hFFFFFFFF;
+    v.instr1.pc    = decode_in.ready1 ? decode_in.pc1 : 32'hFFFFFFFF;
+    v.instr0.instr = decode_in.ready0 ? decode_in.instr0 : 0;
+    v.instr1.instr = decode_in.ready1 ? decode_in.instr1 : 0;
 
     if (stall == 1) begin
       v.instr0 = r.instr0;
       v.instr1 = r.instr1;
-    end
-
-    if (v.instr0.pred.taken == 1) begin
-      v.instr1 = init_instruction;
     end
 
     v.instr0.npc                  = v.instr0.pc + ((&v.instr0.instr[1:0]) ? 4 : 2);
@@ -200,10 +189,17 @@ module decode (
       v.instr1 = init_instruction;
     end
 
-    rin               = v;
+    rin                          = v;
 
-    decode_out.instr0 = r.instr0;
-    decode_out.instr1 = r.instr1;
+    decode_out.instr0            = r.instr0;
+    decode_out.instr1            = decode_in.btac_out.pred0.taken ? init_instruction : r.instr1;
+
+    decode_out.instr0.pred.taken = decode_in.btac_out.pred0.taken;
+    decode_out.instr0.pred.taddr = decode_in.btac_out.pred0.taddr;
+    decode_out.instr0.pred.tsat  = decode_in.btac_out.pred0.tsat;
+    decode_out.instr1.pred.taken = decode_in.btac_out.pred1.taken;
+    decode_out.instr1.pred.taddr = decode_in.btac_out.pred1.taddr;
+    decode_out.instr1.pred.tsat  = decode_in.btac_out.pred1.tsat;
 
   end
 
