@@ -3,12 +3,12 @@ import functions::*;
 import wires::*;
 
 module fetch (
-  input  logic                 reset,
-  input  logic                 clock,
-  input  logic                 flush,
-  input  logic                 stall,
-  input  fetch_in_type         fetch_in,
-  output fetch_out_type        fetch_out
+  input  logic          reset,
+  input  logic          clock,
+  input  logic          flush,
+  input  logic          stall,
+  input  fetch_in_type  fetch_in,
+  output fetch_out_type fetch_out
 );
   timeunit 1ns; timeprecision 1ps;
 

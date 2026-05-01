@@ -5,6 +5,7 @@ import functions::*;
 module commit (
   input  logic           reset,
   input  logic           clock,
+  input  logic           flush,
   input  commit_in_type  commit_in,
   output commit_out_type commit_out
 );
@@ -148,7 +149,7 @@ module commit (
       end
     end
 
-    if (r.flush) begin
+    if (r.flush | flush) begin
       v = init_commit_reg;
     end
 
