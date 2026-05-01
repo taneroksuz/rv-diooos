@@ -197,30 +197,30 @@ module btac_ctrl (
     v_btb.hit0 = 0;
     v_btb.hit1 = 0;
 
-    if (btac_in.upd_valid0 == 1 && btac_in.upd_pred0.taken == 1 && btac_in.upd_jump0 == 1) begin
+    if (btac_in.upd_pred0.taken == 1 && btac_in.upd_jump0 == 1) begin
       v_btb.maddr0 = btac_in.upd_addr0;
       v_btb.miss0  = |(btac_in.upd_addr0 ^ btac_in.upd_pred0.taddr);
       v_btb.hit0   = ~v_btb.miss0;
     end
-    if (btac_in.upd_valid0 == 1 && btac_in.upd_pred0.taken == 1 && btac_in.upd_jump0 == 0) begin
-      v_btb.maddr0 = btac_in.upd_npc0;
-      v_btb.miss0  = 1;
-    end
-    if (btac_in.upd_valid0 == 1 && btac_in.upd_pred0.taken == 0 && btac_in.upd_jump0 == 1) begin
-      v_btb.maddr0 = btac_in.upd_addr0;
-      v_btb.miss0  = 1;
-    end
-    if (btac_in.upd_valid1 == 1 && btac_in.upd_pred1.taken == 1 && btac_in.upd_jump1 == 1) begin
+    if (btac_in.upd_pred1.taken == 1 && btac_in.upd_jump1 == 1) begin
       v_btb.maddr1 = btac_in.upd_addr1;
       v_btb.miss1  = |(btac_in.upd_addr1 ^ btac_in.upd_pred1.taddr);
       v_btb.hit1   = ~v_btb.miss1;
     end
-    if (btac_in.upd_valid1 == 1 && btac_in.upd_pred1.taken == 1 && btac_in.upd_jump1 == 0) begin
-      v_btb.maddr1 = btac_in.upd_npc1;
+    if (btac_in.upd_pred0.taken == 0 && btac_in.upd_jump0 == 1) begin
+      v_btb.maddr0 = btac_in.upd_addr0;
+      v_btb.miss0  = 1;
+    end
+    if (btac_in.upd_pred1.taken == 0 && btac_in.upd_jump1 == 1) begin
+      v_btb.maddr1 = btac_in.upd_addr1;
       v_btb.miss1  = 1;
     end
-    if (btac_in.upd_valid1 == 1 && btac_in.upd_pred1.taken == 0 && btac_in.upd_jump1 == 1) begin
-      v_btb.maddr1 = btac_in.upd_addr1;
+    if (btac_in.upd_branch0 == 1 && btac_in.upd_pred0.taken == 1 && btac_in.upd_jump0 == 0) begin
+      v_btb.maddr0 = btac_in.upd_npc0;
+      v_btb.miss0  = 1;
+    end
+    if (btac_in.upd_branch1 == 1 && btac_in.upd_pred1.taken == 1 && btac_in.upd_jump1 == 0) begin
+      v_btb.maddr1 = btac_in.upd_npc1;
       v_btb.miss1  = 1;
     end
 
