@@ -347,6 +347,8 @@ package wires;
     logic [31:0] upd_addr1;
     logic [0:0] upd_jump0;
     logic [0:0] upd_jump1;
+    logic [0:0] upd_valid0;
+    logic [0:0] upd_valid1;
     prediction_type upd_pred0;
     prediction_type upd_pred1;
   } btac_in_type;

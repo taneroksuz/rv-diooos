@@ -19,7 +19,6 @@ module commit (
     prf_in_type            prf_i;
     fl_in_type             fl_i;
     logic [0:0]            flush;
-    logic [31:0]           flush_pc;
     logic [0:0]            commit_store0;
     rob_entry_type         commit_entry0;
     logic [0:0]            commit_store1;
@@ -34,7 +33,6 @@ module commit (
       prf_i         : init_prf_in,
       fl_i          : init_fl_in,
       flush         : 0,
-      flush_pc      : 0,
       commit_store0 : 0,
       commit_entry0 : init_rob_entry,
       commit_store1 : 0,
@@ -45,7 +43,6 @@ module commit (
   rob_entry_type e0, e1;
   logic c0, c1;
   logic flush0, flush1;
-  logic [31:0] flush_pc0, flush_pc1;
   logic do0, do1;
   always_comb begin
     v      = init_commit_reg;
@@ -59,13 +56,13 @@ module commit (
     do0    = c0;
 
     if (do0) begin
-      flush0 = e0.exception | e0.mret | e0.jump;
+      flush0 = e0.exception | e0.mret | e0.jump | (e0.branch ? e0.jump ^ e0.pred.taken : 0);
     end
 
     do1 = c1 && !flush0;
 
     if (do1) begin
-      flush1 = e1.exception | e1.mret | e1.jump;
+      flush1 = e1.exception | e1.mret | e1.jump | (e1.branch ? e1.jump ^ e1.pred.taken : 0);
     end
 
     v.flush         = flush0 | flush1;
@@ -149,7 +146,7 @@ module commit (
       end
     end
 
-    if (r.flush && flush) begin
+    if (flush) begin
       v = init_commit_reg;
     end
 

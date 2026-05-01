@@ -158,6 +158,8 @@ module fetch (
     fetch_out.btac_in.upd_addr1  = fetch_in.entry1.npc;
     fetch_out.btac_in.upd_jump0  = fetch_in.entry0.jump;
     fetch_out.btac_in.upd_jump1  = fetch_in.entry1.jump;
+    fetch_out.btac_in.upd_valid0 = fetch_in.entry0.valid;
+    fetch_out.btac_in.upd_valid1 = fetch_in.entry1.valid;
     fetch_out.btac_in.upd_pred0  = fetch_in.entry0.pred;
     fetch_out.btac_in.upd_pred1  = fetch_in.entry1.pred;
 

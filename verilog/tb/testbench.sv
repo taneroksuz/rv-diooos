@@ -62,30 +62,30 @@ module testbench ();
     end
   end
 
-  wire        commit0_valid = testbench.soc_comp.cpu_comp.rob_out.commit0;
-  wire        commit1_valid = testbench.soc_comp.cpu_comp.rob_out.commit1;
-  wire [31:0] commit0_pc = testbench.soc_comp.cpu_comp.rob_out.entry0.pc;
-  wire [31:0] commit1_pc = testbench.soc_comp.cpu_comp.rob_out.entry1.pc;
-  wire [ 4:0] commit0_waddr = testbench.soc_comp.cpu_comp.rob_out.entry0.adest;
-  wire [ 4:0] commit1_waddr = testbench.soc_comp.cpu_comp.rob_out.entry1.adest;
-  wire [31:0] commit0_wdata = testbench.soc_comp.cpu_comp.rob_out.entry0.result;
-  wire [31:0] commit1_wdata = testbench.soc_comp.cpu_comp.rob_out.entry1.result;
-  wire        commit0_wren = testbench.soc_comp.cpu_comp.rob_out.entry0.wren;
-  wire        commit1_wren = testbench.soc_comp.cpu_comp.rob_out.entry1.wren;
-  wire        commit0_store = testbench.soc_comp.cpu_comp.rob_out.entry0.store;
-  wire        commit1_store = testbench.soc_comp.cpu_comp.rob_out.entry1.store;
-  wire [31:0] commit0_saddr = testbench.soc_comp.cpu_comp.rob_out.entry0.store_addr;
-  wire [31:0] commit1_saddr = testbench.soc_comp.cpu_comp.rob_out.entry1.store_addr;
-  wire [31:0] commit0_sdata = testbench.soc_comp.cpu_comp.rob_out.entry0.store_data;
-  wire [31:0] commit1_sdata = testbench.soc_comp.cpu_comp.rob_out.entry1.store_data;
-  wire [ 3:0] commit0_sstrb = testbench.soc_comp.cpu_comp.rob_out.entry0.store_strb;
-  wire [ 3:0] commit1_sstrb = testbench.soc_comp.cpu_comp.rob_out.entry1.store_strb;
-  wire        commit0_cwren = testbench.soc_comp.cpu_comp.rob_out.entry0.cwren;
-  wire        commit1_cwren = testbench.soc_comp.cpu_comp.rob_out.entry1.cwren;
-  wire [11:0] commit0_caddr = testbench.soc_comp.cpu_comp.rob_out.entry0.caddr;
-  wire [11:0] commit1_caddr = testbench.soc_comp.cpu_comp.rob_out.entry1.caddr;
-  wire [31:0] commit0_cwdata = testbench.soc_comp.cpu_comp.rob_out.entry0.cwdata;
-  wire [31:0] commit1_cwdata = testbench.soc_comp.cpu_comp.rob_out.entry1.cwdata;
+  wire        commit0_valid = testbench.soc_comp.cpu_comp.commit_out.commit_entry0.valid;
+  wire        commit1_valid = testbench.soc_comp.cpu_comp.commit_out.commit_entry1.valid;
+  wire [31:0] commit0_pc = testbench.soc_comp.cpu_comp.commit_out.commit_entry0.pc;
+  wire [31:0] commit1_pc = testbench.soc_comp.cpu_comp.commit_out.commit_entry1.pc;
+  wire [ 4:0] commit0_waddr = testbench.soc_comp.cpu_comp.commit_out.commit_entry0.adest;
+  wire [ 4:0] commit1_waddr = testbench.soc_comp.cpu_comp.commit_out.commit_entry1.adest;
+  wire [31:0] commit0_wdata = testbench.soc_comp.cpu_comp.commit_out.commit_entry0.result;
+  wire [31:0] commit1_wdata = testbench.soc_comp.cpu_comp.commit_out.commit_entry1.result;
+  wire        commit0_wren = testbench.soc_comp.cpu_comp.commit_out.commit_entry0.wren;
+  wire        commit1_wren = testbench.soc_comp.cpu_comp.commit_out.commit_entry1.wren;
+  wire        commit0_store = testbench.soc_comp.cpu_comp.commit_out.commit_entry0.store;
+  wire        commit1_store = testbench.soc_comp.cpu_comp.commit_out.commit_entry1.store;
+  wire [31:0] commit0_saddr = testbench.soc_comp.cpu_comp.commit_out.commit_entry0.store_addr;
+  wire [31:0] commit1_saddr = testbench.soc_comp.cpu_comp.commit_out.commit_entry1.store_addr;
+  wire [31:0] commit0_sdata = testbench.soc_comp.cpu_comp.commit_out.commit_entry0.store_data;
+  wire [31:0] commit1_sdata = testbench.soc_comp.cpu_comp.commit_out.commit_entry1.store_data;
+  wire [ 3:0] commit0_sstrb = testbench.soc_comp.cpu_comp.commit_out.commit_entry0.store_strb;
+  wire [ 3:0] commit1_sstrb = testbench.soc_comp.cpu_comp.commit_out.commit_entry1.store_strb;
+  wire        commit0_cwren = testbench.soc_comp.cpu_comp.commit_out.commit_entry0.cwren;
+  wire        commit1_cwren = testbench.soc_comp.cpu_comp.commit_out.commit_entry1.cwren;
+  wire [11:0] commit0_caddr = testbench.soc_comp.cpu_comp.commit_out.commit_entry0.caddr;
+  wire [11:0] commit1_caddr = testbench.soc_comp.cpu_comp.commit_out.commit_entry1.caddr;
+  wire [31:0] commit0_cwdata = testbench.soc_comp.cpu_comp.commit_out.commit_entry0.cwdata;
+  wire [31:0] commit1_cwdata = testbench.soc_comp.cpu_comp.commit_out.commit_entry1.cwdata;
 
   initial begin
     string filename;
