@@ -90,7 +90,8 @@ module rs_int (
           (RS_ADDR_BITS'(unsigned'(i)) != v.sel0_idx) &&
           !(v.sel0_found && (
             (woken[v.sel0_idx].op.division && woken[i].op.division) ||
-            (woken[v.sel0_idx].op.bitc && woken[i].op.bitc)
+            (woken[v.sel0_idx].op.bitc && woken[i].op.bitc) ||
+            (woken[v.sel0_idx].op.mult && woken[i].op.mult)
           ))) begin
         v.sel1_idx   = RS_ADDR_BITS'(unsigned'(i));
         v.sel1_found = 1'b1;
