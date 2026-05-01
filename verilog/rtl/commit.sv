@@ -47,59 +47,38 @@ module commit (
   logic [31:0] flush_pc0, flush_pc1;
   logic do0, do1;
   always_comb begin
-    v         = init_commit_reg;
-    e0        = commit_in.entry0;
-    e1        = commit_in.entry1;
-    c0        = commit_in.commit0;
-    c1        = commit_in.commit1;
-    flush0    = 1'b0;
-    flush1    = 1'b0;
-    flush_pc0 = '0;
-    flush_pc1 = '0;
+    v      = init_commit_reg;
+    e0     = commit_in.entry0;
+    e1     = commit_in.entry1;
+    c0     = commit_in.commit0;
+    c1     = commit_in.commit1;
+    flush0 = 1'b0;
+    flush1 = 1'b0;
 
-    do0       = c0;
+    do0    = c0;
 
     if (do0) begin
-      if (e0.exception) begin
-        flush0    = 1'b1;
-        flush_pc0 = commit_in.csr_o.mtvec;
-      end else if (e0.mret) begin
-        flush0    = 1'b1;
-        flush_pc0 = commit_in.csr_o.mepc;
-      end else if (commit_in.btac_out.pred_miss0) begin
-        flush0    = 1'b1;
-        flush_pc0 = commit_in.btac_out.pred_maddr0;
-      end
+      flush0 = e0.exception | e0.mret | e0.jump;
     end
 
     do1 = c1 && !flush0;
 
     if (do1) begin
-      if (e1.exception) begin
-        flush1    = 1'b1;
-        flush_pc1 = commit_in.csr_o.mtvec;
-      end else if (e1.mret) begin
-        flush1    = 1'b1;
-        flush_pc1 = commit_in.csr_o.mepc;
-      end else if (commit_in.btac_out.pred_miss1) begin
-        flush1    = 1'b1;
-        flush_pc1 = commit_in.btac_out.pred_maddr1;
-      end
+      flush1 = e1.exception | e1.mret | e1.jump;
     end
 
     v.flush         = flush0 | flush1;
-    v.flush_pc      = flush0 ? flush_pc0 : flush_pc1;
 
     v.commit_store0 = 1'b0;
     v.commit_entry0 = init_rob_entry;
     v.commit_store1 = 1'b0;
     v.commit_entry1 = init_rob_entry;
-    if (do0 && e0.store && !e0.exception && !flush0) begin
-      v.commit_store0 = 1'b1;
+    if (do0) begin
+      v.commit_store0 = e0.store;
       v.commit_entry0 = e0;
     end
-    if (do1 && e1.store && !e1.exception && !flush1) begin
-      v.commit_store1 = 1'b1;
+    if (do1) begin
+      v.commit_store1 = e1.store;
       v.commit_entry1 = e1;
     end
 
@@ -182,7 +161,6 @@ module commit (
     commit_out.prf_i         = r.prf_i;
     commit_out.fl_i          = r.fl_i;
     commit_out.flush         = r.flush;
-    commit_out.flush_pc      = r.flush_pc;
     commit_out.commit_store0 = r.commit_store0;
     commit_out.commit_entry0 = r.commit_entry0;
     commit_out.commit_store1 = r.commit_store1;

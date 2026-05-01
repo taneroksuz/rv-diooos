@@ -686,6 +686,7 @@ package wires;
     logic [0:0]  ready0;
     logic [0:0]  ready1;
     logic [0:0]  valid;
+    logic [0:0]  flush;
     logic [0:0]  stall;
   } fetch_reg_type;
   localparam fetch_reg_type init_fetch_reg = '{
@@ -705,6 +706,7 @@ package wires;
       ready0: 0,
       ready1: 0,
       valid: 0,
+      flush: 0,
       stall: 0
   };
   typedef struct packed {
@@ -1189,7 +1191,6 @@ package wires;
     prf_in_type            prf_i;
     fl_in_type             fl_i;
     logic [0:0]            flush;
-    logic [31:0]           flush_pc;
     logic [0:0]            commit_store0;
     rob_entry_type         commit_entry0;
     logic [0:0]            commit_store1;
@@ -1204,7 +1205,6 @@ package wires;
       prf_i: init_prf_in,
       fl_i: init_fl_in,
       flush: 0,
-      flush_pc: 0,
       commit_store0: 0,
       commit_entry0: init_rob_entry,
       commit_store1: 0,

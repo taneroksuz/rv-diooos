@@ -83,8 +83,8 @@ module cpu (
   assign fetch_in.imem0_out       = imem0_out;
   assign fetch_in.imem1_out       = imem1_out;
   assign fetch_in.buffer_out      = buffer_out;
-  assign fetch_in.entry0          = rob_out.entry0;
-  assign fetch_in.entry1          = rob_out.entry1;
+  assign fetch_in.entry0          = commit_out.commit_entry0;
+  assign fetch_in.entry1          = commit_out.commit_entry1;
   assign buffer_in                = fetch_out.buffer_in;
   assign btac_in                  = fetch_out.btac_in;
   assign imem0_in                 = fetch_out.imem0_in;
@@ -416,7 +416,6 @@ module cpu (
     .clock    (clock),
     .flush    (commit_out.flush),
     .stall    (rename_out.stall),
-    .flush_pc (commit_out.flush_pc),
     .fetch_in (fetch_in),
     .fetch_out(fetch_out)
   );
