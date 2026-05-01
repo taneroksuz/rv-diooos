@@ -149,7 +149,7 @@ module commit (
       end
     end
 
-    if (r.flush | flush) begin
+    if (r.flush && flush) begin
       v = init_commit_reg;
     end
 
