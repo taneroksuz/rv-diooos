@@ -56,13 +56,13 @@ module commit (
     do0    = c0;
 
     if (do0) begin
-      flush0 = e0.exception | e0.mret | e0.jump | (e0.branch ? e0.jump ^ e0.pred.taken : 0);
+      flush0 = e0.exception | e0.mret | (!e0.branch ? e0.jump : 0) | (e0.branch ? e0.jump ^ e0.pred.taken : 0);
     end
 
     do1 = c1 && !flush0;
 
     if (do1) begin
-      flush1 = e1.exception | e1.mret | e1.jump | (e1.branch ? e1.jump ^ e1.pred.taken : 0);
+      flush1 = e1.exception | e1.mret | (!e1.branch ? e1.jump : 0) | (e1.branch ? e1.jump ^ e1.pred.taken : 0);
     end
 
     v.flush         = flush0 | flush1;
