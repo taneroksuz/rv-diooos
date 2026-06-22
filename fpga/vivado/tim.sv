@@ -176,21 +176,28 @@ module tim_ctrl (
 
   always_comb begin
 
-    v_b                = r_b;
+    v_b        = r_b;
 
-    v_b.valid0         = r_f.valid0;
-    v_b.valid1         = r_f.valid1;
-    v_b.data0          = r_f.data0;
-    v_b.data1          = r_f.data1;
-    v_b.strb0          = r_f.strb0;
-    v_b.strb1          = r_f.strb1;
-    v_b.wid0           = r_f.wid0;
-    v_b.wid1           = r_f.wid1;
-    v_b.did0           = r_f.did0;
-    v_b.did1           = r_f.did1;
+    v_b.valid0 = r_f.valid0;
+    v_b.valid1 = r_f.valid1;
+    v_b.data0  = r_f.data0;
+    v_b.data1  = r_f.data1;
+    v_b.strb0  = r_f.strb0;
+    v_b.strb1  = r_f.strb1;
+    v_b.wid0   = r_f.wid0;
+    v_b.wid1   = r_f.wid1;
+    v_b.did0   = r_f.did0;
+    v_b.did1   = r_f.did1;
 
-    v_b.rdata0         = dvec_out[v_b.wid0].data0;
-    v_b.rdata1         = dvec_out[v_b.wid1].data1;
+    v_b.rdata0 = dvec_out[v_b.wid0].data0;
+    v_b.rdata1 = dvec_out[v_b.wid1].data1;
+
+    if (|(v_b.strb1) == 0 && v_b.wid0 == v_b.wid1 && v_b.did0 == v_b.did1) begin
+      v_b.rdata1[7:0]   = v_b.strb0[0] ? v_b.data0[7:0] : v_b.rdata1[7:0];
+      v_b.rdata1[15:8]  = v_b.strb0[1] ? v_b.data0[15:8] : v_b.rdata1[15:8];
+      v_b.rdata1[23:16] = v_b.strb0[2] ? v_b.data0[23:16] : v_b.rdata1[23:16];
+      v_b.rdata1[31:24] = v_b.strb0[3] ? v_b.data0[31:24] : v_b.rdata1[31:24];
+    end
 
     tim0_out.mem_rdata = v_b.rdata0;
     tim0_out.mem_error = 0;
