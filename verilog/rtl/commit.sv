@@ -18,7 +18,7 @@ module commit (
     rat_in_type            rat_i;
     prf_in_type            prf_i;
     fl_in_type             fl_i;
-    logic [0:0]            flush;
+    logic [0:0]            flush_all;
     logic [0:0]            commit_store0;
     rob_entry_type         commit_entry0;
     logic [0:0]            commit_store1;
@@ -32,7 +32,7 @@ module commit (
       rat_i         : init_rat_in,
       prf_i         : init_prf_in,
       fl_i          : init_fl_in,
-      flush         : 0,
+      flush_all     : 0,
       commit_store0 : 0,
       commit_entry0 : init_rob_entry,
       commit_store1 : 0,
@@ -65,7 +65,7 @@ module commit (
       flush1 = e1.exception | e1.mret | (!e1.branch ? e1.jump : 0) | (e1.branch ? e1.jump ^ e1.pred.taken : 0);
     end
 
-    v.flush         = flush0 | flush1;
+    v.flush_all     = flush0 | flush1;
 
     v.commit_store0 = 1'b0;
     v.commit_entry0 = init_rob_entry;
@@ -158,7 +158,7 @@ module commit (
     commit_out.rat_i         = r.rat_i;
     commit_out.prf_i         = r.prf_i;
     commit_out.fl_i          = r.fl_i;
-    commit_out.flush         = r.flush;
+    commit_out.flush         = r.flush_all;
     commit_out.commit_store0 = r.commit_store0;
     commit_out.commit_entry0 = r.commit_entry0;
     commit_out.commit_store1 = r.commit_store1;

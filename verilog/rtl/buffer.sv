@@ -30,8 +30,10 @@ module buffer_reg (
 
   localparam DEPTH = $clog2(BUFFER_DEPTH);
 
+  genvar i;
+
   generate
-    for (genvar i = 0; i < 4; i++) begin : gen_buffer_reg_array
+    for (i = 0; i < 4; i++) begin : gen_buffer_reg_array
       logic [47:0] buffer_reg_array[0:BUFFER_DEPTH-1] = '{default: '0};
       always_ff @(posedge clock) begin
         if (buffer_reg_in.wen[i] == 1) begin
