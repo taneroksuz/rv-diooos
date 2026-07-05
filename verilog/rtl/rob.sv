@@ -31,6 +31,7 @@ module rob (
   logic [ROB_ADDR_BITS-1:0] head1_idx, tail1_idx;
   logic h0_hit0, h0_hit1, h0_hit2, h0_hit3, h0_hit4, h0_hit5;
   logic h1_hit0, h1_hit1, h1_hit2, h1_hit3, h1_hit4, h1_hit5;
+  logic wv0, wv1, wv2, wv3, wv4, wv5;
 
   always_comb begin
     v                    = r;
@@ -48,23 +49,30 @@ module rob (
     alloc_entry0_w.valid = 1'b1;
     alloc_entry1_w.valid = 1'b1;
 
-    h0       = r.valid_bits[r.head] ? array[r.head] : init_rob_entry;
-    h0.valid = r.valid_bits[r.head];
-    h1       = r.valid_bits[head1_idx] ? array[head1_idx] : init_rob_entry;
-    h1.valid = r.valid_bits[head1_idx];
+    h0                   = r.valid_bits[r.head] ? array[r.head] : init_rob_entry;
+    h0.valid             = r.valid_bits[r.head];
+    h1                   = r.valid_bits[head1_idx] ? array[head1_idx] : init_rob_entry;
+    h1.valid             = r.valid_bits[head1_idx];
 
-    h0_hit0 = rob_in.write_en0 && r.valid_bits[rob_in.write_tag0] && (rob_in.write_tag0 == r.head);
-    h1_hit0 = rob_in.write_en0 && r.valid_bits[rob_in.write_tag0] && (rob_in.write_tag0 == head1_idx);
-    h0_hit1 = rob_in.write_en1 && r.valid_bits[rob_in.write_tag1] && (rob_in.write_tag1 == r.head);
-    h1_hit1 = rob_in.write_en1 && r.valid_bits[rob_in.write_tag1] && (rob_in.write_tag1 == head1_idx);
-    h0_hit2 = rob_in.write_en2 && r.valid_bits[rob_in.write_tag2] && (rob_in.write_tag2 == r.head);
-    h1_hit2 = rob_in.write_en2 && r.valid_bits[rob_in.write_tag2] && (rob_in.write_tag2 == head1_idx);
-    h0_hit3 = rob_in.write_en3 && r.valid_bits[rob_in.write_tag3] && (rob_in.write_tag3 == r.head);
-    h1_hit3 = rob_in.write_en3 && r.valid_bits[rob_in.write_tag3] && (rob_in.write_tag3 == head1_idx);
-    h0_hit4 = rob_in.write_en4 && r.valid_bits[rob_in.write_tag4] && (rob_in.write_tag4 == r.head);
-    h1_hit4 = rob_in.write_en4 && r.valid_bits[rob_in.write_tag4] && (rob_in.write_tag4 == head1_idx);
-    h0_hit5 = rob_in.write_en5 && r.valid_bits[rob_in.write_tag5] && (rob_in.write_tag5 == r.head);
-    h1_hit5 = rob_in.write_en5 && r.valid_bits[rob_in.write_tag5] && (rob_in.write_tag5 == head1_idx);
+    wv0                  = rob_in.write_en0 && r.valid_bits[rob_in.write_tag0];
+    wv1                  = rob_in.write_en1 && r.valid_bits[rob_in.write_tag1];
+    wv2                  = rob_in.write_en2 && r.valid_bits[rob_in.write_tag2];
+    wv3                  = rob_in.write_en3 && r.valid_bits[rob_in.write_tag3];
+    wv4                  = rob_in.write_en4 && r.valid_bits[rob_in.write_tag4];
+    wv5                  = rob_in.write_en5 && r.valid_bits[rob_in.write_tag5];
+
+    h0_hit0              = wv0 && (rob_in.write_tag0 == r.head);
+    h1_hit0              = wv0 && (rob_in.write_tag0 == head1_idx);
+    h0_hit1              = wv1 && (rob_in.write_tag1 == r.head);
+    h1_hit1              = wv1 && (rob_in.write_tag1 == head1_idx);
+    h0_hit2              = wv2 && (rob_in.write_tag2 == r.head);
+    h1_hit2              = wv2 && (rob_in.write_tag2 == head1_idx);
+    h0_hit3              = wv3 && (rob_in.write_tag3 == r.head);
+    h1_hit3              = wv3 && (rob_in.write_tag3 == head1_idx);
+    h0_hit4              = wv4 && (rob_in.write_tag4 == r.head);
+    h1_hit4              = wv4 && (rob_in.write_tag4 == head1_idx);
+    h0_hit5              = wv5 && (rob_in.write_tag5 == r.head);
+    h1_hit5              = wv5 && (rob_in.write_tag5 == head1_idx);
 
     if (h0_hit0) begin
       h0.done       = 1'b1;
