@@ -258,8 +258,6 @@ module msu (
       v.rob_wen0           = 1'b1;
       v.rob_wentry0.done   = 1'b1;
       v.rob_wentry0.result = msu_in.lsu0_out.result;
-      v.load0_pending      = (load0_accept && !msu_in.agu2_out.exception) ? 1'b1 : 1'b0;
-      v.load0_sent         = 1'b0;
     end
     if (load1_accept && msu_in.agu3_out.exception) begin
       v.rob_wtag1             = msu_in.issue1.rob_tag;
@@ -275,8 +273,6 @@ module msu (
       v.rob_wen1           = 1'b1;
       v.rob_wentry1.done   = 1'b1;
       v.rob_wentry1.result = msu_in.lsu1_out.result;
-      v.load1_pending      = (load1_accept && !msu_in.agu3_out.exception) ? 1'b1 : 1'b0;
-      v.load1_sent         = 1'b0;
     end
 
     rin = v;

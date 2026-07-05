@@ -30,7 +30,7 @@ module csr (
   always_comb begin
     if ((csr_ein.valid0 & csr_ein.valid1) == 1) begin
       incr = 2;
-    end else if ((csr_ein.valid0 | csr_ein.valid1) == 1) begin
+    end else if (valid == 1) begin
       incr = 1;
     end else begin
       incr = 0;
@@ -178,7 +178,7 @@ module csr (
             csr_machine_reg.mie.ueie <= csr_win.cdata[8];
             csr_machine_reg.mie.mtie <= csr_win.cdata[7];
             csr_machine_reg.mie.stie <= csr_win.cdata[5];
-            csr_machine_reg.mie.ueie <= csr_win.cdata[4];
+            csr_machine_reg.mie.utie <= csr_win.cdata[4];
             csr_machine_reg.mie.msie <= csr_win.cdata[3];
             csr_machine_reg.mie.ssie <= csr_win.cdata[1];
             csr_machine_reg.mie.usie <= csr_win.cdata[0];
@@ -187,7 +187,7 @@ module csr (
             csr_machine_reg.mip.seip <= csr_win.cdata[9];
             csr_machine_reg.mip.ueip <= csr_win.cdata[8];
             csr_machine_reg.mip.stip <= csr_win.cdata[5];
-            csr_machine_reg.mip.ueip <= csr_win.cdata[4];
+            csr_machine_reg.mip.utip <= csr_win.cdata[4];
             csr_machine_reg.mip.ssip <= csr_win.cdata[1];
             csr_machine_reg.mip.usip <= csr_win.cdata[0];
           end
@@ -239,30 +239,10 @@ module csr (
         csr_machine_reg.mtval        <= csr_ein.etval;
         csr_machine_reg.mcause       <= {24'b0, csr_ein.ecause};
         exception                    <= 1;
-      end else if (csr_machine_reg.mstatus.mie == 1 &&
-                   csr_machine_reg.mie.meie == 1 &&
-                   csr_machine_reg.mip.meip == 1 &&
-                   valid == 1) begin
-        csr_machine_reg.mstatus.mpie <= csr_machine_reg.mstatus.mie;
-        csr_machine_reg.mstatus.mie  <= 0;
-        csr_machine_reg.mepc         <= csr_ein.pc;
-        csr_machine_reg.mtval        <= 0;
-        csr_machine_reg.mcause       <= {1'b1, 23'b0, cause};
-        interrupt                    <= 1;
-      end else if (csr_machine_reg.mstatus.mie == 1 &&
-                   csr_machine_reg.mie.mtie == 1 &&
-                   csr_machine_reg.mip.mtip == 1 &&
-                   valid == 1) begin
-        csr_machine_reg.mstatus.mpie <= csr_machine_reg.mstatus.mie;
-        csr_machine_reg.mstatus.mie  <= 0;
-        csr_machine_reg.mepc         <= csr_ein.pc;
-        csr_machine_reg.mtval        <= 0;
-        csr_machine_reg.mcause       <= {1'b1, 23'b0, cause};
-        interrupt                    <= 1;
-      end else if (csr_machine_reg.mstatus.mie == 1 &&
-                   csr_machine_reg.mie.msie == 1 &&
-                   csr_machine_reg.mip.msip == 1 &&
-                   valid == 1) begin
+      end else if (csr_machine_reg.mstatus.mie == 1 && valid == 1 &&
+                   ((csr_machine_reg.mie.meie == 1 && csr_machine_reg.mip.meip == 1) ||
+                    (csr_machine_reg.mie.mtie == 1 && csr_machine_reg.mip.mtip == 1) ||
+                    (csr_machine_reg.mie.msie == 1 && csr_machine_reg.mip.msip == 1))) begin
         csr_machine_reg.mstatus.mpie <= csr_machine_reg.mstatus.mie;
         csr_machine_reg.mstatus.mie  <= 0;
         csr_machine_reg.mepc         <= csr_ein.pc;

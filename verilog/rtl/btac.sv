@@ -176,6 +176,9 @@ module btac_ctrl (
   btb_reg_type r_btb, rin_btb, v_btb;
   bht_reg_type r_bht, rin_bht, v_bht;
 
+  logic sel0;
+  logic sel1;
+
   always_comb begin
 
     v_btb = r_btb;
@@ -243,15 +246,18 @@ module btac_ctrl (
       v_btb.miss1  = 1;
     end
 
-    v_btb.wen = (v_btb.hit0 | v_btb.miss0) | (v_btb.hit1 | v_btb.miss1);
-    v_btb.waddr = (v_btb.hit0 | v_btb.miss0) ? btac_in.upd_pc0[B_DEPTH:1] : btac_in.upd_pc1[B_DEPTH:1];
-    v_btb.wdata = (v_btb.hit0 | v_btb.miss0) ? {1'b1,btac_in.upd_branch0,btac_in.upd_pc0[31:B_DEPTH+1],v_btb.maddr0} : {1'b1,btac_in.upd_branch1,btac_in.upd_pc1[31:B_DEPTH+1],v_btb.maddr1};
+    sel0 = v_btb.hit0 | v_btb.miss0;
+    sel1 = v_btb.hit1 | v_btb.miss1;
 
-    v_bht.wen = ((v_btb.hit0 | v_btb.miss0) & btac_in.upd_branch0) | ((v_btb.hit1 | v_btb.miss1) & btac_in.upd_branch1);
-    v_bht.waddr = (v_btb.hit0 | v_btb.miss0) ? btac_in.upd_pc0[T_DEPTH:1] : btac_in.upd_pc1[T_DEPTH:1];
+    v_btb.wen = sel0 | sel1;
+    v_btb.waddr = sel0 ? btac_in.upd_pc0[B_DEPTH:1] : btac_in.upd_pc1[B_DEPTH:1];
+    v_btb.wdata = sel0 ? {1'b1,btac_in.upd_branch0,btac_in.upd_pc0[31:B_DEPTH+1],v_btb.maddr0} : {1'b1,btac_in.upd_branch1,btac_in.upd_pc1[31:B_DEPTH+1],v_btb.maddr1};
+
+    v_bht.wen = (sel0 & btac_in.upd_branch0) | (sel1 & btac_in.upd_branch1);
+    v_bht.waddr = sel0 ? btac_in.upd_pc0[T_DEPTH:1] : btac_in.upd_pc1[T_DEPTH:1];
     v_bht.sat0 = saturation(btac_in.upd_pred0.tsat, btac_in.upd_jump0);
     v_bht.sat1 = saturation(btac_in.upd_pred1.tsat, btac_in.upd_jump1);
-    v_bht.wdata = (v_btb.hit0 | v_btb.miss0) ? v_bht.sat0 : v_bht.sat1;
+    v_bht.wdata = sel0 ? v_bht.sat0 : v_bht.sat1;
 
     btb_in.wen = v_btb.wen;
     btb_in.waddr = v_btb.waddr;

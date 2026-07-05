@@ -51,7 +51,7 @@ module fl (
     fl_out.alloc_ok0 = (r.spec_count >= 1);
     fl_out.alloc_ok1 = (r.spec_count >= 2);
     fl_out.empty = (r.spec_count == '0);
-    fl_out.has_two = (r.spec_count >= 2);
+    fl_out.has_two = fl_out.alloc_ok1;
 
     if (flush) begin
       v.spec_head  = r.comm_head;

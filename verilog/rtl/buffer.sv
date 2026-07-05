@@ -108,6 +108,8 @@ module buffer_ctrl (
 
   int base, need;
 
+  logic [DEPTH-1:0] rid_p1;
+
   always_comb begin
 
     v = r;
@@ -145,25 +147,27 @@ module buffer_ctrl (
     buffer_reg_in.wdata[2] = v.wdata[2];
     buffer_reg_in.wdata[3] = v.wdata[3];
 
+    rid_p1                 = v.rid[DEPTH+1:2] + one;
+
     if (v.rid[1:0] == 0) begin
       buffer_reg_in.raddr[0] = v.rid[DEPTH+1:2];
       buffer_reg_in.raddr[1] = v.rid[DEPTH+1:2];
       buffer_reg_in.raddr[2] = v.rid[DEPTH+1:2];
       buffer_reg_in.raddr[3] = v.rid[DEPTH+1:2];
     end else if (v.rid[1:0] == 1) begin
-      buffer_reg_in.raddr[0] = v.rid[DEPTH+1:2] + one;
+      buffer_reg_in.raddr[0] = rid_p1;
       buffer_reg_in.raddr[1] = v.rid[DEPTH+1:2];
       buffer_reg_in.raddr[2] = v.rid[DEPTH+1:2];
       buffer_reg_in.raddr[3] = v.rid[DEPTH+1:2];
     end else if (v.rid[1:0] == 2) begin
-      buffer_reg_in.raddr[0] = v.rid[DEPTH+1:2] + one;
-      buffer_reg_in.raddr[1] = v.rid[DEPTH+1:2] + one;
+      buffer_reg_in.raddr[0] = rid_p1;
+      buffer_reg_in.raddr[1] = rid_p1;
       buffer_reg_in.raddr[2] = v.rid[DEPTH+1:2];
       buffer_reg_in.raddr[3] = v.rid[DEPTH+1:2];
     end else begin
-      buffer_reg_in.raddr[0] = v.rid[DEPTH+1:2] + one;
-      buffer_reg_in.raddr[1] = v.rid[DEPTH+1:2] + one;
-      buffer_reg_in.raddr[2] = v.rid[DEPTH+1:2] + one;
+      buffer_reg_in.raddr[0] = rid_p1;
+      buffer_reg_in.raddr[1] = rid_p1;
+      buffer_reg_in.raddr[2] = rid_p1;
       buffer_reg_in.raddr[3] = v.rid[DEPTH+1:2];
     end
 

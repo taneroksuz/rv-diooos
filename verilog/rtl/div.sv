@@ -23,7 +23,7 @@ module div (
         v.div_op     = div_in.div_op;
         v.division   = v.div_op.divs | v.div_op.rem | v.div_op.divu | v.div_op.remu;
         v.op1_signed = v.div_op.divs | v.div_op.rem;
-        v.op2_signed = v.div_op.divs | v.div_op.rem;
+        v.op2_signed = v.op1_signed;
         v.negativ    = 0;
         v.op1_neg    = 0;
         if (v.op1_signed == 1 && v.data1[31] == 1) begin
@@ -52,8 +52,7 @@ module div (
           v.counter        = 32;
         end
         v.overflow = 0;
-        if ((v.div_op.divs == 1 | v.div_op.rem == 1) &&
-            v.op1 == 32'h80000000 && v.op2 == 32'hFFFFFFFF) begin
+        if (v.op1_signed == 1 && v.op1 == 32'h80000000 && v.op2 == 32'hFFFFFFFF) begin
           v.overflow = 1;
           v.counter  = 32;
         end

@@ -150,7 +150,7 @@ module rs_int (
         v.valid_bits[v.sel0_idx] = 1'b0;
         v.count                  = v.count - 1'b1;
       end
-      if (v.sel1_found && !(v.sel0_found && woken[v.sel0_idx].op.csreg)) begin
+      if (v.rs_o.issue1_valid) begin
         v.valid_bits[v.sel1_idx] = 1'b0;
         v.count                  = v.count - 1'b1;
       end
@@ -198,7 +198,7 @@ module rs_int (
           array[i] <= rs_in.entry1;
         end else if (r.valid_bits[i] && rin.valid_bits[i] &&
                      !((rin.sel0_found && (rin.sel0_idx == RS_ADDR_BITS'(unsigned'(i)))) ||
-                       (rin.sel1_found && !(rin.sel0_found && woken[rin.sel0_idx].op.csreg) && (rin.sel1_idx == RS_ADDR_BITS'(unsigned'(i)))))) begin
+                       (rin.rs_o.issue1_valid && (rin.sel1_idx == RS_ADDR_BITS'(unsigned'(i)))))) begin
           array[i] <= woken[i];
         end
       end

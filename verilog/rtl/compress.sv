@@ -69,6 +69,9 @@ module compress (
 
   logic [0 : 0] nonzero_shamt;
 
+  logic [0 : 0] nonzero_raddr1;
+  logic [0 : 0] nonzero_raddr2;
+
   always_comb begin
 
     instr = compress_in.instr;
@@ -143,6 +146,9 @@ module compress (
     nonzero_imm_p = |imm_p;
 
     nonzero_shamt = |shamt;
+
+    nonzero_raddr1 = |raddr1;
+    nonzero_raddr2 = |raddr2;
 
     case (opcode)
       opcode_c0: begin
@@ -346,13 +352,13 @@ module compress (
           c2_alu: begin
             case (funct4)
               0: begin
-                if (|raddr1 == 1) begin
-                  if (|raddr2 == 0) begin
+                if (nonzero_raddr1 == 1) begin
+                  if (nonzero_raddr2 == 0) begin
                     instr_str = "c.jr";
                     rden1     = 1;
                     waddr     = 0;
                     jalr      = 1;
-                  end else if (|raddr2 == 1) begin
+                  end else if (nonzero_raddr2 == 1) begin
                     instr_str      = "c.mv";
                     wren           = 1;
                     rden2          = 1;
@@ -362,19 +368,19 @@ module compress (
                 end
               end
               1: begin
-                if (|raddr1 == 0) begin
-                  if (|raddr2 == 0) begin
+                if (nonzero_raddr1 == 0) begin
+                  if (nonzero_raddr2 == 0) begin
                     instr_str = "c.ebreak";
                     ebreak    = 1;
                   end
-                end else if (|raddr1 == 1) begin
-                  if (|raddr2 == 0) begin
+                end else if (nonzero_raddr1 == 1) begin
+                  if (nonzero_raddr2 == 0) begin
                     instr_str = "c.jalr";
                     wren      = 1;
                     rden1     = 1;
                     waddr     = 1;
                     jalr      = 1;
-                  end else if (|raddr2 == 1) begin
+                  end else if (nonzero_raddr2 == 1) begin
                     instr_str      = "c.add";
                     wren           = 1;
                     rden1          = 1;

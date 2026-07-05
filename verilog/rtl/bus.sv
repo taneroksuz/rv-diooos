@@ -57,6 +57,11 @@ module bus (
   logic [0 : 0] dtim0_rev_reg;
   logic [0 : 0] dtim1_rev_reg;
 
+  logic itim0_hit_i, dtim0_hit_i;
+  logic itim0_hit_d, dtim0_hit_d;
+  logic itim1_hit_i, dtim1_hit_i;
+  logic itim1_hit_d, dtim1_hit_d;
+
   always_comb begin
 
     itim0_in    = init_mem_in;
@@ -74,56 +79,65 @@ module bus (
     dtim0_rev   = dtim0_rev_reg;
     dtim1_rev   = dtim1_rev_reg;
 
-    if (imem0_in.mem_valid & ~|(ITIM_BASE ^ (imem0_in.mem_addr & ITIM_MASK))) begin
+    itim0_hit_i = ~|(ITIM_BASE ^ (imem0_in.mem_addr & ITIM_MASK));
+    dtim0_hit_i = ~|(DTIM_BASE ^ (imem0_in.mem_addr & DTIM_MASK));
+    itim0_hit_d = ~|(ITIM_BASE ^ (dmem0_in.mem_addr & ITIM_MASK));
+    dtim0_hit_d = ~|(DTIM_BASE ^ (dmem0_in.mem_addr & DTIM_MASK));
+    itim1_hit_i = ~|(ITIM_BASE ^ (imem1_in.mem_addr & ITIM_MASK));
+    dtim1_hit_i = ~|(DTIM_BASE ^ (imem1_in.mem_addr & DTIM_MASK));
+    itim1_hit_d = ~|(ITIM_BASE ^ (dmem1_in.mem_addr & ITIM_MASK));
+    dtim1_hit_d = ~|(DTIM_BASE ^ (dmem1_in.mem_addr & DTIM_MASK));
+
+    if (imem0_in.mem_valid & itim0_hit_i) begin
       itim0_in          = imem0_in;
       itim0_in.mem_addr = imem0_in.mem_addr - ITIM_BASE;
       itim0_rev         = 0;
-    end else if (dmem0_in.mem_valid & ~|(ITIM_BASE ^ (dmem0_in.mem_addr & ITIM_MASK))) begin
+    end else if (dmem0_in.mem_valid & itim0_hit_d) begin
       itim0_in          = dmem0_in;
       itim0_in.mem_addr = dmem0_in.mem_addr - ITIM_BASE;
       itim0_rev         = 1;
     end
 
-    if (imem1_in.mem_valid & ~|(ITIM_BASE ^ (imem1_in.mem_addr & ITIM_MASK))) begin
+    if (imem1_in.mem_valid & itim1_hit_i) begin
       itim1_in          = imem1_in;
       itim1_in.mem_addr = imem1_in.mem_addr - ITIM_BASE;
       itim1_rev         = 0;
-    end else if (dmem1_in.mem_valid & ~|(ITIM_BASE ^ (dmem1_in.mem_addr & ITIM_MASK))) begin
+    end else if (dmem1_in.mem_valid & itim1_hit_d) begin
       itim1_in          = dmem1_in;
       itim1_in.mem_addr = dmem1_in.mem_addr - ITIM_BASE;
       itim1_rev         = 1;
     end
 
-    if (imem0_in.mem_valid & ~|(DTIM_BASE ^ (imem0_in.mem_addr & DTIM_MASK))) begin
+    if (imem0_in.mem_valid & dtim0_hit_i) begin
       dtim0_in          = imem0_in;
       dtim0_in.mem_addr = imem0_in.mem_addr - DTIM_BASE;
       dtim0_rev         = 1;
-    end else if (dmem0_in.mem_valid & ~|(DTIM_BASE ^ (dmem0_in.mem_addr & DTIM_MASK))) begin
+    end else if (dmem0_in.mem_valid & dtim0_hit_d) begin
       dtim0_in          = dmem0_in;
       dtim0_in.mem_addr = dmem0_in.mem_addr - DTIM_BASE;
       dtim0_rev         = 0;
     end
 
-    if (imem1_in.mem_valid & ~|(DTIM_BASE ^ (imem1_in.mem_addr & DTIM_MASK))) begin
+    if (imem1_in.mem_valid & dtim1_hit_i) begin
       dtim1_in          = imem1_in;
       dtim1_in.mem_addr = imem1_in.mem_addr - DTIM_BASE;
       dtim1_rev         = 1;
-    end else if (dmem1_in.mem_valid & ~|(DTIM_BASE ^ (dmem1_in.mem_addr & DTIM_MASK))) begin
+    end else if (dmem1_in.mem_valid & dtim1_hit_d) begin
       dtim1_in          = dmem1_in;
       dtim1_in.mem_addr = dmem1_in.mem_addr - DTIM_BASE;
       dtim1_rev         = 0;
     end
 
-    if (imem0_in.mem_valid & |(ITIM_BASE ^ (imem0_in.mem_addr & ITIM_MASK)) & |(DTIM_BASE ^ (imem0_in.mem_addr & DTIM_MASK))) begin
+    if (imem0_in.mem_valid & ~itim0_hit_i & ~dtim0_hit_i) begin
       ibridge0_in = imem0_in;
     end
-    if (imem1_in.mem_valid & |(ITIM_BASE ^ (imem1_in.mem_addr & ITIM_MASK)) & |(DTIM_BASE ^ (imem1_in.mem_addr & DTIM_MASK))) begin
+    if (imem1_in.mem_valid & ~itim1_hit_i & ~dtim1_hit_i) begin
       ibridge1_in = imem1_in;
     end
-    if (dmem0_in.mem_valid & |(ITIM_BASE ^ (dmem0_in.mem_addr & ITIM_MASK)) & |(DTIM_BASE ^ (dmem0_in.mem_addr & DTIM_MASK))) begin
+    if (dmem0_in.mem_valid & ~itim0_hit_d & ~dtim0_hit_d) begin
       dbridge0_in = dmem0_in;
     end
-    if (dmem1_in.mem_valid & |(ITIM_BASE ^ (dmem1_in.mem_addr & ITIM_MASK)) & |(DTIM_BASE ^ (dmem1_in.mem_addr & DTIM_MASK))) begin
+    if (dmem1_in.mem_valid & ~itim1_hit_d & ~dtim1_hit_d) begin
       dbridge1_in = dmem1_in;
     end
 

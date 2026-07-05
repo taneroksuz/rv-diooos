@@ -213,7 +213,7 @@ module rob (
       rob_out.alloc_tag1   = r.tail_ptr + ROB_ADDR_BITS'(1);
       rob_out.full         = (r.count >= ROB_DEPTH - 1);
       rob_out.has_two_free = (r.count <= ROB_DEPTH - 2);
-      rob_out.stall        = (r.count >= ROB_DEPTH - 1);
+      rob_out.stall        = rob_out.full;
       rob_out.entry0       = h0;
       rob_out.entry1       = h1;
     end

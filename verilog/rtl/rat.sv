@@ -10,9 +10,6 @@ module rat (
 );
   timeunit 1ns; timeprecision 1ps;
 
-  typedef struct packed {logic [0:0] active;} rat_reg_type;
-  localparam rat_reg_type init_rat_reg = '{active: 1'b0};
-
   logic [PRF_ADDR_BITS:0] spec[0:ARCH_REGS-1] = '{
       0: {1'b1, PRF_ADDR_BITS'(0)},
       1: {1'b1, PRF_ADDR_BITS'(1)},
@@ -83,11 +80,9 @@ module rat (
       31: {1'b1, PRF_ADDR_BITS'(31)}
   };
 
-  rat_reg_type r, rin, v;
   logic [PRF_ADDR_BITS:0] eff0, eff1, eff2, eff3, old0, old1;
 
   always_comb begin
-    v    = r;
     eff0 = flush ? comm[rat_in.rsrc0_a] : spec[rat_in.rsrc0_a];
     eff1 = flush ? comm[rat_in.rsrc1_a] : spec[rat_in.rsrc1_a];
     eff2 = flush ? comm[rat_in.rsrc2_a] : spec[rat_in.rsrc2_a];
@@ -141,15 +136,6 @@ module rat (
     end else begin
       rat_out.psrc3       = eff3[PRF_ADDR_BITS-1:0];
       rat_out.psrc3_valid = eff3[PRF_ADDR_BITS];
-    end
-    rin = v;
-  end
-
-  always_ff @(posedge clock) begin
-    if (reset == 0) begin
-      r <= init_rat_reg;
-    end else begin
-      r <= rin;
     end
   end
 
