@@ -21,6 +21,7 @@ module top (
   logic CLOCK_CPU;
   logic LOCKED;
   logic RESET;
+  logic [1:0] CLEAR;
 
   logic SCLK;
   logic MOSI;
@@ -44,10 +45,19 @@ module top (
     .locked  (LOCKED)
   );
 
+  always_ff @(posedge CLOCK_CPU) begin
+    if (RESET == 0) begin
+      CLEAR <= 2'b11;
+    end else begin
+      CLEAR <= {1'b0, CLEAR[1]};
+    end
+  end
+
   assign RESET = LOCKED & KEY[0];
 
   soc soc_comp (
     .reset  (RESET),
+    .clear  (CLEAR[0]),
     .clock  (CLOCK_CPU),
     .sclk   (SCLK),
     .mosi   (MOSI),

@@ -3,6 +3,7 @@ import wires::*;
 
 module bus (
   input  logic        reset,
+  input  logic        clear,
   input  logic        clock,
   input  mem_in_type  imem0_in,
   input  mem_in_type  imem1_in,
