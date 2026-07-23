@@ -22,7 +22,7 @@ module csr (
   logic [7 : 0] cause = 0;
   logic [0 : 0] mret = 0;
 
-  logic [0 : 0] valid;
+  logic [ 0 : 0] valid;
   logic [63 : 0] incr;
 
   assign valid = csr_ein.valid0 | csr_ein.valid1;

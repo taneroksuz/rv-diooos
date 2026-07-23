@@ -94,21 +94,21 @@ module msu (
       v.load1_sent    = 1'b0;
     end
 
-    v.lsu0_in.ldata     = msu_in.dmem0_out.mem_rdata;
-    v.lsu1_in.ldata     = msu_in.dmem1_out.mem_rdata;
+    v.lsu0_in.ldata = msu_in.dmem0_out.mem_rdata;
+    v.lsu1_in.ldata = msu_in.dmem1_out.mem_rdata;
 
     commit_store0_valid = msu_in.commit_store0 && !msu_in.commit_entry0.exception;
     commit_store1_valid = msu_in.commit_store1 && !msu_in.commit_entry1.exception;
 
-    load0_busy          = r.load0_pending && !msu_in.dmem0_out.mem_ready;
-    load1_busy          = r.load1_pending && !msu_in.dmem1_out.mem_ready;
-    store0_busy         = r.store0_pending && !msu_in.dmem0_out.mem_ready;
-    store1_busy         = r.store1_pending && !msu_in.dmem1_out.mem_ready;
-    store0_done         = r.store0_pending && r.store0_sent && msu_in.dmem0_out.mem_ready;
-    store1_done         = r.store1_pending && r.store1_sent && msu_in.dmem1_out.mem_ready;
+    load0_busy  = r.load0_pending && !msu_in.dmem0_out.mem_ready;
+    load1_busy  = r.load1_pending && !msu_in.dmem1_out.mem_ready;
+    store0_busy = r.store0_pending && !msu_in.dmem0_out.mem_ready;
+    store1_busy = r.store1_pending && !msu_in.dmem1_out.mem_ready;
+    store0_done = r.store0_pending && r.store0_sent && msu_in.dmem0_out.mem_ready;
+    store1_done = r.store1_pending && r.store1_sent && msu_in.dmem1_out.mem_ready;
 
-    slot0_free_pre      = !r.store0_pending || store0_done;
-    slot1_free_pre      = !r.store1_pending || store1_done;
+    slot0_free_pre = !r.store0_pending || store0_done;
+    slot1_free_pre = !r.store1_pending || store1_done;
 
     commit_claims_slot0 = 1'b0;
     commit_claims_slot1 = 1'b0;
@@ -130,10 +130,10 @@ module msu (
     slot0_blocked = load0_busy || store0_busy || commit_claims_slot0;
     slot1_blocked = load1_busy || store1_busy || commit_claims_slot1;
 
-    load0_accept  = msu_in.issue0_valid && msu_in.issue0.op.load && !slot0_blocked && !flush;
-    load1_accept  = msu_in.issue1_valid && msu_in.issue1.op.load && !slot1_blocked && !flush;
-    load0_ready   = r.load0_pending && !r.store0_pending && msu_in.dmem0_out.mem_ready && !flush;
-    load1_ready   = r.load1_pending && !r.store1_pending && msu_in.dmem1_out.mem_ready && !flush;
+    load0_accept = msu_in.issue0_valid && msu_in.issue0.op.load && !slot0_blocked && !flush;
+    load1_accept = msu_in.issue1_valid && msu_in.issue1.op.load && !slot1_blocked && !flush;
+    load0_ready  = r.load0_pending && !r.store0_pending && msu_in.dmem0_out.mem_ready && !flush;
+    load1_ready  = r.load1_pending && !r.store1_pending && msu_in.dmem1_out.mem_ready && !flush;
 
     if (load0_accept && !msu_in.agu2_out.exception) begin
       v.load0_pending      = 1'b1;
@@ -287,7 +287,7 @@ module msu (
     msu_out.rob_wen1 = r.rob_wen1;
     msu_out.load_busy = {slot1_blocked, slot0_blocked};
     msu_out.store_ready = !(r.store0_pending || r.store1_pending) &&
-                          !(msu_in.commit_store0 || msu_in.commit_store1);
+        !(msu_in.commit_store0 || msu_in.commit_store1);
     msu_out.dmem1_in = v.dmem1_in;
     msu_out.lsu1_in = v.lsu1_in;
     msu_out.dmem0_in = v.dmem0_in;

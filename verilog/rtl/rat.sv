@@ -115,11 +115,12 @@ module rat (
 
     rat_out = init_rat_out;
     rat_out.old_pdest0 = old0[PRF_ADDR_BITS-1:0];
-    rat_out.old_pdest1 = (rat_in.wren0 && (rat_in.waddr0_a == rat_in.waddr1_a)) ? rat_in.waddr0_p : old1[PRF_ADDR_BITS-1:0];
+    rat_out.old_pdest1 = (rat_in.wren0 && (rat_in.waddr0_a == rat_in.waddr1_a)) ? rat_in.waddr0_p :
+        old1[PRF_ADDR_BITS-1:0];
 
-    rat_out.psrc0 = eff0[PRF_ADDR_BITS-1:0];
+    rat_out.psrc0       = eff0[PRF_ADDR_BITS-1:0];
     rat_out.psrc0_valid = eff0[PRF_ADDR_BITS];
-    rat_out.psrc1 = eff1[PRF_ADDR_BITS-1:0];
+    rat_out.psrc1       = eff1[PRF_ADDR_BITS-1:0];
     rat_out.psrc1_valid = eff1[PRF_ADDR_BITS];
 
     if (rat_in.wren0 && (rat_in.rsrc2_a == rat_in.waddr0_a) && (rat_in.waddr0_a != 5'h0)) begin

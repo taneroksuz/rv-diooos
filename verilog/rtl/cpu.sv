@@ -287,7 +287,8 @@ module cpu (
   assign commit_in.btac_out = btac_out;
   assign register0_win = commit_out.register0_win;
   assign register1_win = commit_out.register1_win;
-  assign commit_flush = clear | csr_out.trap | csr_out.mret | btac_out.pred_miss0 | btac_out.pred_miss1;
+  assign commit_flush = clear | csr_out.trap | csr_out.mret | btac_out.pred_miss0 |
+      btac_out.pred_miss1;
   alu alu0_comp (
     .alu_in (alu0_in),
     .alu_out(alu0_out)

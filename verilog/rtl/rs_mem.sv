@@ -22,16 +22,16 @@ module rs_mem (
 
   rs_entry_type array[0:RS_MEM_DEPTH-1];
   rs_mem_reg_type r, rin, v;
-  rs_entry_type woken[0:RS_MEM_DEPTH-1];
+  rs_entry_type woken     [0:RS_MEM_DEPTH-1];
   rs_entry_type cur_entry;
   logic [MEM_ADDR_BITS-1:0] sel0_idx, sel1_idx;
   logic sel0_found, sel1_found;
   logic [MEM_ADDR_BITS-1:0] free_idx0, free_idx1;
   logic free_found0, free_found1;
   logic [ROB_ADDR_BITS-1:0] best0_age, best1_age, cand_age;
-  logic [ROB_DEPTH-1:0] store_valid;
-  logic [ROB_ADDR_BITS-1:0] store_age[0:ROB_DEPTH-1];
-  logic older_store_block;
+  logic [    ROB_DEPTH-1:0] store_valid;
+  logic [ROB_ADDR_BITS-1:0] store_age         [0:ROB_DEPTH-1];
+  logic                     older_store_block;
   logic [MEM_ADDR_BITS-1:0] oldest0_idx, oldest1_idx;
   logic oldest0_found, oldest1_found;
   logic oldest0_ready, oldest1_ready;
@@ -111,7 +111,7 @@ module rs_mem (
         end
       end
       oldest0_ready = woken[oldest0_idx].src1_ready && woken[oldest0_idx].src2_ready &&
-                      (woken[oldest0_idx].op.store || (woken[oldest0_idx].op.load && !older_store_block));
+          (woken[oldest0_idx].op.store || (woken[oldest0_idx].op.load && !older_store_block));
     end
     if (oldest1_found) begin
       older_store_block = 1'b0;
@@ -123,7 +123,7 @@ module rs_mem (
         end
       end
       oldest1_ready = woken[oldest1_idx].src1_ready && woken[oldest1_idx].src2_ready &&
-                      (woken[oldest1_idx].op.store || (woken[oldest1_idx].op.load && !older_store_block));
+          (woken[oldest1_idx].op.store || (woken[oldest1_idx].op.load && !older_store_block));
     end
     sel0_found = 1'b0;
     sel1_found = 1'b0;
@@ -147,8 +147,7 @@ module rs_mem (
 
     for (int i = 0; i < RS_MEM_DEPTH; i++) begin
       logic free_cond;
-      free_cond = (!woken[i].valid ||
-                   (sel0_found && (sel0_idx == MEM_ADDR_BITS'(unsigned'(i)))) ||
+      free_cond = (!woken[i].valid || (sel0_found && (sel0_idx == MEM_ADDR_BITS'(unsigned'(i)))) ||
                    (sel1_found && (sel1_idx == MEM_ADDR_BITS'(unsigned'(i)))));
       if (free_cond && !free_found0) begin
         free_idx0   = MEM_ADDR_BITS'(unsigned'(i));
@@ -216,7 +215,8 @@ module rs_mem (
         for (int i = 0; i < RS_MEM_DEPTH; i++) begin
           if (rs_in.alloc0 && free_found0 && (free_idx0 == MEM_ADDR_BITS'(unsigned'(i)))) begin
             array[i] <= rs_in.entry0;
-          end else if (rs_in.alloc1 && free_found1 && (free_idx1 == MEM_ADDR_BITS'(unsigned'(i)))) begin
+          end else
+              if (rs_in.alloc1 && free_found1 && (free_idx1 == MEM_ADDR_BITS'(unsigned'(i)))) begin
             array[i] <= rs_in.entry1;
           end else if (r.valid_bits[i] && rin.valid_bits[i] &&
                        !(sel0_found && (sel0_idx == MEM_ADDR_BITS'(unsigned'(i)))) &&

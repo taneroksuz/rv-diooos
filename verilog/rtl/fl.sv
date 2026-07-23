@@ -35,19 +35,21 @@ module fl (
   logic [FL_CNT_BITS-1:0] spec_head_p1;
 
   always_comb begin
-    v = r;
-    do_free0 = 1'b0;
-    do_free1 = 1'b0;
+    v          = r;
+    do_free0   = 1'b0;
+    do_free1   = 1'b0;
     free0_slot = '0;
     free1_slot = '0;
 
-    alloc_slot0 = r.spec_head[FL_IDX_BITS-1:0];
+    alloc_slot0  = r.spec_head[FL_IDX_BITS-1:0];
     spec_head_p1 = r.spec_head + FL_CNT_BITS'(1);
-    alloc_slot1 = spec_head_p1[FL_IDX_BITS-1:0];
+    alloc_slot1  = spec_head_p1[FL_IDX_BITS-1:0];
 
     fl_out = '0;
-    fl_out.alloc_tag0 = r.list_written[alloc_slot0] ? list[alloc_slot0] : (PRF_ADDR_BITS'(ARCH_REGS) + PRF_ADDR_BITS'(alloc_slot0));
-    fl_out.alloc_tag1 = r.list_written[alloc_slot1] ? list[alloc_slot1] : (PRF_ADDR_BITS'(ARCH_REGS) + PRF_ADDR_BITS'(alloc_slot1));
+    fl_out.alloc_tag0 = r.list_written[alloc_slot0] ?
+        list[alloc_slot0] : (PRF_ADDR_BITS'(ARCH_REGS) + PRF_ADDR_BITS'(alloc_slot0));
+    fl_out.alloc_tag1 = r.list_written[alloc_slot1] ?
+        list[alloc_slot1] : (PRF_ADDR_BITS'(ARCH_REGS) + PRF_ADDR_BITS'(alloc_slot1));
     fl_out.alloc_ok0 = (r.spec_count >= 1);
     fl_out.alloc_ok1 = (r.spec_count >= 2);
     fl_out.empty = (r.spec_count == '0);

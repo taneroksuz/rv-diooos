@@ -65,20 +65,20 @@ module bus (
 
   always_comb begin
 
-    itim0_in    = init_mem_in;
-    itim1_in    = init_mem_in;
-    dtim0_in    = init_mem_in;
-    dtim1_in    = init_mem_in;
+    itim0_in = init_mem_in;
+    itim1_in = init_mem_in;
+    dtim0_in = init_mem_in;
+    dtim1_in = init_mem_in;
 
     ibridge0_in = init_mem_in;
     ibridge1_in = init_mem_in;
     dbridge0_in = init_mem_in;
     dbridge1_in = init_mem_in;
 
-    itim0_rev   = itim0_rev_reg;
-    itim1_rev   = itim1_rev_reg;
-    dtim0_rev   = dtim0_rev_reg;
-    dtim1_rev   = dtim1_rev_reg;
+    itim0_rev = itim0_rev_reg;
+    itim1_rev = itim1_rev_reg;
+    dtim0_rev = dtim0_rev_reg;
+    dtim1_rev = dtim1_rev_reg;
 
     itim0_hit_i = ~|(ITIM_BASE ^ (imem0_in.mem_addr & ITIM_MASK));
     dtim0_hit_i = ~|(DTIM_BASE ^ (imem0_in.mem_addr & DTIM_MASK));

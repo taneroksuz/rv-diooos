@@ -4,20 +4,20 @@ import wires::*;
 module testbench ();
   timeunit 1ns; timeprecision 1ps;
 
-  logic reset;
-  logic clock;
-  logic sclk;
-  logic mosi;
-  logic miso = 1'b1;
-  logic ss;
-  logic rx = 1'b1;
-  logic tx;
+  logic       reset;
+  logic       clock;
+  logic       sclk;
+  logic       mosi;
+  logic       miso = 1'b1;
+  logic       ss;
+  logic       rx = 1'b1;
+  logic       tx;
   logic [1:0] clear;
 
-  mem_in_type ram_in;
+  mem_in_type  ram_in;
   mem_out_type ram_out;
 
-  logic [31:0] host[0:0];
+  logic [31:0] host                [0:0];
   logic [31:0] stoptime = 10000000;
   logic [31:0] counter = 0;
 

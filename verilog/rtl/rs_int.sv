@@ -45,10 +45,10 @@ module rs_int (
       rs_o: init_rs_int_out
   };
 
-  rs_entry_type array[0:RS_INT_DEPTH-1];
-  rs_entry_type view[0:RS_INT_DEPTH-1];
-  rs_entry_type woken[0:RS_INT_DEPTH-1];
-  logic [RS_INT_DEPTH-1:0] ready_vec;
+  rs_entry_type                    array     [0:RS_INT_DEPTH-1];
+  rs_entry_type                    view      [0:RS_INT_DEPTH-1];
+  rs_entry_type                    woken     [0:RS_INT_DEPTH-1];
+  logic         [RS_INT_DEPTH-1:0] ready_vec;
   rs_int_reg_type r, rin, v;
 
   always_comb begin
@@ -72,11 +72,10 @@ module rs_int (
       woken[i] = rs_wakeup(woken[i], rs_in.cdb_load1);
       woken[i] = rs_wakeup(woken[i], rs_in.cdb_commit0);
       woken[i] = rs_wakeup(woken[i], rs_in.cdb_commit1);
-      ready_vec[i] = woken[i].valid & woken[i].src1_ready & woken[i].src2_ready &
-                     ~rs_in.div_busy & ~rs_in.clmul_busy &
-                     ~(woken[i].op.csreg & (r.csr_inflight > 0)) &
-                     ~(woken[i].op.csreg & r.csr_drain) &
-                     ~(woken[i].op.csreg & (woken[i].rob_tag != rs_in.rob_head));
+      ready_vec[i] = woken[i].valid & woken[i].src1_ready &
+          woken[i].src2_ready & ~rs_in.div_busy & ~rs_in.clmul_busy & ~(
+          woken[i].op.csreg & (r.csr_inflight > 0)) & ~(woken[i].op.csreg & r.csr_drain) & ~(
+          woken[i].op.csreg & (woken[i].rob_tag != rs_in.rob_head));
     end
 
     for (int i = RS_INT_DEPTH - 1; i >= 0; i--) begin
@@ -86,13 +85,10 @@ module rs_int (
       end
     end
     for (int i = RS_INT_DEPTH - 1; i >= 0; i--) begin
-      if (ready_vec[i] &&
-          (RS_ADDR_BITS'(unsigned'(i)) != v.sel0_idx) &&
-          !(v.sel0_found && (
-            (woken[v.sel0_idx].op.division && woken[i].op.division) ||
-            (woken[v.sel0_idx].op.bitc && woken[i].op.bitc) ||
-            (woken[v.sel0_idx].op.mult && woken[i].op.mult)
-          ))) begin
+      if (ready_vec[i] && (RS_ADDR_BITS'(unsigned'(i)) != v.sel0_idx) &&
+          !(v.sel0_found && ((woken[v.sel0_idx].op.division && woken[i].op.division) ||
+                             (woken[v.sel0_idx].op.bitc && woken[i].op.bitc) ||
+                             (woken[v.sel0_idx].op.mult && woken[i].op.mult)))) begin
         v.sel1_idx   = RS_ADDR_BITS'(unsigned'(i));
         v.sel1_found = 1'b1;
       end
@@ -101,8 +97,8 @@ module rs_int (
     for (int i = 0; i < RS_INT_DEPTH; i++) begin
       logic issue_free;
       issue_free = (v.sel0_found && (v.sel0_idx == RS_ADDR_BITS'(unsigned'(i)))) ||
-                   (v.sel1_found && !(v.sel0_found && woken[v.sel0_idx].op.csreg) &&
-                    (v.sel1_idx == RS_ADDR_BITS'(unsigned'(i))));
+          (v.sel1_found && !(v.sel0_found && woken[v.sel0_idx].op.csreg) &&
+           (v.sel1_idx == RS_ADDR_BITS'(unsigned'(i))));
       if ((!woken[i].valid || issue_free) && !v.free_found0) begin
         v.free_idx0   = RS_ADDR_BITS'(unsigned'(i));
         v.free_found0 = 1'b1;
@@ -128,7 +124,7 @@ module rs_int (
     v.rs_o.full         = (r.count >= (RS_ADDR_BITS + 1)'(RS_INT_DEPTH - 1));
     v.rs_o.has_two_free = (r.count <= (RS_ADDR_BITS + 1)'(RS_INT_DEPTH - 2));
 
-    v.rs_o.csr_rin      = '0;
+    v.rs_o.csr_rin = '0;
     if (v.sel0_found && woken[v.sel0_idx].op.csreg) begin
       v.rs_o.csr_rin.crden  = 1'b1;
       v.rs_o.csr_rin.craddr = woken[v.sel0_idx].caddr;
@@ -194,11 +190,13 @@ module rs_int (
       for (int i = 0; i < RS_INT_DEPTH; i++) begin
         if (rs_in.alloc0 && rin.free_found0 && (rin.free_idx0 == RS_ADDR_BITS'(unsigned'(i)))) begin
           array[i] <= rs_in.entry0;
-        end else if (rs_in.alloc1 && rin.free_found1 && (rin.free_idx1 == RS_ADDR_BITS'(unsigned'(i)))) begin
+        end else if (rs_in.alloc1 && rin.free_found1 &&
+                     (rin.free_idx1 == RS_ADDR_BITS'(unsigned'(i)))) begin
           array[i] <= rs_in.entry1;
-        end else if (r.valid_bits[i] && rin.valid_bits[i] &&
-                     !((rin.sel0_found && (rin.sel0_idx == RS_ADDR_BITS'(unsigned'(i)))) ||
-                       (rin.rs_o.issue1_valid && (rin.sel1_idx == RS_ADDR_BITS'(unsigned'(i)))))) begin
+        end else
+            if (r.valid_bits[i] && rin.valid_bits[i] &&
+                !((rin.sel0_found && (rin.sel0_idx == RS_ADDR_BITS'(unsigned'(i)))) ||
+                  (rin.rs_o.issue1_valid && (rin.sel1_idx == RS_ADDR_BITS'(unsigned'(i)))))) begin
           array[i] <= woken[i];
         end
       end

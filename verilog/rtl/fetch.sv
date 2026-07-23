@@ -17,7 +17,7 @@ module fetch (
 
   always_comb begin
 
-    v       = r;
+    v = r;
 
     v.valid = 0;
     v.stall = fetch_in.buffer_out.stall;
@@ -127,26 +127,26 @@ module fetch (
       end
     endcase
 
-    fetch_out.buffer_in.pc0       = r.ipc0;
-    fetch_out.buffer_in.pc1       = r.ipc1;
-    fetch_out.buffer_in.rdata     = v.rdata;
-    fetch_out.buffer_in.ready     = v.ready;
-    fetch_out.buffer_in.clear     = v.flush;
-    fetch_out.buffer_in.stall     = stall;
+    fetch_out.buffer_in.pc0   = r.ipc0;
+    fetch_out.buffer_in.pc1   = r.ipc1;
+    fetch_out.buffer_in.rdata = v.rdata;
+    fetch_out.buffer_in.ready = v.ready;
+    fetch_out.buffer_in.clear = v.flush;
+    fetch_out.buffer_in.stall = stall;
 
-    fetch_out.imem0_in.mem_valid  = v.valid;
-    fetch_out.imem0_in.mem_instr  = 1;
-    fetch_out.imem0_in.mem_mode   = 0;
-    fetch_out.imem0_in.mem_addr   = v.ipc0;
-    fetch_out.imem0_in.mem_wdata  = 0;
-    fetch_out.imem0_in.mem_wstrb  = 0;
+    fetch_out.imem0_in.mem_valid = v.valid;
+    fetch_out.imem0_in.mem_instr = 1;
+    fetch_out.imem0_in.mem_mode  = 0;
+    fetch_out.imem0_in.mem_addr  = v.ipc0;
+    fetch_out.imem0_in.mem_wdata = 0;
+    fetch_out.imem0_in.mem_wstrb = 0;
 
-    fetch_out.imem1_in.mem_valid  = v.valid;
-    fetch_out.imem1_in.mem_instr  = 1;
-    fetch_out.imem1_in.mem_mode   = 0;
-    fetch_out.imem1_in.mem_addr   = v.ipc1;
-    fetch_out.imem1_in.mem_wdata  = 0;
-    fetch_out.imem1_in.mem_wstrb  = 0;
+    fetch_out.imem1_in.mem_valid = v.valid;
+    fetch_out.imem1_in.mem_instr = 1;
+    fetch_out.imem1_in.mem_mode  = 0;
+    fetch_out.imem1_in.mem_addr  = v.ipc1;
+    fetch_out.imem1_in.mem_wdata = 0;
+    fetch_out.imem1_in.mem_wstrb = 0;
 
     fetch_out.btac_in.get_pc0     = v.pc0;
     fetch_out.btac_in.get_pc1     = v.pc1;
@@ -163,14 +163,14 @@ module fetch (
     fetch_out.btac_in.upd_pred0   = fetch_in.entry0.pred;
     fetch_out.btac_in.upd_pred1   = fetch_in.entry1.pred;
 
-    fetch_out.pc0                 = v.pc0;
-    fetch_out.pc1                 = v.pc1;
-    fetch_out.instr0              = v.instr0;
-    fetch_out.instr1              = v.instr1;
-    fetch_out.ready0              = v.ready0;
-    fetch_out.ready1              = v.ready1;
+    fetch_out.pc0    = v.pc0;
+    fetch_out.pc1    = v.pc1;
+    fetch_out.instr0 = v.instr0;
+    fetch_out.instr1 = v.instr1;
+    fetch_out.ready0 = v.ready0;
+    fetch_out.ready1 = v.ready1;
 
-    rin                           = v;
+    rin = v;
 
   end
 

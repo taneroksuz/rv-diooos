@@ -69,25 +69,27 @@ module eu (
 
     v = r;
 
-    v.cdb0 = init_cdb;
-    v.cdb1 = init_cdb;
-    v.rob_wtag0 = eu_in.int_issue0.rob_tag;
-    v.rob_wentry0 = init_rob_entry;
-    v.rob_wen0 = 1'b0;
-    v.rob_wtag1 = eu_in.int_issue1.rob_tag;
-    v.rob_wentry1 = init_rob_entry;
-    v.rob_wen1 = 1'b0;
-    v.rob_wtag_store0 = eu_in.mem_issue0.rob_tag;
+    v.cdb0              = init_cdb;
+    v.cdb1              = init_cdb;
+    v.rob_wtag0         = eu_in.int_issue0.rob_tag;
+    v.rob_wentry0       = init_rob_entry;
+    v.rob_wen0          = 1'b0;
+    v.rob_wtag1         = eu_in.int_issue1.rob_tag;
+    v.rob_wentry1       = init_rob_entry;
+    v.rob_wen1          = 1'b0;
+    v.rob_wtag_store0   = eu_in.mem_issue0.rob_tag;
     v.rob_wentry_store0 = init_rob_entry;
-    v.rob_wen_store0 = 1'b0;
-    v.rob_wtag_store1 = eu_in.mem_issue1.rob_tag;
+    v.rob_wen_store0    = 1'b0;
+    v.rob_wtag_store1   = eu_in.mem_issue1.rob_tag;
     v.rob_wentry_store1 = init_rob_entry;
-    v.rob_wen_store1 = 1'b0;
+    v.rob_wen_store1    = 1'b0;
 
     div_issue0 = eu_in.int_issue0_valid & eu_in.int_issue0.op.division & ~r.div_pending_valid;
-    div_issue1   = eu_in.int_issue1_valid & eu_in.int_issue1.op.division & ~r.div_pending_valid & ~div_issue0;
+    div_issue1 = eu_in.int_issue1_valid &
+        eu_in.int_issue1.op.division & ~r.div_pending_valid & ~div_issue0;
     clmul_issue0 = eu_in.int_issue0_valid & eu_in.int_issue0.op.bitc & ~r.clmul_pending_valid;
-    clmul_issue1 = eu_in.int_issue1_valid & eu_in.int_issue1.op.bitc    & ~r.clmul_pending_valid & ~clmul_issue0;
+    clmul_issue1 = eu_in.int_issue1_valid &
+        eu_in.int_issue1.op.bitc & ~r.clmul_pending_valid & ~clmul_issue0;
 
     if (flush) begin
       v.div_pending_valid   = 1'b0;
@@ -115,59 +117,59 @@ module eu (
     end
 
     eu_out.agu0_in.rdata1 = eu_in.int_issue0.rdata1;
-    eu_out.agu0_in.imm = eu_in.int_issue0.imm;
-    eu_out.agu0_in.pc = eu_in.int_issue0.pc;
-    eu_out.agu0_in.auipc = eu_in.int_issue0.op.auipc;
-    eu_out.agu0_in.jal = eu_in.int_issue0.op.jal;
-    eu_out.agu0_in.jalr = eu_in.int_issue0.op.jalr;
+    eu_out.agu0_in.imm    = eu_in.int_issue0.imm;
+    eu_out.agu0_in.pc     = eu_in.int_issue0.pc;
+    eu_out.agu0_in.auipc  = eu_in.int_issue0.op.auipc;
+    eu_out.agu0_in.jal    = eu_in.int_issue0.op.jal;
+    eu_out.agu0_in.jalr   = eu_in.int_issue0.op.jalr;
     eu_out.agu0_in.branch = eu_in.int_issue0.op.branch;
-    eu_out.agu0_in.load = 1'b0;
-    eu_out.agu0_in.store = 1'b0;
+    eu_out.agu0_in.load   = 1'b0;
+    eu_out.agu0_in.store  = 1'b0;
     eu_out.agu0_in.lsu_op = init_lsu_op;
 
     eu_out.agu1_in.rdata1 = eu_in.int_issue1.rdata1;
-    eu_out.agu1_in.imm = eu_in.int_issue1.imm;
-    eu_out.agu1_in.pc = eu_in.int_issue1.pc;
-    eu_out.agu1_in.auipc = eu_in.int_issue1.op.auipc;
-    eu_out.agu1_in.jal = eu_in.int_issue1.op.jal;
-    eu_out.agu1_in.jalr = eu_in.int_issue1.op.jalr;
+    eu_out.agu1_in.imm    = eu_in.int_issue1.imm;
+    eu_out.agu1_in.pc     = eu_in.int_issue1.pc;
+    eu_out.agu1_in.auipc  = eu_in.int_issue1.op.auipc;
+    eu_out.agu1_in.jal    = eu_in.int_issue1.op.jal;
+    eu_out.agu1_in.jalr   = eu_in.int_issue1.op.jalr;
     eu_out.agu1_in.branch = eu_in.int_issue1.op.branch;
-    eu_out.agu1_in.load = 1'b0;
-    eu_out.agu1_in.store = 1'b0;
+    eu_out.agu1_in.load   = 1'b0;
+    eu_out.agu1_in.store  = 1'b0;
     eu_out.agu1_in.lsu_op = init_lsu_op;
 
     eu_out.agu2_in.rdata1 = eu_in.mem_issue0.rdata1;
-    eu_out.agu2_in.imm = eu_in.mem_issue0.imm;
-    eu_out.agu2_in.pc = eu_in.mem_issue0.pc;
-    eu_out.agu2_in.auipc = 1'b0;
-    eu_out.agu2_in.jal = 1'b0;
-    eu_out.agu2_in.jalr = 1'b0;
+    eu_out.agu2_in.imm    = eu_in.mem_issue0.imm;
+    eu_out.agu2_in.pc     = eu_in.mem_issue0.pc;
+    eu_out.agu2_in.auipc  = 1'b0;
+    eu_out.agu2_in.jal    = 1'b0;
+    eu_out.agu2_in.jalr   = 1'b0;
     eu_out.agu2_in.branch = 1'b0;
-    eu_out.agu2_in.load = eu_in.mem_issue0.op.load;
-    eu_out.agu2_in.store = eu_in.mem_issue0.op.store;
+    eu_out.agu2_in.load   = eu_in.mem_issue0.op.load;
+    eu_out.agu2_in.store  = eu_in.mem_issue0.op.store;
     eu_out.agu2_in.lsu_op = eu_in.mem_issue0.lsu_op;
 
     eu_out.agu3_in.rdata1 = eu_in.mem_issue1.rdata1;
-    eu_out.agu3_in.imm = eu_in.mem_issue1.imm;
-    eu_out.agu3_in.pc = eu_in.mem_issue1.pc;
-    eu_out.agu3_in.auipc = 1'b0;
-    eu_out.agu3_in.jal = 1'b0;
-    eu_out.agu3_in.jalr = 1'b0;
+    eu_out.agu3_in.imm    = eu_in.mem_issue1.imm;
+    eu_out.agu3_in.pc     = eu_in.mem_issue1.pc;
+    eu_out.agu3_in.auipc  = 1'b0;
+    eu_out.agu3_in.jal    = 1'b0;
+    eu_out.agu3_in.jalr   = 1'b0;
     eu_out.agu3_in.branch = 1'b0;
-    eu_out.agu3_in.load = eu_in.mem_issue1.op.load;
-    eu_out.agu3_in.store = eu_in.mem_issue1.op.store;
+    eu_out.agu3_in.load   = eu_in.mem_issue1.op.load;
+    eu_out.agu3_in.store  = eu_in.mem_issue1.op.store;
     eu_out.agu3_in.lsu_op = eu_in.mem_issue1.lsu_op;
 
     eu_out.alu0_in.rdata1 = eu_in.int_issue0.rdata1;
     eu_out.alu0_in.rdata2 = eu_in.int_issue0.rdata2;
-    eu_out.alu0_in.imm = eu_in.int_issue0.imm;
-    eu_out.alu0_in.sel = eu_in.int_issue0.op.rden2;
+    eu_out.alu0_in.imm    = eu_in.int_issue0.imm;
+    eu_out.alu0_in.sel    = eu_in.int_issue0.op.rden2;
     eu_out.alu0_in.alu_op = eu_in.int_issue0.alu_op;
 
     eu_out.alu1_in.rdata1 = eu_in.int_issue1.rdata1;
     eu_out.alu1_in.rdata2 = eu_in.int_issue1.rdata2;
-    eu_out.alu1_in.imm = eu_in.int_issue1.imm;
-    eu_out.alu1_in.sel = eu_in.int_issue1.op.rden2;
+    eu_out.alu1_in.imm    = eu_in.int_issue1.imm;
+    eu_out.alu1_in.sel    = eu_in.int_issue1.op.rden2;
     eu_out.alu1_in.alu_op = eu_in.int_issue1.alu_op;
 
     eu_out.bcu0_in.rdata1 = eu_in.int_issue0.rdata1;
@@ -183,12 +185,12 @@ module eu (
     branch0_taken = eu_in.int_issue0.op.branch & eu_in.bcu0_out.branch;
     branch1_taken = eu_in.int_issue1.op.branch & eu_in.bcu1_out.branch;
 
-    eu_out.mul_in.rdata1 = eu_in.int_issue0.op.mult ? eu_in.int_issue0.rdata1
-                                                     : eu_in.int_issue1.rdata1;
-    eu_out.mul_in.rdata2 = eu_in.int_issue0.op.mult ? eu_in.int_issue0.rdata2
-                                                     : eu_in.int_issue1.rdata2;
-    eu_out.mul_in.mul_op = eu_in.int_issue0.op.mult ? eu_in.int_issue0.mul_op
-                                                     : eu_in.int_issue1.mul_op;
+    eu_out.mul_in.rdata1 = eu_in.int_issue0.op.mult ? eu_in.int_issue0.rdata1 :
+        eu_in.int_issue1.rdata1;
+    eu_out.mul_in.rdata2 = eu_in.int_issue0.op.mult ? eu_in.int_issue0.rdata2 :
+        eu_in.int_issue1.rdata2;
+    eu_out.mul_in.mul_op = eu_in.int_issue0.op.mult ? eu_in.int_issue0.mul_op :
+        eu_in.int_issue1.mul_op;
 
     eu_out.div_in.rdata1 = div_issue0 ? eu_in.int_issue0.rdata1 : eu_in.int_issue1.rdata1;
     eu_out.div_in.rdata2 = div_issue0 ? eu_in.int_issue0.rdata2 : eu_in.int_issue1.rdata2;
@@ -197,32 +199,34 @@ module eu (
 
     eu_out.bit_alu0_in.rdata1 = eu_in.int_issue0.rdata1;
     eu_out.bit_alu0_in.rdata2 = eu_in.int_issue0.rdata2;
-    eu_out.bit_alu0_in.imm = eu_in.int_issue0.imm;
-    eu_out.bit_alu0_in.sel = eu_in.int_issue0.op.rden2;
+    eu_out.bit_alu0_in.imm    = eu_in.int_issue0.imm;
+    eu_out.bit_alu0_in.sel    = eu_in.int_issue0.op.rden2;
     eu_out.bit_alu0_in.bit_op = eu_in.int_issue0.bit_op;
 
     eu_out.bit_alu1_in.rdata1 = eu_in.int_issue1.rdata1;
     eu_out.bit_alu1_in.rdata2 = eu_in.int_issue1.rdata2;
-    eu_out.bit_alu1_in.imm = eu_in.int_issue1.imm;
-    eu_out.bit_alu1_in.sel = eu_in.int_issue1.op.rden2;
+    eu_out.bit_alu1_in.imm    = eu_in.int_issue1.imm;
+    eu_out.bit_alu1_in.sel    = eu_in.int_issue1.op.rden2;
     eu_out.bit_alu1_in.bit_op = eu_in.int_issue1.bit_op;
 
     eu_out.bit_clmul_in.rdata1 = clmul_issue0 ? eu_in.int_issue0.rdata1 : eu_in.int_issue1.rdata1;
     eu_out.bit_clmul_in.rdata2 = clmul_issue0 ? eu_in.int_issue0.rdata2 : eu_in.int_issue1.rdata2;
     eu_out.bit_clmul_in.enable = clmul_issue0 | clmul_issue1;
-    eu_out.bit_clmul_in.op     = clmul_issue0 ? eu_in.int_issue0.bit_op.bit_zbc
-                                               : eu_in.int_issue1.bit_op.bit_zbc;
+    eu_out.bit_clmul_in.op = clmul_issue0 ? eu_in.int_issue0.bit_op.bit_zbc :
+        eu_in.int_issue1.bit_op.bit_zbc;
 
     eu_out.csr_alu0_in.cdata = eu_in.csr.cdata;
     eu_out.csr_alu0_in.rdata1 = eu_in.int_issue0.rdata1;
     eu_out.csr_alu0_in.imm = eu_in.int_issue0.imm;
-    eu_out.csr_alu0_in.sel    = eu_in.int_issue0.csr_op.csrrwi | eu_in.int_issue0.csr_op.csrrsi | eu_in.int_issue0.csr_op.csrrci;
+    eu_out.csr_alu0_in.sel = eu_in.int_issue0.csr_op.csrrwi | eu_in.int_issue0.csr_op.csrrsi |
+        eu_in.int_issue0.csr_op.csrrci;
     eu_out.csr_alu0_in.csr_op = eu_in.int_issue0.csr_op;
 
     eu_out.csr_alu1_in.cdata = eu_in.csr.cdata;
     eu_out.csr_alu1_in.rdata1 = eu_in.int_issue1.rdata1;
     eu_out.csr_alu1_in.imm = eu_in.int_issue1.imm;
-    eu_out.csr_alu1_in.sel    = eu_in.int_issue1.csr_op.csrrwi | eu_in.int_issue1.csr_op.csrrsi | eu_in.int_issue1.csr_op.csrrci;
+    eu_out.csr_alu1_in.sel = eu_in.int_issue1.csr_op.csrrwi | eu_in.int_issue1.csr_op.csrrsi |
+        eu_in.int_issue1.csr_op.csrrci;
     eu_out.csr_alu1_in.csr_op = eu_in.int_issue1.csr_op;
 
     eu0_result = eu_result(
@@ -297,10 +301,9 @@ module eu (
         v.rob_wentry0.branch = eu_in.int_issue0.op.branch;
         v.rob_wentry0.jump = eu_in.int_issue0.op.jal | eu_in.int_issue0.op.jalr | branch0_taken;
         v.rob_wentry0.exception = eu_in.int_issue0.op.ecall | eu_in.int_issue0.op.ebreak |
-                                  eu_in.agu0_out.exception;
-        v.rob_wentry0.ecause    = eu_in.int_issue0.op.ecall  ? except_env_call_user :
-                                  eu_in.int_issue0.op.ebreak ? except_breakpoint    :
-                                                               eu_in.agu0_out.ecause;
+            eu_in.agu0_out.exception;
+        v.rob_wentry0.ecause = eu_in.int_issue0.op.ecall ? except_env_call_user :
+            eu_in.int_issue0.op.ebreak ? except_breakpoint : eu_in.agu0_out.ecause;
         v.rob_wentry0.etval = eu_in.agu0_out.etval;
         v.rob_wentry0.cwdata = eu_in.csr_alu0_out.cdata;
       end
@@ -336,10 +339,9 @@ module eu (
         v.rob_wentry1.branch = eu_in.int_issue1.op.branch;
         v.rob_wentry1.jump = eu_in.int_issue1.op.jal | eu_in.int_issue1.op.jalr | branch1_taken;
         v.rob_wentry1.exception = eu_in.int_issue1.op.ecall | eu_in.int_issue1.op.ebreak |
-                                  eu_in.agu1_out.exception;
-        v.rob_wentry1.ecause    = eu_in.int_issue1.op.ecall  ? except_env_call_user :
-                                  eu_in.int_issue1.op.ebreak ? except_breakpoint    :
-                                                               eu_in.agu1_out.ecause;
+            eu_in.agu1_out.exception;
+        v.rob_wentry1.ecause = eu_in.int_issue1.op.ecall ? except_env_call_user :
+            eu_in.int_issue1.op.ebreak ? except_breakpoint : eu_in.agu1_out.ecause;
         v.rob_wentry1.etval = eu_in.agu1_out.etval;
         v.rob_wentry1.cwdata = eu_in.csr_alu1_out.cdata;
       end
@@ -369,7 +371,7 @@ module eu (
 
     end
 
-    rin                      = v;
+    rin = v;
 
     eu_out.cdb0              = r.cdb0;
     eu_out.cdb1              = r.cdb1;

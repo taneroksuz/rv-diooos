@@ -12,57 +12,65 @@ module rename (
   timeunit 1ns; timeprecision 1ps;
 
   typedef struct packed {
-    logic i0_is_mem;
-    logic i1_is_mem;
-    logic need_fl0;
-    logic need_fl1;
-    logic rs0_ok;
-    logic rs1_ok;
-    logic can_dispatch0;
-    logic can_dispatch1;
-    logic stall;
+    logic                     i0_is_mem;
+    logic                     i1_is_mem;
+    logic                     need_fl0;
+    logic                     need_fl1;
+    logic                     rs0_ok;
+    logic                     rs1_ok;
+    logic                     can_dispatch0;
+    logic                     can_dispatch1;
+    logic                     stall;
     logic [PRF_ADDR_BITS-1:0] pdest0;
     logic [PRF_ADDR_BITS-1:0] pdest1;
-    rs_entry_type e0;
-    rs_entry_type e1;
-    rs_entry_type em0;
-    rs_entry_type em1;
-    rename_out_type rename_out;
+    rs_entry_type             e0;
+    rs_entry_type             e1;
+    rs_entry_type             em0;
+    rs_entry_type             em1;
+    rename_out_type           rename_out;
   } rename_reg_type;
 
   rename_reg_type v;
-  cdb_type cdb_load_any;
+  cdb_type        cdb_load_any;
 
   always_comb begin
-    v = '0;
+    v            = '0;
     v.rename_out = '0;
     cdb_load_any = rename_in.cdb_load0.valid ? rename_in.cdb_load0 : rename_in.cdb_load1;
 
     v.i0_is_mem = rename_in.instr0.op.load | rename_in.instr0.op.store;
     v.i1_is_mem = rename_in.instr1.op.load | rename_in.instr1.op.store;
-    v.need_fl0 = rename_in.instr0_valid && rename_in.instr0.op.wren && (rename_in.instr0.waddr != 5'h0);
-    v.need_fl1 = rename_in.instr1_valid && rename_in.instr1.op.wren && (rename_in.instr1.waddr != 5'h0);
-    v.rs0_ok = rename_in.instr0_valid ? (v.i0_is_mem ? !rename_in.rs_mem_full : !rename_in.rs_int_full) : 1'b1;
+    v.need_fl0 = rename_in.instr0_valid && rename_in.instr0.op.wren &&
+        (rename_in.instr0.waddr != 5'h0);
+    v.need_fl1 = rename_in.instr1_valid && rename_in.instr1.op.wren &&
+        (rename_in.instr1.waddr != 5'h0);
+    v.rs0_ok = rename_in.instr0_valid ?
+        (v.i0_is_mem ? !rename_in.rs_mem_full : !rename_in.rs_int_full) : 1'b1;
     if (rename_in.instr1_valid) begin
       if (v.i1_is_mem) begin
-        v.rs1_ok = (rename_in.instr0_valid && v.i0_is_mem) ? rename_in.rs_mem_has_two : !rename_in.rs_mem_full;
+        v.rs1_ok = (rename_in.instr0_valid && v.i0_is_mem) ? rename_in.rs_mem_has_two :
+            !rename_in.rs_mem_full;
       end else begin
-        v.rs1_ok = (rename_in.instr0_valid && !v.i0_is_mem) ? rename_in.rs_int_has_two : !rename_in.rs_int_full;
+        v.rs1_ok = (rename_in.instr0_valid && !v.i0_is_mem) ? rename_in.rs_int_has_two :
+            !rename_in.rs_int_full;
       end
     end else begin
       v.rs1_ok = 1'b1;
     end
-    v.can_dispatch0 = rename_in.instr0_valid && !rename_in.rob_full && (!v.need_fl0 || rename_in.fl.alloc_ok0) && v.rs0_ok && !flush;
+    v.can_dispatch0 = rename_in.instr0_valid && !rename_in.rob_full &&
+        (!v.need_fl0 || rename_in.fl.alloc_ok0) && v.rs0_ok && !flush;
     v.can_dispatch1 = rename_in.instr1_valid && v.can_dispatch0 && rename_in.rob_has_two &&
-                      (!v.need_fl1 || (v.need_fl0 ? rename_in.fl.alloc_ok1 : rename_in.fl.alloc_ok0)) &&
-                      v.rs1_ok && !flush;
-    v.stall = (rename_in.instr0_valid && !v.can_dispatch0) || (rename_in.instr1_valid && !v.can_dispatch1);
+        (!v.need_fl1 || (v.need_fl0 ? rename_in.fl.alloc_ok1 : rename_in.fl.alloc_ok0)) &&
+        v.rs1_ok && !flush;
+    v.stall = (rename_in.instr0_valid && !v.can_dispatch0) ||
+        (rename_in.instr1_valid && !v.can_dispatch1);
     if (v.stall) begin
       v.can_dispatch0 = 1'b0;
       v.can_dispatch1 = 1'b0;
     end
     v.pdest0 = v.need_fl0 ? rename_in.fl.alloc_tag0 : PRF_ADDR_BITS'(0);
-    v.pdest1 = v.need_fl1 ? (v.need_fl0 ? rename_in.fl.alloc_tag1 : rename_in.fl.alloc_tag0) : PRF_ADDR_BITS'(0);
+    v.pdest1 = v.need_fl1 ? (v.need_fl0 ? rename_in.fl.alloc_tag1 : rename_in.fl.alloc_tag0) :
+        PRF_ADDR_BITS'(0);
 
     v.rename_out.stall = v.stall;
     v.rename_out.fl.alloc0 = v.can_dispatch0 && v.need_fl0;
@@ -73,10 +81,12 @@ module rename (
     v.rename_out.rat.rsrc3_a = rename_in.instr1.op.rden2 ? rename_in.instr1.raddr2 : 5'h0;
     v.rename_out.rat.waddr0_a = rename_in.instr0.waddr;
     v.rename_out.rat.waddr0_p = v.pdest0;
-    v.rename_out.rat.wren0 = v.can_dispatch0 && rename_in.instr0.op.wren && (rename_in.instr0.waddr != 5'h0);
+    v.rename_out.rat.wren0 = v.can_dispatch0 && rename_in.instr0.op.wren &&
+        (rename_in.instr0.waddr != 5'h0);
     v.rename_out.rat.waddr1_a = rename_in.instr1.waddr;
     v.rename_out.rat.waddr1_p = v.pdest1;
-    v.rename_out.rat.wren1 = v.can_dispatch1 && rename_in.instr1.op.wren && (rename_in.instr1.waddr != 5'h0);
+    v.rename_out.rat.wren1 = v.can_dispatch1 && rename_in.instr1.op.wren &&
+        (rename_in.instr1.waddr != 5'h0);
     v.rename_out.rob_alloc0 = v.can_dispatch0;
     v.rename_out.rob_alloc1 = v.can_dispatch1;
 
@@ -178,9 +188,9 @@ module rename (
     v.e1.mul_op = rename_in.instr1.mul_op;
     v.e1.bit_op = rename_in.instr1.bit_op;
 
-    v.em0 = v.e0;
+    v.em0       = v.e0;
     v.em0.valid = v.can_dispatch0 && v.i0_is_mem;
-    v.em1 = v.e1;
+    v.em1       = v.e1;
     v.em1.valid = v.can_dispatch1 && v.i1_is_mem;
 
     v.rename_out.rs_int_alloc0 = v.e0.valid;
